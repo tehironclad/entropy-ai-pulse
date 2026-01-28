@@ -532,6 +532,25 @@
       margin-right: 24px;
     }
 
+    .ai-message.system {
+      background: rgba(99, 102, 241, 0.1);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      margin-right: 24px;
+      font-size: 13px;
+    }
+
+    .ai-message.result {
+      background: rgba(34, 197, 94, 0.1);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      margin-right: 24px;
+    }
+
+    .ai-message.error {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      margin-right: 24px;
+    }
+
     .ai-message pre {
       background: var(--bg-primary);
       padding: 12px;
@@ -1035,28 +1054,31 @@ Quick tips:
 
       <div class="ai-messages" id="aiMessages">
         <div class="ai-message assistant">
-          👋 Hi! I'm Claude, your AI assistant for PulseChain contracts.
+          👋 Hi! I'm Claude, your AI agent for PulseChain contracts.
 
-I can help you:
-• Analyze unknown function selectors
-• Explain what contract functions do
-• Debug transaction errors
-• Decode bytecode patterns
+I can <strong>execute functions</strong> for you! Try:
+• "What's the total supply?"
+• "Check my balance"
+• "Who owns this contract?"
+• "What's the current Entropy?"
+• "Call Beat()" (I'll prepare it, you approve)
 
-Configure your API key to get started, or use the quick actions below to copy prompts for manual use.
+I can also analyze bytecode, explain functions, and help debug.
+
+Configure your API key to get started!
         </div>
       </div>
 
       <div class="ai-input-container">
         <div class="ai-input-wrapper">
-          <textarea class="ai-input" id="aiInput" placeholder="Ask Claude about this contract..." rows="2"></textarea>
+          <textarea class="ai-input" id="aiInput" placeholder="Ask Claude anything... 'What's my balance?' 'Call Beat()'" rows="2"></textarea>
           <button class="btn btn-primary" onclick="sendToAI()">Send</button>
         </div>
         <div class="ai-quick-actions">
+          <button class="ai-quick-btn" onclick="quickAction('supply')">Total Supply</button>
+          <button class="ai-quick-btn" onclick="quickAction('owner')">Check Owner</button>
+          <button class="ai-quick-btn" onclick="quickAction('balance')">My Balance</button>
           <button class="ai-quick-btn" onclick="quickAction('explain')">Explain Contract</button>
-          <button class="ai-quick-btn" onclick="quickAction('functions')">List Functions</button>
-          <button class="ai-quick-btn" onclick="quickAction('unknown')">Analyze Unknown</button>
-          <button class="ai-quick-btn" onclick="quickAction('decode')">Decode Bytecode</button>
         </div>
       </div>
     </aside>
@@ -2189,6 +2211,102 @@ Once allowed, click "Connect Wallet" again.`);
       }
     }
 
+    // ═══════════════════════════════════════════════════════════════════════════
+    // AI AGENT - Can execute contract functions
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    async function executeFromAI(functionName, args = [], isRead = true) {
+      if (!currentAddress || !currentABI) {
+        return { success: false, error: 'No contract loaded' };
+      }
+
+      const fn = currentABI.find(f => f.type === 'function' && f.name === functionName);
+      if (!fn) {
+        return { success: false, error: `Function ${functionName} not found in ABI` };
+      }
+
+      try {
+        let result;
+        if (isRead) {
+          const contract = new ethers.Contract(currentAddress, currentABI, provider);
+          result = await contract[functionName](...args);
+          log(`AI called ${functionName}(${args.join(', ')})`, 'success');
+        } else {
+          if (!signer) {
+            await connectWallet();
+            if (!signer) {
+              return { success: false, error: 'Wallet not connected' };
+            }
+          }
+          const contract = new ethers.Contract(currentAddress, currentABI, signer);
+          const tx = await contract[functionName](...args);
+          log(`AI sent tx: ${tx.hash.slice(0, 16)}...`, 'success');
+          const receipt = await tx.wait();
+          result = { hash: tx.hash, blockNumber: receipt.blockNumber, status: 'confirmed' };
+        }
+        return { success: true, result: formatResult(result) };
+      } catch (e) {
+        return { success: false, error: e.message };
+      }
+    }
+
+    async function processAICommands(text) {
+      // Parse [[READ:function(args)]] and [[WRITE:function(args)]] commands
+      const readPattern = /\[\[READ:(\w+)\((.*?)\)\]\]/g;
+      const writePattern = /\[\[WRITE:(\w+)\((.*?)\)\]\]/g;
+      
+      let results = [];
+      let match;
+
+      // Process READ commands automatically
+      while ((match = readPattern.exec(text)) !== null) {
+        const fnName = match[1];
+        const argsStr = match[2].trim();
+        const args = argsStr ? argsStr.split(',').map(a => a.trim().replace(/^["']|["']$/g, '')) : [];
+        
+        addAIMessage(`⚡ Executing read: <code>${fnName}(${args.join(', ')})</code>...`, 'system');
+        const result = await executeFromAI(fnName, args, true);
+        
+        if (result.success) {
+          results.push({ fn: fnName, result: result.result });
+          addAIMessage(`✅ <strong>${fnName}()</strong> returned:\n<pre>${result.result}</pre>`, 'result');
+        } else {
+          addAIMessage(`❌ <strong>${fnName}()</strong> failed: ${result.error}`, 'error');
+        }
+      }
+
+      // Process WRITE commands - require confirmation
+      while ((match = writePattern.exec(text)) !== null) {
+        const fnName = match[1];
+        const argsStr = match[2].trim();
+        const args = argsStr ? argsStr.split(',').map(a => a.trim().replace(/^["']|["']$/g, '')) : [];
+        
+        // Populate the function builder instead of auto-executing
+        const fn = currentABI?.find(f => f.type === 'function' && f.name === fnName);
+        if (fn) {
+          selectFunction(fnName);
+          // Fill in params
+          args.forEach((arg, i) => {
+            const paramInput = document.getElementById(`param_${i}`);
+            if (paramInput) paramInput.value = arg;
+          });
+          addAIMessage(`⚠️ Write function prepared: <strong>${fnName}(${args.join(', ')})</strong>\n\n→ Check the Function Call panel and click "Write" to execute. Your wallet will prompt for approval.`, 'system');
+        } else {
+          addAIMessage(`❌ Function ${fnName} not found in ABI`, 'error');
+        }
+      }
+
+      return results;
+    }
+
+    function getConnectedWallet() {
+      const walletEl = document.getElementById('walletStatus');
+      if (walletEl && walletEl.classList.contains('connected')) {
+        return walletEl.textContent.trim();
+      }
+      return null;
+    }
+
     async function sendToAI() {
       const input = document.getElementById('aiInput').value.trim();
       if (!input) return;
@@ -2211,8 +2329,36 @@ Once allowed, click "Connect Wallet" again.`);
 
       try {
         const context = buildContext();
+        const walletAddr = getConnectedWallet();
         const apiUrl = USE_CORS_PROXY ? CORS_PROXY + encodeURIComponent(ANTHROPIC_API) : ANTHROPIC_API;
         
+        const systemPrompt = `You are an AI agent for Entropy AI, a PulseChain smart contract interface specializing in the Dysnomia/Atropa ecosystem.
+
+You have the ability to EXECUTE contract functions! Use these commands:
+- [[READ:functionName(arg1, arg2)]] - Execute a read/view function and get the result
+- [[WRITE:functionName(arg1, arg2)]] - Prepare a write function (user confirms in wallet)
+
+RULES FOR FUNCTION EXECUTION:
+1. For READ functions: Execute freely to answer user questions. Show them the actual data!
+2. For WRITE functions: Always explain what it will do BEFORE using [[WRITE:...]]. The user's wallet will prompt for approval.
+3. Use the EXACT function names from the ABI (case-sensitive)
+4. For address parameters, use the full 0x... address
+5. For uint256, use the raw number (no decimals adjustment unless asked)
+${walletAddr ? `6. Connected wallet: ${walletAddr} - use this for balance checks if user says "my"` : '6. No wallet connected yet'}
+
+EXAMPLES:
+- User: "What's the total supply?" → [[READ:totalSupply()]]
+- User: "Check my balance" → [[READ:balanceOf(${walletAddr || '0x...walletAddress'})]]
+- User: "Who owns this?" → [[READ:owner()]]
+- User: "What's the Entropy value?" → [[READ:Entropy()]]
+- User: "Call Beat" → First explain what Beat does, then [[WRITE:Beat()]]
+
+${context}
+
+User request: ${input}
+
+Respond conversationally. If the user asks about data, USE THE COMMANDS to fetch it - don't just describe what they could do. If analyzing bytecode or explaining concepts, respond normally without commands.`;
+
         const response = await fetch(apiUrl, {
           method: 'POST',
           headers: {
@@ -2225,33 +2371,7 @@ Once allowed, click "Connect Wallet" again.`);
             max_tokens: 2048,
             messages: [{
               role: 'user',
-              content: `You are an expert Ethereum/PulseChain smart contract reverse engineer specializing in bytecode analysis and the Dysnomia/Atropa ecosystem.
-
-${context}
-
-User question: ${input}
-
-IMPORTANT INSTRUCTIONS:
-1. When analyzing unknown selectors, search the bytecode for patterns to determine:
-   - Number of parameters (look for CALLDATALOAD patterns)
-   - Parameter types (addresses are 20 bytes, uint256 are 32 bytes)
-   - Whether it's view/pure (no SSTORE) or state-changing (has SSTORE)
-   - Return values (look for RETURN opcode context)
-
-2. For unknown functions, provide your BEST GUESS for the function signature, even if uncertain. Format as:
-   - 0xSELECTOR → likelyFunctionName(paramType1, paramType2) [VIEW/WRITE]
-
-3. When asked for an ABI, ALWAYS include entries for unknown selectors with your best guess at parameters.
-
-4. Common bytecode patterns:
-   - 63XXXXXXXX = PUSH4 (function selector)
-   - 6004 = PUSH1 04 (calldata offset)
-   - 35 = CALLDATALOAD
-   - 54 = SLOAD, 55 = SSTORE
-   - F3 = RETURN
-   - FD = REVERT
-
-Provide helpful, technical responses. Use code blocks for bytecode, ABIs, and function signatures.`
+              content: systemPrompt
             }]
           })
         });
@@ -2263,7 +2383,25 @@ Provide helpful, technical responses. Use code blocks for bytecode, ABIs, and fu
         messages.removeChild(messages.lastChild);
 
         if (data.content && data.content[0]) {
-          addAIMessage(data.content[0].text, 'assistant');
+          let responseText = data.content[0].text;
+          
+          // Check for commands and execute them
+          const hasCommands = responseText.includes('[[READ:') || responseText.includes('[[WRITE:');
+          
+          // Show Claude's response (strip out command syntax for cleaner display)
+          const cleanResponse = responseText
+            .replace(/\[\[READ:\w+\(.*?\)\]\]/g, '')
+            .replace(/\[\[WRITE:\w+\(.*?\)\]\]/g, '')
+            .trim();
+          
+          if (cleanResponse) {
+            addAIMessage(cleanResponse, 'assistant');
+          }
+          
+          // Execute any commands
+          if (hasCommands) {
+            await processAICommands(responseText);
+          }
         } else {
           addAIMessage('Error: ' + (data.error?.message || 'Unknown error'), 'assistant');
         }
@@ -2286,15 +2424,15 @@ Provide helpful, technical responses. Use code blocks for bytecode, ABIs, and fu
     function clearAIChat() {
       document.getElementById('aiMessages').innerHTML = `
         <div class="ai-message assistant">
-          👋 Chat cleared! Ready for new questions.
+          👋 Chat cleared! Ready for commands.
           
-I can help you:
-• Analyze unknown function selectors
-• Decode bytecode patterns
-• Generate complete ABIs
-• Explain contract functionality
+I can <strong>execute functions</strong> for you:
+• "What's the total supply?"
+• "Check my balance"
+• "Who owns this?"
+• "Call Beat()"
 
-Load a contract and ask me anything!
+Load a contract and try it!
         </div>
       `;
       log('AI chat cleared', 'info');
@@ -2381,6 +2519,15 @@ Load a contract and ask me anything!
       let prompt = '';
       
       switch (action) {
+        case 'supply':
+          prompt = "What's the total supply of this token?";
+          break;
+        case 'owner':
+          prompt = 'Who owns this contract?';
+          break;
+        case 'balance':
+          prompt = "What's my balance of this token?";
+          break;
         case 'explain':
           prompt = 'Explain what this contract does and its main purpose.';
           break;
