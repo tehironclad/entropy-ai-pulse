@@ -334,20 +334,30 @@
 
     /* Contract Info */
     .contract-info {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .info-row {
+      display: flex;
+      gap: 12px;
     }
 
     .info-item {
+      flex: 1;
       background: var(--bg-primary);
-      padding: 14px 16px;
+      padding: 12px 14px;
       border-radius: 8px;
       border: 1px solid var(--border-color);
     }
 
+    .info-item.flex-2 {
+      flex: 2;
+    }
+
     .info-label {
-      font-size: 11px;
+      font-size: 10px;
       color: var(--text-muted);
       text-transform: uppercase;
       letter-spacing: 0.5px;
@@ -364,6 +374,117 @@
     .info-value.large {
       font-size: 18px;
       font-weight: 600;
+    }
+
+    .info-value.mono {
+      font-size: 11px;
+    }
+
+    .info-value.small {
+      font-size: 11px;
+    }
+
+    .info-value.clickable {
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+
+    .info-value.clickable:hover {
+      color: var(--accent-primary);
+    }
+
+    /* Sidebar enhancements */
+    .sidebar-title.clickable {
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .sidebar-title.clickable:hover {
+      color: var(--text-primary);
+    }
+
+    .collapse-icon {
+      font-size: 10px;
+      transition: transform 0.2s;
+    }
+
+    .collapse-icon.collapsed {
+      transform: rotate(-90deg);
+    }
+
+    .contract-categories {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .category-group {
+      margin-bottom: 8px;
+    }
+
+    .category-label {
+      font-size: 10px;
+      color: var(--accent-primary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+      padding-left: 4px;
+    }
+
+    .category-items {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .favorite-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      padding: 4px;
+      opacity: 0.5;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+
+    .favorite-btn:hover {
+      opacity: 1;
+      transform: scale(1.1);
+    }
+
+    .favorite-btn.active {
+      opacity: 1;
+      color: gold;
+    }
+
+    /* Provider Toggle */
+    .provider-toggle {
+      display: flex;
+      gap: 8px;
+    }
+
+    .provider-btn {
+      flex: 1;
+      padding: 10px 16px;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .provider-btn:hover {
+      border-color: var(--border-hover);
+      color: var(--text-primary);
+    }
+
+    .provider-btn.active {
+      background: var(--accent-gradient);
+      border-color: transparent;
+      color: white;
     }
 
     /* Function Builder */
@@ -974,9 +1095,9 @@
         </div>
       </div>
 
-      <div class="sidebar-section">
-        <div class="sidebar-title">Quick Access</div>
-        <div class="contract-list" id="quickContracts">
+      <div class="sidebar-section" id="favoritesSection" style="display: none;">
+        <div class="sidebar-title">⭐ Favorites</div>
+        <div class="contract-list" id="favoriteContracts">
           <!-- Populated by JS -->
         </div>
       </div>
@@ -987,6 +1108,15 @@
           <div class="contract-item" style="justify-content: center; color: var(--text-muted);">
             No recent contracts
           </div>
+        </div>
+      </div>
+
+      <div class="sidebar-section collapsible">
+        <div class="sidebar-title clickable" onclick="toggleSection('quickAccessSection')">
+          Quick Access <span class="collapse-icon" id="quickAccessIcon">▼</span>
+        </div>
+        <div class="contract-categories" id="quickAccessSection">
+          <!-- Populated by JS with categories -->
         </div>
       </div>
 
@@ -1009,27 +1139,52 @@
             <span class="contract-item-type" id="contractType">ERC20</span>
           </div>
           <div style="display: flex; gap: 8px;">
-            <button class="btn btn-secondary btn-sm" onclick="copyAddress()">📋 Copy</button>
-            <button class="btn btn-secondary btn-sm" onclick="viewOnScan()">🔗 PulseScan</button>
+            <button class="btn btn-secondary btn-sm" onclick="toggleFavorite()" id="favBtn">☆ Favorite</button>
+            <button class="btn btn-secondary btn-sm" onclick="shareContract()">🔗 Share</button>
+            <button class="btn btn-secondary btn-sm" onclick="viewOnScan()">↗ PulseScan</button>
           </div>
         </div>
         <div class="card-body">
           <div class="contract-info">
-            <div class="info-item">
-              <div class="info-label">Address</div>
-              <div class="info-value" id="contractAddr">-</div>
+            <div class="info-row">
+              <div class="info-item">
+                <div class="info-label">Address</div>
+                <div class="info-value mono clickable" id="contractAddr" onclick="copyAddress()">-</div>
+              </div>
             </div>
-            <div class="info-item">
-              <div class="info-label">Verification</div>
-              <div class="info-value" id="contractVerified">-</div>
+            <div class="info-row">
+              <div class="info-item">
+                <div class="info-label">Symbol</div>
+                <div class="info-value large" id="contractSymbol">-</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Decimals</div>
+                <div class="info-value large" id="contractDecimals">-</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Verified</div>
+                <div class="info-value" id="contractVerified">-</div>
+              </div>
             </div>
-            <div class="info-item">
-              <div class="info-label">Total Supply</div>
-              <div class="info-value large" id="contractSupply">-</div>
+            <div class="info-row">
+              <div class="info-item flex-2">
+                <div class="info-label">Total Supply</div>
+                <div class="info-value large" id="contractSupply">-</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Your Balance</div>
+                <div class="info-value" id="contractBalance">-</div>
+              </div>
             </div>
-            <div class="info-item">
-              <div class="info-label">Decimals</div>
-              <div class="info-value large" id="contractDecimals">-</div>
+            <div class="info-row" id="dysnomiaInfo" style="display: none;">
+              <div class="info-item">
+                <div class="info-label">Entropy</div>
+                <div class="info-value" id="contractEntropy">-</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">Owner</div>
+                <div class="info-value mono small" id="contractOwner">-</div>
+              </div>
             </div>
           </div>
         </div>
@@ -1149,7 +1304,7 @@ Quick tips:
 
       <div class="ai-messages" id="aiMessages">
         <div class="ai-message assistant">
-          👋 Hi! I'm Claude, your AI agent for PulseChain contracts.
+          👋 Hi! I'm your AI agent for PulseChain contracts.
 
 I can <strong>execute functions</strong> for you! Try:
 • "What's the total supply?"
@@ -1160,13 +1315,13 @@ I can <strong>execute functions</strong> for you! Try:
 
 I can also analyze bytecode, explain functions, and help debug.
 
-Configure your API key to get started!
+Configure your API key (Claude or Gemini) to get started!
         </div>
       </div>
 
       <div class="ai-input-container">
         <div class="ai-input-wrapper">
-          <textarea class="ai-input" id="aiInput" placeholder="Ask Claude anything... 'What's my balance?' 'Call Beat()'" rows="2"></textarea>
+          <textarea class="ai-input" id="aiInput" placeholder="Ask anything... 'What's my balance?' 'Call Beat()'" rows="2"></textarea>
           <button class="btn btn-primary" onclick="sendToAI()">Send</button>
         </div>
         <div class="ai-quick-actions">
@@ -1183,24 +1338,48 @@ Configure your API key to get started!
   <div class="modal-overlay" id="apiKeyModal">
     <div class="modal">
       <div class="modal-header">
-        <div class="modal-title">🔑 Anthropic API Key</div>
+        <div class="modal-title">🔑 AI Configuration</div>
         <button class="modal-close" onclick="closeApiKeyModal()">×</button>
       </div>
       <div class="modal-body">
-        <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 16px;">
-          Enter your personal Anthropic API key to enable Claude integration.<br>
-          Get one at <a href="https://console.anthropic.com" target="_blank" style="color: var(--accent-primary);">console.anthropic.com</a> (~$5 for thousands of queries)
-        </p>
-        <div class="input-group">
-          <label class="input-label">Your API Key</label>
-          <input type="password" class="input" id="apiKeyInput" placeholder="sk-ant-...">
+        <div class="input-group" style="margin-bottom: 16px;">
+          <label class="input-label">AI Provider</label>
+          <div class="provider-toggle">
+            <button class="provider-btn active" id="providerClaude" onclick="selectProvider('claude')">
+              Claude (Anthropic)
+            </button>
+            <button class="provider-btn" id="providerGemini" onclick="selectProvider('gemini')">
+              Gemini (Google)
+            </button>
+          </div>
         </div>
+        
+        <div id="claudeConfig">
+          <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 12px;">
+            Get a Claude API key at <a href="https://console.anthropic.com" target="_blank" style="color: var(--accent-primary);">console.anthropic.com</a>
+          </p>
+          <div class="input-group">
+            <label class="input-label">Anthropic API Key</label>
+            <input type="password" class="input" id="apiKeyInput" placeholder="sk-ant-...">
+          </div>
+        </div>
+        
+        <div id="geminiConfig" style="display: none;">
+          <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 12px;">
+            Get a Gemini API key at <a href="https://aistudio.google.com/apikey" target="_blank" style="color: var(--accent-primary);">aistudio.google.com</a>
+          </p>
+          <div class="input-group">
+            <label class="input-label">Google AI API Key</label>
+            <input type="password" class="input" id="geminiKeyInput" placeholder="AIza...">
+          </div>
+        </div>
+        
         <p style="color: var(--text-muted); font-size: 11px; margin: 12px 0;">
-          🔒 Your key is stored only in your browser's local storage and sent directly to Anthropic. It never touches our servers.
+          🔒 Keys are stored in your browser only and sent directly to the provider.
         </p>
         <div style="display: flex; gap: 12px; margin-top: 20px;">
           <button class="btn btn-secondary" onclick="closeApiKeyModal()" style="flex: 1;">Cancel</button>
-          <button class="btn btn-primary" onclick="saveApiKey()" style="flex: 1;">Save Key</button>
+          <button class="btn btn-primary" onclick="saveApiKey()" style="flex: 1;">Save</button>
         </div>
       </div>
     </div>
@@ -1280,6 +1459,8 @@ Configure your API key to get started!
     let currentBytecode = null;
     let selectedFunction = null;
     let apiKey = localStorage.getItem('entropyAI_apiKey') || null;
+    let geminiKey = localStorage.getItem('entropyAI_geminiKey') || null;
+    let aiProvider = localStorage.getItem('entropyAI_provider') || 'claude';
     let recentContracts = JSON.parse(localStorage.getItem('entropyAI_recent') || '[]');
     let pendingSimulation = null; // Stores pending write tx for simulation
 
@@ -1384,20 +1565,47 @@ Configure your API key to get started!
       'cLAUde': '0x3a668BB3DcE4A2573Be90A24Fd57771f9b1b9d30',
       'IronChad': '0xD2a00a61743f39Fe74096653E564107cc80457BA',
       'ChatLogZhou': '0x5cC318d0c01FeD5942B5ED2F53dB07727d36E261',
-      // System
+      // Dysnomia System
       'ZHENG': '0x24E62C39e34d7fE2B7dF1162e1344eB6eb3b3e15',
-      // PulseChain
-      'WPLS': '0xA1077a294dDE1B09bB078844df40758a5D0f9a27',
-      'PLSX': '0x95B303987A60C71504D99Aa1b13B4DA07b0790ab',
-      'pDAI': '0xefD766cCb38EaF1dfd701853BFCe31359239F305',
-      'HEX': '0x2b591e99afE9f32eAA6214f7B7629768c40Eeb39',
       // Atropa
       'atropa': '0x7a20189B297343CF26d8548764b04891f37F3414',
       'CROWS': '0x203e366A1821570b2f84Ff5ae8B3BdeB48Dc4fa1',
       'Neptune': '0x9A3796Cf41B7CbA6921fd50c3f5204ED6506C3e7',
       'LOL': '0xA63F8061A67ecdbf147Cd1B60f91Cf95464E868D',
       'Buckingham': '0xe5d3A6e88590fc2A8037D9CCbd816C05B1ff5f11',
+      // PulseChain Core (RH)
+      'WPLS': '0xA1077a294dDE1B09bB078844df40758a5D0f9a27',
+      'PLSX': '0x95B303987A60C71504D99Aa1b13B4DA07b0790ab',
+      'INC': '0x2fa878Ab3F87CC1C9737Fc071108F904c0B0C95d',
+      'HEX': '0x2b591e99afE9f32eAA6214f7B7629768c40Eeb39',
+      // PulseChain Copy Tokens (from Ethereum)
+      'pDAI': '0xefD766cCb38EaF1dfd701853BFCe31359239F305',
+      'pUSDC': '0x15D38573d2feeb82e7ad5187aB8c1D52810B1f07',
+      'pUSDT': '0x0Cb6F5a34ad42ec934882A05265A7d5F59b51A2f',
+      'pWETH': '0x02DcdD04e3F455D838cd1249292C58f3B79e3C3C',
+      'pWBTC': '0xb17D901469B9208B17d916112988A3FeD19b5cA1',
+      'pLINK': '0x514910771AF9Ca656af840dff83E8264EcF986CA',
+      'pUNI': '0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984',
+      'pAAVE': '0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9',
+      'pMKR': '0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2',
+      // DEX
+      'PulseX Router': '0x165C3410fC91EF562C50559f7d2289fEbed552d9',
+      'PulseX Factory': '0x1715a3E4A142d8b698131108995174F37aEBA10D',
     };
+
+    // Categorized contracts for UI
+    const CONTRACT_CATEGORIES = {
+      'Dysnomia': ['libAtropaMath', 'AFFECTION', 'RESTRAININGORDER', 'WITHOUT', 'ZHENG'],
+      'Atropa': ['atropa', 'CROWS', 'Neptune', 'LOL', 'Buckingham'],
+      'LAUs': ['cLAUde', 'IronChad', 'ChatLogZhou'],
+      'PulseChain': ['WPLS', 'PLSX', 'INC', 'HEX'],
+      'Stablecoins': ['pDAI', 'pUSDC', 'pUSDT'],
+      'Copy Tokens': ['pWETH', 'pWBTC', 'pLINK', 'pUNI', 'pAAVE', 'pMKR'],
+      'DEX': ['PulseX Router', 'PulseX Factory'],
+    };
+
+    // Favorites stored in localStorage
+    let favorites = JSON.parse(localStorage.getItem('entropyAI_favorites') || '[]');
 
     // ═══════════════════════════════════════════════════════════════════════════
     // DYSNOMIA TYPE-SPECIFIC ABIs
@@ -1744,33 +1952,135 @@ Read functions still work! Only write functions need a wallet.`);
         });
       }
 
-      // Populate quick contracts
-      const quickList = document.getElementById('quickContracts');
-      quickList.innerHTML = '';
-      Object.entries(KNOWN_CONTRACTS).forEach(([name, addr]) => {
-        quickList.innerHTML += `
-          <div class="contract-item" onclick="loadContract('${addr}')">
-            <div>
-              <div class="contract-item-name">${name}</div>
-              <div class="contract-item-addr">${addr.slice(0, 8)}...${addr.slice(-6)}</div>
-            </div>
-          </div>
-        `;
-      });
+      // Populate categorized quick access
+      renderCategories();
+
+      // Update favorites
+      updateFavoritesList();
 
       // Update recent
       updateRecentList();
 
-      // Check API key
-      if (apiKey) {
-        document.getElementById('aiConfig').innerHTML = `
-          <div style="display: flex; align-items: center; gap: 8px; color: var(--success); font-size: 12px;">
-            <span>✓</span> API key configured
-          </div>
-        `;
+      // Check API key status
+      updateAIConfigStatus();
+
+      // Check URL params for contract to load
+      const urlParams = new URLSearchParams(window.location.search);
+      const contractParam = urlParams.get('c') || urlParams.get('contract');
+      if (contractParam) {
+        log(`Loading contract from URL: ${contractParam.slice(0, 10)}...`, 'info');
+        setTimeout(() => loadContract(contractParam), 500);
       }
 
       log('Ready', 'success');
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // CATEGORIES & FAVORITES
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    function renderCategories() {
+      const container = document.getElementById('quickAccessSection');
+      container.innerHTML = '';
+      
+      Object.entries(CONTRACT_CATEGORIES).forEach(([category, contracts]) => {
+        const group = document.createElement('div');
+        group.className = 'category-group';
+        group.innerHTML = `<div class="category-label">${category}</div>`;
+        
+        const items = document.createElement('div');
+        items.className = 'category-items';
+        
+        contracts.forEach(name => {
+          const addr = KNOWN_CONTRACTS[name];
+          if (addr) {
+            items.innerHTML += `
+              <div class="contract-item" onclick="loadContract('${addr}')">
+                <div>
+                  <div class="contract-item-name">${name}</div>
+                  <div class="contract-item-addr">${addr.slice(0, 8)}...${addr.slice(-6)}</div>
+                </div>
+              </div>
+            `;
+          }
+        });
+        
+        group.appendChild(items);
+        container.appendChild(group);
+      });
+    }
+
+    function toggleSection(sectionId) {
+      const section = document.getElementById(sectionId);
+      const icon = document.getElementById(sectionId.replace('Section', 'Icon'));
+      
+      if (section.style.display === 'none') {
+        section.style.display = 'flex';
+        icon?.classList.remove('collapsed');
+      } else {
+        section.style.display = 'none';
+        icon?.classList.add('collapsed');
+      }
+    }
+
+    function updateFavoritesList() {
+      const container = document.getElementById('favoriteContracts');
+      const section = document.getElementById('favoritesSection');
+      
+      if (favorites.length === 0) {
+        section.style.display = 'none';
+        return;
+      }
+      
+      section.style.display = 'block';
+      container.innerHTML = '';
+      
+      favorites.forEach(fav => {
+        container.innerHTML += `
+          <div class="contract-item" onclick="loadContract('${fav.address}')">
+            <div>
+              <div class="contract-item-name">${fav.name}</div>
+              <div class="contract-item-addr">${fav.address.slice(0, 8)}...${fav.address.slice(-6)}</div>
+            </div>
+            <span class="contract-item-type">${fav.type || 'ERC20'}</span>
+          </div>
+        `;
+      });
+    }
+
+    function toggleFavorite() {
+      if (!currentAddress) return;
+      
+      const name = document.getElementById('contractName').textContent;
+      const type = document.getElementById('contractType').textContent;
+      const existingIndex = favorites.findIndex(f => f.address.toLowerCase() === currentAddress.toLowerCase());
+      
+      if (existingIndex >= 0) {
+        favorites.splice(existingIndex, 1);
+        document.getElementById('favBtn').textContent = '☆ Favorite';
+        document.getElementById('favBtn').classList.remove('active');
+        log(`Removed ${name} from favorites`, 'info');
+      } else {
+        favorites.push({ address: currentAddress, name, type });
+        document.getElementById('favBtn').textContent = '★ Favorited';
+        document.getElementById('favBtn').classList.add('active');
+        log(`Added ${name} to favorites`, 'success');
+      }
+      
+      localStorage.setItem('entropyAI_favorites', JSON.stringify(favorites));
+      updateFavoritesList();
+    }
+
+    function isFavorite(address) {
+      return favorites.some(f => f.address.toLowerCase() === address.toLowerCase());
+    }
+
+    function shareContract() {
+      if (!currentAddress) return;
+      
+      const url = `${window.location.origin}${window.location.pathname}?c=${currentAddress}`;
+      navigator.clipboard.writeText(url);
+      log('Share link copied to clipboard!', 'success');
     }
 
     // ═══════════════════════════════════════════════════════════════════════════
@@ -1976,6 +2286,59 @@ Once allowed, click "Connect Wallet" again.`);
       document.getElementById('contractType').textContent = contractType;
       document.getElementById('contractSupply').textContent = totalSupply;
       document.getElementById('contractDecimals').textContent = decimals;
+      document.getElementById('contractSymbol').textContent = symbol || '-';
+
+      // Update favorite button
+      if (isFavorite(address)) {
+        document.getElementById('favBtn').textContent = '★ Favorited';
+        document.getElementById('favBtn').classList.add('active');
+      } else {
+        document.getElementById('favBtn').textContent = '☆ Favorite';
+        document.getElementById('favBtn').classList.remove('active');
+      }
+
+      // Fetch user balance if wallet connected
+      try {
+        const walletEl = document.getElementById('walletStatus');
+        if (walletEl && walletEl.classList.contains('connected')) {
+          const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+          if (accounts.length > 0) {
+            const balance = await contract.balanceOf(accounts[0]);
+            document.getElementById('contractBalance').textContent = formatLargeNumber(balance, parseInt(decimals) || 18);
+          }
+        } else {
+          document.getElementById('contractBalance').textContent = 'Connect wallet';
+        }
+      } catch {
+        document.getElementById('contractBalance').textContent = '-';
+      }
+
+      // Show Dysnomia-specific fields if applicable
+      const dysnomiaInfoEl = document.getElementById('dysnomiaInfo');
+      if (isDysnomia) {
+        dysnomiaInfoEl.style.display = 'flex';
+        try {
+          const entropy = await contract.Entropy();
+          document.getElementById('contractEntropy').textContent = entropy.toString();
+        } catch {
+          document.getElementById('contractEntropy').textContent = '-';
+        }
+        try {
+          const owners = await contract.getOwners();
+          document.getElementById('contractOwner').textContent = Array.isArray(owners) && owners.length > 0 
+            ? owners[0].slice(0, 10) + '...' 
+            : '-';
+        } catch {
+          try {
+            const owner = await contract.owner();
+            document.getElementById('contractOwner').textContent = owner.slice(0, 10) + '...';
+          } catch {
+            document.getElementById('contractOwner').textContent = '-';
+          }
+        }
+      } else {
+        dysnomiaInfoEl.style.display = 'none';
+      }
 
       // Populate function list
       populateFunctionList(currentABI);
@@ -2334,8 +2697,16 @@ Once allowed, click "Connect Wallet" again.`);
 
     function openApiKeyModal() {
       document.getElementById('apiKeyModal').classList.add('active');
+      
+      // Set current provider toggle
+      selectProvider(aiProvider);
+      
+      // Fill in existing keys
       if (apiKey) {
         document.getElementById('apiKeyInput').value = apiKey;
+      }
+      if (geminiKey) {
+        document.getElementById('geminiKeyInput').value = geminiKey;
       }
     }
 
@@ -2343,21 +2714,59 @@ Once allowed, click "Connect Wallet" again.`);
       document.getElementById('apiKeyModal').classList.remove('active');
     }
 
+    function selectProvider(provider) {
+      aiProvider = provider;
+      
+      // Update toggle UI
+      document.getElementById('providerClaude').classList.toggle('active', provider === 'claude');
+      document.getElementById('providerGemini').classList.toggle('active', provider === 'gemini');
+      
+      // Show/hide config sections
+      document.getElementById('claudeConfig').style.display = provider === 'claude' ? 'block' : 'none';
+      document.getElementById('geminiConfig').style.display = provider === 'gemini' ? 'block' : 'none';
+    }
+
     function saveApiKey() {
-      const key = document.getElementById('apiKeyInput').value.trim();
-      if (key && key.startsWith('sk-ant-')) {
-        apiKey = key;
-        localStorage.setItem('entropyAI_apiKey', key);
-        document.getElementById('aiConfig').innerHTML = `
-          <div style="display: flex; align-items: center; gap: 8px; color: var(--success); font-size: 12px;">
-            <span>✓</span> API key configured
-          </div>
-        `;
-        closeApiKeyModal();
-        log('API key saved', 'success');
+      if (aiProvider === 'claude') {
+        const key = document.getElementById('apiKeyInput').value.trim();
+        if (key && key.startsWith('sk-ant-')) {
+          apiKey = key;
+          localStorage.setItem('entropyAI_apiKey', key);
+          localStorage.setItem('entropyAI_provider', 'claude');
+          updateAIConfigStatus();
+          closeApiKeyModal();
+          log('Claude API key saved', 'success');
+        } else {
+          alert('Invalid Anthropic API key. Should start with sk-ant-');
+        }
       } else {
-        alert('Invalid API key format. Should start with sk-ant-');
+        const key = document.getElementById('geminiKeyInput').value.trim();
+        if (key && key.startsWith('AIza')) {
+          geminiKey = key;
+          localStorage.setItem('entropyAI_geminiKey', key);
+          localStorage.setItem('entropyAI_provider', 'gemini');
+          updateAIConfigStatus();
+          closeApiKeyModal();
+          log('Gemini API key saved', 'success');
+        } else {
+          alert('Invalid Google AI API key. Should start with AIza...');
+        }
       }
+    }
+
+    function updateAIConfigStatus() {
+      const hasKey = (aiProvider === 'claude' && apiKey) || (aiProvider === 'gemini' && geminiKey);
+      const providerName = aiProvider === 'claude' ? 'Claude' : 'Gemini';
+      
+      document.getElementById('aiConfig').innerHTML = hasKey ? `
+        <div style="display: flex; align-items: center; gap: 8px; color: var(--success); font-size: 12px;">
+          <span>✓</span> ${providerName} configured
+        </div>
+      ` : `
+        <div style="display: flex; align-items: center; gap: 8px; color: var(--text-muted); font-size: 12px;">
+          Configure API key
+        </div>
+      `;
     }
 
     // ═══════════════════════════════════════════════════════════════════════════
@@ -2638,16 +3047,16 @@ Once allowed, click "Connect Wallet" again.`);
       addAIMessage(input, 'user');
       document.getElementById('aiInput').value = '';
 
-      if (!apiKey) {
-        // No API key - copy to clipboard
+      // Check if we have an API key for the selected provider
+      const currentKey = aiProvider === 'claude' ? apiKey : geminiKey;
+      if (!currentKey) {
         const context = buildContext();
         const prompt = `${context}\n\nUser question: ${input}`;
         navigator.clipboard.writeText(prompt);
-        addAIMessage('📋 No API key configured. I\'ve copied a formatted prompt to your clipboard that you can paste into Claude directly.', 'assistant');
+        addAIMessage(`📋 No ${aiProvider === 'claude' ? 'Claude' : 'Gemini'} API key configured. I've copied a formatted prompt to your clipboard.`, 'assistant');
         return;
       }
 
-      // Call Anthropic API
       addAIMessage('<div class="loader"></div> Thinking...', 'assistant');
 
       try {
@@ -2681,51 +3090,83 @@ User request: ${input}
 
 Respond conversationally. If the user asks about data, USE THE COMMANDS to fetch it - don't just describe what they could do. If analyzing bytecode or explaining concepts, respond normally without commands.`;
 
-        const response = await fetch(ANTHROPIC_API, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey,
-            'anthropic-version': '2023-06-01'
-          },
-          body: JSON.stringify({
-            model: 'claude-sonnet-4-20250514',
-            max_tokens: 2048,
-            messages: [{
-              role: 'user',
-              content: systemPrompt
-            }]
-          })
-        });
+        let response;
+        let responseText;
 
-        const data = await response.json();
+        if (aiProvider === 'claude') {
+          // Claude API
+          response = await fetch(ANTHROPIC_API, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-api-key': apiKey,
+              'anthropic-version': '2023-06-01'
+            },
+            body: JSON.stringify({
+              model: 'claude-sonnet-4-20250514',
+              max_tokens: 2048,
+              messages: [{
+                role: 'user',
+                content: systemPrompt
+              }]
+            })
+          });
+
+          const data = await response.json();
+          
+          if (data.content && data.content[0]) {
+            responseText = data.content[0].text;
+          } else {
+            throw new Error(data.error?.message || 'Unknown Claude error');
+          }
+        } else {
+          // Gemini API
+          const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiKey}`;
+          
+          response = await fetch(geminiUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              contents: [{
+                parts: [{ text: systemPrompt }]
+              }],
+              generationConfig: {
+                maxOutputTokens: 2048
+              }
+            })
+          });
+
+          const data = await response.json();
+          
+          if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
+            responseText = data.candidates[0].content.parts[0].text;
+          } else {
+            throw new Error(data.error?.message || 'Unknown Gemini error');
+          }
+        }
         
         // Remove loading message
         const messages = document.getElementById('aiMessages');
         messages.removeChild(messages.lastChild);
 
-        if (data.content && data.content[0]) {
-          let responseText = data.content[0].text;
-          
-          // Check for commands and execute them
-          const hasCommands = responseText.includes('[[READ:') || responseText.includes('[[WRITE:');
-          
-          // Show Claude's response (strip out command syntax for cleaner display)
-          const cleanResponse = responseText
-            .replace(/\[\[READ:\w+\(.*?\)\]\]/g, '')
-            .replace(/\[\[WRITE:\w+\(.*?\)\]\]/g, '')
-            .trim();
-          
-          if (cleanResponse) {
-            addAIMessage(cleanResponse, 'assistant');
-          }
-          
-          // Execute any commands
-          if (hasCommands) {
-            await processAICommands(responseText);
-          }
-        } else {
-          addAIMessage('Error: ' + (data.error?.message || 'Unknown error'), 'assistant');
+        // Check for commands and execute them
+        const hasCommands = responseText.includes('[[READ:') || responseText.includes('[[WRITE:');
+        
+        // Show response (strip out command syntax for cleaner display)
+        const cleanResponse = responseText
+          .replace(/\[\[READ:\w+\(.*?\)\]\]/g, '')
+          .replace(/\[\[WRITE:\w+\(.*?\)\]\]/g, '')
+          .trim();
+        
+        if (cleanResponse) {
+          addAIMessage(cleanResponse, 'assistant');
+        }
+        
+        // Execute any commands
+        if (hasCommands) {
+          await processAICommands(responseText);
         }
       } catch (e) {
         const messages = document.getElementById('aiMessages');
