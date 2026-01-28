@@ -2220,12 +2220,14 @@ Once allowed, click "Connect Wallet" again.`);
         return { success: false, error: 'No contract loaded' };
       }
 
-      const fn = currentABI.find(f => f.type === 'function' && f.name === functionName);
-      if (!fn) {
-        return { success: false, error: `Function ${functionName} not found in ABI` };
-      }
-
       try {
+        // Use ethers Interface to check if function exists (works with both ABI formats)
+        const iface = new ethers.Interface(currentABI);
+        const fn = iface.getFunction(functionName);
+        if (!fn) {
+          return { success: false, error: `Function ${functionName} not found in ABI` };
+        }
+
         let result;
         if (isRead) {
           const contract = new ethers.Contract(currentAddress, currentABI, provider);
@@ -2281,18 +2283,23 @@ Once allowed, click "Connect Wallet" again.`);
         const argsStr = match[2].trim();
         const args = argsStr ? argsStr.split(',').map(a => a.trim().replace(/^["']|["']$/g, '')) : [];
         
-        // Populate the function builder instead of auto-executing
-        const fn = currentABI?.find(f => f.type === 'function' && f.name === fnName);
-        if (fn) {
-          selectFunction(fnName);
-          // Fill in params
-          args.forEach((arg, i) => {
-            const paramInput = document.getElementById(`param_${i}`);
-            if (paramInput) paramInput.value = arg;
-          });
-          addAIMessage(`⚠️ Write function prepared: <strong>${fnName}(${args.join(', ')})</strong>\n\n→ Check the Function Call panel and click "Write" to execute. Your wallet will prompt for approval.`, 'system');
-        } else {
-          addAIMessage(`❌ Function ${fnName} not found in ABI`, 'error');
+        // Check if function exists using ethers Interface
+        try {
+          const iface = new ethers.Interface(currentABI);
+          const fn = iface.getFunction(fnName);
+          if (fn) {
+            selectFunction(fnName);
+            // Fill in params
+            args.forEach((arg, i) => {
+              const paramInput = document.getElementById(`param_${i}`);
+              if (paramInput) paramInput.value = arg;
+            });
+            addAIMessage(`⚠️ Write function prepared: <strong>${fnName}(${args.join(', ')})</strong>\n\n→ Check the Function Call panel and click "Write" to execute. Your wallet will prompt for approval.`, 'system');
+          } else {
+            addAIMessage(`❌ Function ${fnName} not found in ABI`, 'error');
+          }
+        } catch (e) {
+          addAIMessage(`❌ Function ${fnName} not found: ${e.message}`, 'error');
         }
       }
 
@@ -2446,20 +2453,30 @@ Load a contract and try it!
         context += `- Type: ${document.getElementById('contractType').textContent}\n`;
         context += `- Verified: ${document.getElementById('contractVerified').textContent}\n`;
         
-        if (currentABI) {
-          const fns = currentABI.filter(x => x.type === 'function');
-          const reads = fns.filter(f => f.stateMutability === 'view' || f.stateMutability === 'pure');
-          const writes = fns.filter(f => f.stateMutability !== 'view' && f.stateMutability !== 'pure');
-          
-          context += `\nIdentified Read Functions (${reads.length}):\n`;
-          reads.forEach(f => {
-            context += `  - ${f.name}(${f.inputs.map(i => i.type).join(', ')})${f.outputs?.length ? ' → ' + f.outputs.map(o => o.type).join(', ') : ''}\n`;
-          });
-          
-          context += `\nIdentified Write Functions (${writes.length}):\n`;
-          writes.forEach(f => {
-            context += `  - ${f.name}(${f.inputs.map(i => i.type).join(', ')})\n`;
-          });
+        if (currentABI && currentABI.length > 0) {
+          try {
+            // Parse ABI using ethers Interface to handle both formats
+            const iface = new ethers.Interface(currentABI);
+            const fragments = iface.fragments.filter(f => f.type === 'function');
+            
+            const reads = fragments.filter(f => f.stateMutability === 'view' || f.stateMutability === 'pure');
+            const writes = fragments.filter(f => f.stateMutability !== 'view' && f.stateMutability !== 'pure');
+            
+            context += `\nAvailable Read Functions (${reads.length}):\n`;
+            reads.forEach(f => {
+              const inputs = f.inputs.map(i => i.type).join(', ');
+              const outputs = f.outputs?.length ? ' → ' + f.outputs.map(o => o.type).join(', ') : '';
+              context += `  - ${f.name}(${inputs})${outputs}\n`;
+            });
+            
+            context += `\nAvailable Write Functions (${writes.length}):\n`;
+            writes.forEach(f => {
+              const inputs = f.inputs.map(i => i.type).join(', ');
+              context += `  - ${f.name}(${inputs})\n`;
+            });
+          } catch (e) {
+            context += `\nABI parsing error: ${e.message}\n`;
+          }
         }
         
         if (currentBytecode) {
