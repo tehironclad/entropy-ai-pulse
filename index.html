@@ -211,6 +211,24 @@
       background: linear-gradient(90deg, var(--border-color), transparent);
     }
 
+    .clear-link {
+      font-size: 10px;
+      color: var(--text-muted);
+      cursor: pointer;
+      text-transform: lowercase;
+      font-weight: 400;
+      letter-spacing: 0;
+      margin-left: auto;
+      padding: 2px 6px;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+
+    .clear-link:hover {
+      color: var(--error);
+      background: rgba(239, 68, 68, 0.1);
+    }
+
     /* Input styles */
     .input-group {
       margin-bottom: 12px;
@@ -1096,14 +1114,20 @@
       </div>
 
       <div class="sidebar-section" id="favoritesSection" style="display: none;">
-        <div class="sidebar-title">⭐ Favorites</div>
+        <div class="sidebar-title">
+          ⭐ Favorites
+          <span class="clear-link" onclick="clearFavorites()">clear</span>
+        </div>
         <div class="contract-list" id="favoriteContracts">
           <!-- Populated by JS -->
         </div>
       </div>
 
       <div class="sidebar-section">
-        <div class="sidebar-title">Recent</div>
+        <div class="sidebar-title">
+          Recent
+          <span class="clear-link" onclick="clearRecent()">clear</span>
+        </div>
         <div class="contract-list" id="recentContracts">
           <div class="contract-item" style="justify-content: center; color: var(--text-muted);">
             No recent contracts
@@ -1378,6 +1402,7 @@ Configure your API key (Claude or Gemini) to get started!
           🔒 Keys are stored in your browser only and sent directly to the provider.
         </p>
         <div style="display: flex; gap: 12px; margin-top: 20px;">
+          <button class="btn btn-secondary" onclick="clearApiKey()" style="color: var(--error);">Clear Key</button>
           <button class="btn btn-secondary" onclick="closeApiKeyModal()" style="flex: 1;">Cancel</button>
           <button class="btn btn-primary" onclick="saveApiKey()" style="flex: 1;">Save</button>
         </div>
@@ -2769,6 +2794,22 @@ Once allowed, click "Connect Wallet" again.`);
       `;
     }
 
+    function clearApiKey() {
+      if (aiProvider === 'claude') {
+        apiKey = null;
+        localStorage.removeItem('entropyAI_apiKey');
+        document.getElementById('apiKeyInput').value = '';
+        log('Claude API key cleared', 'info');
+      } else {
+        geminiKey = null;
+        localStorage.removeItem('entropyAI_geminiKey');
+        document.getElementById('geminiKeyInput').value = '';
+        log('Gemini API key cleared', 'info');
+      }
+      updateAIConfigStatus();
+      closeApiKeyModal();
+    }
+
     // ═══════════════════════════════════════════════════════════════════════════
     // AI AGENT - Can execute contract functions
     // ═══════════════════════════════════════════════════════════════════════════
@@ -3391,6 +3432,20 @@ Load a contract and try it!
           </div>
         `;
       });
+    }
+
+    function clearRecent() {
+      recentContracts = [];
+      localStorage.removeItem('entropyAI_recent');
+      updateRecentList();
+      log('Recent contracts cleared', 'info');
+    }
+
+    function clearFavorites() {
+      favorites = [];
+      localStorage.removeItem('entropyAI_favorites');
+      updateFavoritesList();
+      log('Favorites cleared', 'info');
     }
 
     // Initialize on load
