@@ -1285,14 +1285,7 @@ Configure your API key to get started!
 
     // Constants
     const PULSESCAN_API = 'https://api.scan.pulsechain.com/api';
-    const ANTHROPIC_API = 'https://api.anthropic.com/v1/messages';
-    
-    // CORS proxy for browser-based API calls
-    // Option 1: Use cors-anywhere or similar (for development)
-    // Option 2: Run local proxy
-    // Option 3: Use the copy-to-clipboard fallback
-    const USE_CORS_PROXY = true;
-    const CORS_PROXY = 'https://corsproxy.io/?';
+    const ANTHROPIC_API = '/api/chat'; // Vercel serverless function
 
     // Known selectors with full ABI info
     const KNOWN_SELECTORS = {
@@ -2635,7 +2628,6 @@ Once allowed, click "Connect Wallet" again.`);
       try {
         const context = buildContext();
         const walletAddr = getConnectedWallet();
-        const apiUrl = USE_CORS_PROXY ? CORS_PROXY + encodeURIComponent(ANTHROPIC_API) : ANTHROPIC_API;
         
         const systemPrompt = `You are an AI agent for Entropy AI, a PulseChain smart contract interface specializing in the Dysnomia/Atropa ecosystem.
 
@@ -2664,7 +2656,7 @@ User request: ${input}
 
 Respond conversationally. If the user asks about data, USE THE COMMANDS to fetch it - don't just describe what they could do. If analyzing bytecode or explaining concepts, respond normally without commands.`;
 
-        const response = await fetch(apiUrl, {
+        const response = await fetch(ANTHROPIC_API, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
