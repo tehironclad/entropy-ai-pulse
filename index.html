@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -814,7 +813,19 @@
   <!-- Header -->
   <header class="header">
     <div class="logo">
-      <div class="logo-icon">⟁</div>
+      <div class="logo-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Eris (large body) with Dysnomia moon in chaotic orbit -->
+          <circle cx="10" cy="12" r="6" stroke="white" stroke-width="1.5" fill="none"/>
+          <!-- Chaotic orbital path -->
+          <ellipse cx="12" cy="12" rx="10" ry="5" stroke="white" stroke-width="1" fill="none" opacity="0.4" transform="rotate(-20 12 12)"/>
+          <!-- Dysnomia moon -->
+          <circle cx="20" cy="8" r="2.5" fill="white"/>
+          <!-- Entropy particles scattering -->
+          <circle cx="4" cy="6" r="1" fill="white" opacity="0.6"/>
+          <circle cx="6" cy="18" r="1" fill="white" opacity="0.4"/>
+        </svg>
+      </div>
       <div>
         <div class="logo-text">Entropy AI</div>
         <div class="logo-subtitle">PulseChain Interface</div>
@@ -1616,7 +1627,24 @@ Or drag this file to a browser tab on a dApp site like app.pulsex.com`;
       }
 
       if (!window.ethereum) {
-        alert('No wallet detected! Please install Rabby or MetaMask.');
+        document.getElementById('walletStatus').innerHTML = `
+          <span class="status-dot"></span>
+          <span style="color: var(--warning);">Not Detected</span>
+        `;
+        document.getElementById('walletStatus').classList.add('error');
+        log('Wallet not detected - check extension permissions', 'warning');
+        setOutput(`⚠️ Wallet Not Detected
+
+If you have Rabby or MetaMask installed:
+1. Click the wallet extension icon in your browser
+2. Look for a prompt to connect, or check Settings → Connected Sites
+3. Make sure this site (${window.location.hostname}) is allowed
+
+If you don't have a wallet:
+• Get Rabby at https://rabby.io (recommended)
+• Get MetaMask at https://metamask.io
+
+Once allowed, click "Connect Wallet" again.`);
         return;
       }
 
