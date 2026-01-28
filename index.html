@@ -2519,9 +2519,17 @@ Once allowed, click "Connect Wallet" again.`);
           document.getElementById('simSuccess').style.display = 'none';
           document.getElementById('simConfirmBtn').textContent = '⚠️ Execute Anyway';
         } else {
-          const formatted = simResult !== null && simResult !== undefined 
-            ? formatResult(simResult) 
-            : '(void - no return value)';
+          // Check for empty/void results
+          let formatted;
+          if (simResult === null || simResult === undefined) {
+            formatted = '✓ Success (no return value)';
+          } else if (Array.isArray(simResult) && simResult.length === 0) {
+            formatted = '✓ Success (no return value)';
+          } else if (typeof simResult === 'object' && Object.keys(simResult).length === 0) {
+            formatted = '✓ Success (no return value)';
+          } else {
+            formatted = formatResult(simResult);
+          }
           resultEl.textContent = formatted;
           resultEl.classList.remove('error');
           document.getElementById('simWarning').style.display = 'none';
@@ -2529,10 +2537,27 @@ Once allowed, click "Connect Wallet" again.`);
           document.getElementById('simConfirmBtn').textContent = '✓ Confirm & Execute';
         }
 
-        // Show gas
-        document.getElementById('simGas').textContent = gasEstimate 
-          ? `~${Number(gasEstimate).toLocaleString()} gas` 
-          : 'Unable to estimate';
+        // Show gas with PLS cost estimate
+        if (gasEstimate) {
+          try {
+            const feeData = await provider.getFeeData();
+            const gasPrice = feeData.gasPrice || feeData.maxFeePerGas;
+            if (gasPrice) {
+              const costWei = gasEstimate * gasPrice;
+              const costPLS = Number(costWei) / 1e18;
+              document.getElementById('simGas').innerHTML = `
+                ~${Number(gasEstimate).toLocaleString()} gas<br>
+                <span style="color: var(--text-muted); font-size: 12px;">≈ ${costPLS.toFixed(4)} PLS</span>
+              `;
+            } else {
+              document.getElementById('simGas').textContent = `~${Number(gasEstimate).toLocaleString()} gas`;
+            }
+          } catch (e) {
+            document.getElementById('simGas').textContent = `~${Number(gasEstimate).toLocaleString()} gas`;
+          }
+        } else {
+          document.getElementById('simGas').textContent = 'Unable to estimate';
+        }
 
         log(`Simulation complete for ${fnName}()`, 'info');
 
