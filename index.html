@@ -1704,6 +1704,7 @@ Quick tips:
       
       // MATH FOUNDATION
       'libAtropaMath': '0xB680F0cc810317933F234f67EB6A9E923407f05D',
+      'MATH': '0xB680F0cc810317933F234f67EB6A9E923407f05D',  // Alias for libAtropaMath
       
       // CORE CHAIN
       'VOID': '0x965B0d74591bF30327075A247C47dBf487dCff08',
@@ -4488,7 +4489,12 @@ RULES:
       try {
         switch (type) {
           case 'navigate':
-            const navAddress = KNOWN_CONTRACTS[action];
+            // Case-insensitive lookup
+            const actionUpper = action.toUpperCase();
+            const navAddress = KNOWN_CONTRACTS[action] || 
+                              KNOWN_CONTRACTS[actionUpper] || 
+                              KNOWN_CONTRACTS[action.toLowerCase()] ||
+                              Object.entries(KNOWN_CONTRACTS).find(([k, v]) => k.toUpperCase() === actionUpper)?.[1];
             if (navAddress) {
               addAIMessage(`✅ Loading ${action}...`, 'assistant');
               await loadContract(navAddress);
