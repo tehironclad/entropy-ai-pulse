@@ -148,26 +148,39 @@ Always provide:
 3. Expected results and what to do next
 4. Gas estimates when relevant
 
-Example response format for "What's next?":
+=== AI SUGGESTED ACTIONS ===
 
-Based on your state:
-- You have LAU at 0x...
-- You have YUE at 0x...
-- Currently in QING at 0x...
+You can SUGGEST actions for the user to confirm. Use these special formats:
 
-**Next Step: Call CHEON.Su() to accumulate**
+{{SUGGEST_NAVIGATE:CONTRACT_NAME:short reason}} - Suggest loading a known contract
+  Example: {{SUGGEST_NAVIGATE:SEI:Load SEI to create YUE}}
+  Example: {{SUGGEST_NAVIGATE:CHEON:Load CHEON for accumulation}}
 
-\\\`\\\`\\\`javascript
-const cheon = new ethers.Contract(
-  '0x3d23084cA3F40465553797b5138CFC456E61FB5D',
-  ['function Su(address) returns (uint256, uint256, uint256)'],
-  signer
-);
+{{SUGGEST_LOAD:0x...:short reason}} - Suggest loading a specific address
+  Example: {{SUGGEST_LOAD:0x3a668BB3DcE4A2573Be90A24Fd57771f9b1b9d30:Load your LAU}}
 
-const tx = await cheon.Su('YOUR_QING_ADDRESS');
-await tx.wait();
-// Returns: (Charge, Hypobar, Epibar)
-\\\`\\\`\\\`
+{{SUGGEST_READ:functionName(args):short reason}} - Suggest reading data
+  Example: {{SUGGEST_READ:totalSupply():Check total supply}}
+  Example: {{SUGGEST_READ:CurrentArea():See current QING}}
+
+{{SUGGEST_WRITE:functionName(args):short reason}} - Suggest a write transaction
+  Example: {{SUGGEST_WRITE:Start(0x..., 'name', 'SYM'):Create your YUE}}
+
+The user will see BUTTONS to confirm or decline! They click to execute.
+
+IMPORTANT RULES:
+1. Always explain WHY before suggesting an action
+2. Keep the "reason" SHORT (shows on button)
+3. For writes, explain consequences first
+4. Be conversational - "Would you like me to load SEI? {{SUGGEST_NAVIGATE:SEI:Load SEI}}"
+
+EXAMPLE:
+User: "I have my LAU, what's next?"
+You: "Great! Let's check if you have a YUE yet. I can load the SEI contract to check.
+
+{{SUGGEST_NAVIGATE:SEI:Load SEI contract}}
+
+Once loaded, we can see if you need to create a YUE or if you already have one."
 
 === INSTRUCTIONS ===
 
@@ -176,7 +189,8 @@ await tx.wait();
 3. Explain the math when asked - use actual numbers
 4. Provide ethers.js code for transactions
 5. Reference the user's discovered contracts (LAU, YUE, QING) when known
-6. Guide them through the terraforming journey step by step`;
+6. Guide them through the terraforming journey step by step
+7. USE SUGGESTIONS to help users - they confirm with a button click!`;
 
 export default async function handler(req, res) {
   // CORS headers
