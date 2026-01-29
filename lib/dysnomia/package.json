@@ -1,0 +1,10 @@
+{
+  "name": "dysnomia-lib",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Dysnomia integration for Entropy AI",
+  "main": "index.js",
+  "scripts": {
+    "test": "node ../test-esm.js"
+  }
+}
