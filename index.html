@@ -1158,14 +1158,11 @@ Load a contract and ask me anything about the Dysnomia architecture!
 
     // Constants
     const PULSESCAN_API = 'https://api.scan.pulsechain.com/api';
-    const ANTHROPIC_API = 'https://api.anthropic.com/v1/messages';
+    const ANTHROPIC_API = '/api/chat';  // Use Vercel serverless function
     
-    // CORS proxy for browser-based API calls
-    // Option 1: Use cors-anywhere or similar (for development)
-    // Option 2: Run local proxy
-    // Option 3: Use the copy-to-clipboard fallback
-    const USE_CORS_PROXY = true;
-    const CORS_PROXY = 'https://corsproxy.io/?';
+    // CORS proxy no longer needed - using serverless function
+    const USE_CORS_PROXY = false;
+    const CORS_PROXY = '';
 
     // Known selectors with full ABI info
     const KNOWN_SELECTORS = {
@@ -2491,94 +2488,22 @@ Or drag this file to a browser tab on a dApp site like app.pulsex.com`;
 
       try {
         const context = buildContext();
-        const apiUrl = USE_CORS_PROXY ? CORS_PROXY + encodeURIComponent(ANTHROPIC_API) : ANTHROPIC_API;
         
-        const response = await fetch(apiUrl, {
+        const response = await fetch('/api/chat', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'x-api-key': apiKey,
-            'anthropic-version': '2023-06-01'
+            'x-api-key': apiKey
           },
           body: JSON.stringify({
             model: 'claude-sonnet-4-20250514',
             max_tokens: 4096,
             messages: [{
               role: 'user',
-              content: `You are an expert on the Dysnomia ecosystem - a mathematical smart contract system on PulseChain built around modular exponentiation and paired reactors.
-
-=== DYSNOMIA ARCHITECTURE ===
-
-MOTZKIN PRIME: 953467954114363 (fundamental modulus for all operations)
-
-CORE CHAIN (Layer by layer):
-- VOID (0x965B0d74...) → Main ecosystem hub, user entry point
-  - VOID.Enter() creates user's LAU token
-  - VOID.Nu() → SIU
-- SIU → YANG (via Psi)
-- YANG → YAU (via Mu) 
-- YAU → ZHOU (via Tau)
-- ZHOU → ZHENG (via Upsilon)
-- ZHENG → YI (via Eta)
-- YI → SHIO (via Psi) - Main reactor
-
-REACTOR SYSTEM:
-- SHA: Single reactor with 13-variable Fa state (Base, Secret, Signal, Channel, Contour, Pole, Identity, Foundation, Element, Coordinate, Charge, Chin, Monopole)
-- SHIO: Paired reactor (Rod + Cone), must produce symmetric outputs
-- React(Pi) → XOR with Monopole → modExp64 → (Omicron, Omega)
-
-TANG DOMAIN:
-- CHEON → SEI (via Sei) - Heavenly layer
-- SEI.Chi() returns user's (YUE, LAU)
-- SEI.Start(lauAddress, name, symbol) creates user's YUE
-
-SOENG DOMAIN (Commerce chain):
-META → RING → PANG → ZI → CHOA → SEI → CHAN → XIE → XIA → MAI → QI → MAP
-- META.Beat(qingWaat) synthesizes through entire chain
-
-SPATIAL SYSTEM:
-- MAP: Coordinate grid (Waat → QING)
-- QING: Territory with Waat coordinate, Entropy, Asset
-- GWAT: Personal territory (Waat % 476733977057179 != 0)
-- HECKE: Meridian calculations
-
-USER LAYER:
-- CHO: User interaction handler
-  - CHO.GetUserTokenAddress(wallet) → LAU address
-  - CHO.Luo() → generates coordinate
-- LAU: User token/minter with Saat[3] array (pole, soul, aura)
-- YUE: IOT bridge with Hypobar/Epibar accumulation
-  - YUE.Bar(qing) → (Hypobar, Epibar)
-  - CHAN.Yan(wallet) → YUE address
-
-KEY FUNCTIONS:
-- Type() → returns contract type string
-- Xiao() → returns libAtropaMath address
-- React() variants → trigger state reactions
-- Beat() → synthesis function on META/higher contracts
-- Purchase()/Redeem() → market operations
-
-TERRAFORMING LAYERS (Maria's Vision):
-- Layer 3 (Life): YUE + IOT devices
-- Layer 2 (Firma): Personal GWATs 
-- Layer 1 (Terra): Data accumulation on minters (LAU)
-- Layer 0 (Physics): Mathematical foundation
-
-${context}
-
-User question: ${input}
-
-INSTRUCTIONS:
-1. Use your knowledge of Dysnomia architecture to provide accurate answers
-2. Reference specific contracts and their relationships
-3. Explain mathematical operations (modExp64, XOR chains) when relevant
-4. For unknown selectors, analyze bytecode patterns
-5. Provide code examples using ethers.js when helpful
-6. Format function signatures clearly: functionName(params) → returns
-
-Provide helpful, technical responses about the Dysnomia ecosystem.`
+              content: `${context}\n\nUser question: ${input}`
             }]
           })
+        });
         });
 
         const data = await response.json();
