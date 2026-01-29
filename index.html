@@ -3427,20 +3427,34 @@ Or drag this file to a browser tab on a dApp site like app.pulsex.com`;
     }
 
     function formatResult(result) {
-      if (typeof result === 'bigint') {
-        return result.toString();
-      } else if (Array.isArray(result)) {
-        return JSON.stringify(result.map(r => typeof r === 'bigint' ? r.toString() : r), null, 2);
-      } else if (result && typeof result === 'object') {
-        const obj = {};
-        for (const key of Object.keys(result)) {
-          if (isNaN(key)) {
-            obj[key] = typeof result[key] === 'bigint' ? result[key].toString() : result[key];
+      // Helper to recursively convert BigInts
+      function convertBigInts(value) {
+        if (typeof value === 'bigint') {
+          return value.toString();
+        } else if (Array.isArray(value)) {
+          return value.map(convertBigInts);
+        } else if (value && typeof value === 'object') {
+          const obj = {};
+          for (const key of Object.keys(value)) {
+            // Skip numeric keys (tuple indices)
+            if (isNaN(key)) {
+              obj[key] = convertBigInts(value[key]);
+            }
           }
+          return obj;
         }
-        return JSON.stringify(obj, null, 2);
+        return value;
       }
-      return String(result);
+      
+      try {
+        const converted = convertBigInts(result);
+        if (typeof converted === 'object') {
+          return JSON.stringify(converted, null, 2);
+        }
+        return String(converted);
+      } catch (e) {
+        return String(result);
+      }
     }
 
     // ═══════════════════════════════════════════════════════════════════════════
@@ -4071,23 +4085,49 @@ RULES:
               // Try to simulate/preview the transaction first
               let simulationMsg = '';
               try {
+                // Determine the category based on function name
+                let category = 'gas';
+                let operation = fnName.toLowerCase();
+                let params = { args };
+                
+                // Terraform operations
+                if (['alpha', 'beta', 'pi', 'rho', 'upsilon', 'generate'].includes(operation)) {
+                  category = 'terraform';
+                  params = { a: args[0] || '0' };
+                }
+                // LAU operations
+                else if (['chat', 'username', 'withdraw', 'leave', 'alias'].includes(operation)) {
+                  category = 'lau';
+                  params = { message: args[0] };
+                }
+                // Buy operations
+                else if (operation.startsWith('buy') || operation.includes('mint')) {
+                  category = 'buy';
+                  params = { amount: args[0] || '1' };
+                }
+                
                 const previewResponse = await fetch('/api/preview', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({
-                    category: 'general',
-                    operation: fnName.toLowerCase(),
-                    params: { args, contractType: currentContractType }
-                  })
+                  body: JSON.stringify({ category, operation, params })
                 });
                 
                 if (previewResponse.ok) {
                   const preview = await previewResponse.json();
-                  if (preview.gasEstimate) {
-                    simulationMsg = `\n📊 **Simulation:**\nEstimated Gas: ~${preview.gasEstimate.toLocaleString()}\n`;
+                  
+                  // Build simulation message
+                  if (preview.estimatedGas || preview.estimates?.[operation]) {
+                    const gas = preview.estimatedGas || preview.estimates?.[operation] || 80000;
+                    simulationMsg = `\n\n📊 **Simulation:**\n• Gas: ~${gas.toLocaleString()}`;
                   }
-                  if (preview.steps) {
-                    simulationMsg += `Steps: ${preview.steps.join(' → ')}\n`;
+                  if (preview.steps && Array.isArray(preview.steps)) {
+                    simulationMsg += `\n• Steps: ${preview.steps.map(s => s.action || s).join(' → ')}`;
+                  }
+                  if (preview.formula) {
+                    simulationMsg += `\n• Formula: ${preview.formula}`;
+                  }
+                  if (preview.warning) {
+                    simulationMsg += `\n⚠️ ${preview.warning}`;
                   }
                 }
               } catch (simErr) {
@@ -4095,7 +4135,16 @@ RULES:
                 log('Simulation skipped: ' + simErr.message, 'info');
               }
               
-              addAIMessage(`✍️ **${fnName}(${args.join(', ')})**\nContract: ${currentAddress.slice(0,10)}...${simulationMsg}\n⏳ Please confirm in your wallet.`, 'assistant');
+              // If no simulation, at least show basic gas estimate
+              if (!simulationMsg) {
+                const basicGas = {
+                  'chat': 80000, 'username': 120000, 'react': 150000,
+                  'alpha': 300000, 'beta': 250000, 'withdraw': 80000
+                }[fnName.toLowerCase()] || 100000;
+                simulationMsg = `\n\n📊 **Estimated Gas:** ~${basicGas.toLocaleString()}`;
+              }
+              
+              addAIMessage(`✍️ **${fnName}(${args.join(', ')})**\nContract: ${currentAddress.slice(0,10)}...${simulationMsg}\n\n⏳ Please confirm in your wallet.`, 'assistant');
               
               try {
                 const contractWithSigner = currentContract.connect(signer);
