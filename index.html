@@ -4286,6 +4286,19 @@ RULES:
               const argsStr = writeMatch[2];
               const args = argsStr ? argsStr.split(',').map(a => a.trim().replace(/['"]/g, '')) : [];
               
+              // Check if function exists on the contract
+              const contractWithSigner = currentContract.connect(signer);
+              if (typeof contractWithSigner[fnName] !== 'function') {
+                // Try to find the function in the ABI
+                const availableFns = Object.keys(contractWithSigner.interface.functions || {})
+                  .map(f => f.split('(')[0])
+                  .filter((v, i, a) => a.indexOf(v) === i);
+                  
+                addAIMessage(`❌ Function "${fnName}" not found on this contract.\n\nAvailable functions: ${availableFns.slice(0,10).join(', ')}${availableFns.length > 10 ? '...' : ''}\n\nContract type: ${currentContractType || 'Unknown'}`, 'assistant');
+                log(`Function ${fnName} not in ABI. Available: ${availableFns.join(', ')}`, 'error');
+                return;
+              }
+              
               // Try to simulate/preview the transaction first
               let simulationMsg = '';
               try {
@@ -4294,8 +4307,8 @@ RULES:
                 let operation = fnName.toLowerCase();
                 let params = { args };
                 
-                // Terraform operations
-                if (['alpha', 'beta', 'pi', 'rho', 'upsilon', 'generate'].includes(operation)) {
+                // Terraform operations (including React)
+                if (['alpha', 'beta', 'pi', 'rho', 'upsilon', 'generate', 'react'].includes(operation)) {
                   category = 'terraform';
                   params = { a: args[0] || '0' };
                 }
