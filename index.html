@@ -778,24 +778,20 @@
       position: absolute;
       top: 8px;
       right: 8px;
-      padding: 4px 8px;
+      padding: 4px 10px;
       font-size: 10px;
       background: var(--bg-tertiary);
       border: 1px solid var(--border-color);
       border-radius: 4px;
       cursor: pointer;
-      opacity: 0;
-      transition: opacity 0.2s;
       color: var(--text-muted);
-    }
-
-    .ai-message:hover .copy-msg-btn {
-      opacity: 1;
+      z-index: 10;
     }
 
     .ai-message .copy-msg-btn:hover {
       background: var(--accent-primary);
       color: white;
+      border-color: var(--accent-primary);
     }
 
     .ai-message.user {
@@ -809,6 +805,10 @@
       background: rgba(255,255,255,0.2);
       border-color: rgba(255,255,255,0.3);
       color: white;
+    }
+
+    .ai-message.user .copy-msg-btn:hover {
+      background: rgba(255,255,255,0.4);
     }
 
     .ai-message.assistant {
@@ -1367,7 +1367,8 @@
       
       <div class="ai-messages" id="aiMessages">
         <div class="ai-message assistant">
-          🔮 Hi! I'm your Dysnomia AI Guide.
+          <button class="copy-msg-btn" onclick="copyInitialMsg(this)">📋 Copy</button>
+          <div>🔮 Hi! I'm your Dysnomia AI Guide.
 
 <b>To get started:</b>
 1. Enter your LAU address in the sidebar
@@ -1380,7 +1381,7 @@ I know the full Dysnomia architecture:
 • Terraforming layers
 • How to execute transactions
 
-<b>Set your API key to enable me!</b>
+<b>Set your API key to enable me!</b></div>
         </div>
       </div>
 
@@ -2987,6 +2988,7 @@ Or drag this file to a browser tab on a dApp site like app.pulsex.com`;
 
       // Get basic info
       const contract = new ethers.Contract(address, currentABI, provider);
+      currentContract = contract; // Store for AI actions
       
       let name = 'Unknown';
       let symbol = '';
@@ -3656,6 +3658,15 @@ Be helpful and suggest actions when appropriate. User confirms before execution.
       messages.scrollTop = div.offsetTop - messages.offsetTop;
     }
 
+    // Copy helper for initial hardcoded message
+    function copyInitialMsg(btn) {
+      const msgDiv = btn.parentElement;
+      const textContent = msgDiv.querySelector('div').textContent;
+      navigator.clipboard.writeText(textContent);
+      btn.textContent = '✓ Copied!';
+      setTimeout(() => btn.textContent = '📋 Copy', 1500);
+    }
+
     // Contract Panel Tab Switching
     function showContractTab(tabName) {
       // Update tab buttons
@@ -3885,8 +3896,11 @@ RULES:
         
         const btnClass = suggestion.type === 'write' ? 'action-btn write' : 'action-btn';
         
+        // Encode the action to avoid quote issues in onclick
+        const encodedAction = btoa(suggestion.action);
+        
         html += `
-          <button class="${btnClass}" onclick="executeAIAction('${suggestion.type}', '${suggestion.action.replace(/'/g, "\\'")}')">
+          <button class="${btnClass}" onclick="executeAIActionEncoded('${suggestion.type}', '${encodedAction}')">
             ${icon} ${suggestion.reason}
           </button>
         `;
@@ -3896,6 +3910,12 @@ RULES:
       html += '</div>';
       
       return html;
+    }
+    
+    // Decode and execute action
+    function executeAIActionEncoded(type, encodedAction) {
+      const action = atob(encodedAction);
+      executeAIAction(type, action);
     }
     
     // Execute a confirmed action
