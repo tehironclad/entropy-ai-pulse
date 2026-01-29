@@ -771,6 +771,31 @@
       font-size: 15px;
       line-height: 1.8;
       white-space: pre-wrap;
+      position: relative;
+    }
+
+    .ai-message .copy-msg-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      padding: 4px 8px;
+      font-size: 10px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.2s;
+      color: var(--text-muted);
+    }
+
+    .ai-message:hover .copy-msg-btn {
+      opacity: 1;
+    }
+
+    .ai-message .copy-msg-btn:hover {
+      background: var(--accent-primary);
+      color: white;
     }
 
     .ai-message.user {
@@ -778,6 +803,12 @@
       color: white;
       margin-left: 40px;
       border-bottom-right-radius: 4px;
+    }
+
+    .ai-message.user .copy-msg-btn {
+      background: rgba(255,255,255,0.2);
+      border-color: rgba(255,255,255,0.3);
+      color: white;
     }
 
     .ai-message.assistant {
@@ -1382,15 +1413,32 @@ I know the full Dysnomia architecture:
     <!-- Right Contract Panel - TABBED -->
     <aside class="contract-panel">
       <div class="contract-panel-tabs">
-        <div class="contract-panel-tab active" onclick="showContractTab('info')">📋 Info</div>
+        <div class="contract-panel-tab active" onclick="showContractTab('output')">📤 Output</div>
+        <div class="contract-panel-tab" onclick="showContractTab('info')">📋 Info</div>
         <div class="contract-panel-tab" onclick="showContractTab('functions')">⚡ Funcs</div>
-        <div class="contract-panel-tab" onclick="showContractTab('output')">📤 Output</div>
         <div class="contract-panel-tab" onclick="showContractTab('bytecode')">🔍 Bytes</div>
       </div>
       
       <div class="contract-panel-content">
+        <!-- Output Tab - NOW FIRST AND DEFAULT -->
+        <div class="contract-panel-section active" id="tabOutput">
+          <div class="output-panel-compact">
+            <div style="display: flex; justify-content: flex-end; margin-bottom: 8px;">
+              <button class="btn btn-secondary btn-sm" onclick="copyOutput()" style="font-size: 10px; padding: 4px 8px;">📋 Copy</button>
+            </div>
+            <div class="output-content" id="outputContent" style="font-size: 12px; line-height: 1.5;">
+Enter a contract address to begin.
+
+Quick tips:
+• Load verified contracts for full ABI
+• Unverified contracts use bytecode analysis
+• Use the AI assistant for help
+            </div>
+          </div>
+        </div>
+
         <!-- Info Tab -->
-        <div class="contract-panel-section active" id="tabInfo">
+        <div class="contract-panel-section" id="tabInfo">
           <div id="contractInfoContent">
             <div style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
               <div style="font-size: 48px; margin-bottom: 16px;">📋</div>
@@ -1406,20 +1454,6 @@ I know the full Dysnomia architecture:
             <div style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
               <div style="font-size: 48px; margin-bottom: 16px;">⚡</div>
               <div style="font-size: 14px;">No contract loaded</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Output Tab -->
-        <div class="contract-panel-section" id="tabOutput">
-          <div class="output-panel-compact">
-            <div class="output-content" id="outputContent" style="font-size: 12px; line-height: 1.5;">
-Enter a contract address to begin.
-
-Quick tips:
-• Load verified contracts for full ABI
-• Unverified contracts use bytecode analysis
-• Use the AI assistant for help
             </div>
           </div>
         </div>
@@ -3599,7 +3633,24 @@ Be helpful and suggest actions when appropriate. User confirms before execution.
       const messages = document.getElementById('aiMessages');
       const div = document.createElement('div');
       div.className = 'ai-message ' + role;
-      div.innerHTML = content.replace(/```(\w+)?\n([\s\S]*?)```/g, '<pre>$2</pre>').replace(/`([^`]+)`/g, '<code>$1</code>');
+      
+      // Add copy button
+      const copyBtn = document.createElement('button');
+      copyBtn.className = 'copy-msg-btn';
+      copyBtn.textContent = '📋 Copy';
+      copyBtn.onclick = () => {
+        navigator.clipboard.writeText(content);
+        copyBtn.textContent = '✓ Copied!';
+        setTimeout(() => copyBtn.textContent = '📋 Copy', 1500);
+      };
+      
+      div.appendChild(copyBtn);
+      
+      // Add content
+      const contentDiv = document.createElement('div');
+      contentDiv.innerHTML = content.replace(/```(\w+)?\n([\s\S]*?)```/g, '<pre>$2</pre>').replace(/`([^`]+)`/g, '<code>$1</code>');
+      div.appendChild(contentDiv);
+      
       messages.appendChild(div);
       // Scroll within the messages container only, not the whole page
       messages.scrollTop = div.offsetTop - messages.offsetTop;
