@@ -1291,7 +1291,7 @@ I know the full Dysnomia architecture:
               <button class="ai-quick-btn primary" onclick="quickAction('guide')">🧭 Next?</button>
               <button class="ai-quick-btn" onclick="quickAction('explain')">📖 Explain</button>
               <button class="ai-quick-btn" onclick="quickAction('react')">⚡ React</button>
-              <button class="ai-quick-btn" onclick="quickAction('math')">🔢 Math</button>
+              <button class="ai-quick-btn" onclick="showCurrentState()">📋 State</button>
             </div>
             <button class="btn btn-primary" onclick="sendToAI()" style="padding: 12px 24px; font-size: 14px;">Send</button>
           </div>
@@ -3474,6 +3474,8 @@ RULES:
     // Execute a confirmed action
     async function executeAIAction(type, action) {
       log(`Executing: ${type} - ${action}`, 'info');
+      log(`Current contract: ${currentAddress || 'none'}`, 'info');
+      log(`Signer: ${signer ? 'connected' : 'not connected'}`, 'info');
       
       // Remove action buttons
       document.querySelectorAll('.ai-action-buttons').forEach(el => el.remove());
@@ -3481,13 +3483,13 @@ RULES:
       try {
         switch (type) {
           case 'navigate':
-            const address = KNOWN_CONTRACTS[action];
-            if (address) {
+            const navAddress = KNOWN_CONTRACTS[action];
+            if (navAddress) {
               addAIMessage(`✅ Loading ${action}...`, 'assistant');
-              await loadContract(address);
-              addAIMessage(`✅ ${action} loaded! You can now see its functions in the middle panel.`, 'assistant');
+              await loadContract(navAddress);
+              addAIMessage(`✅ ${action} loaded at ${navAddress.slice(0,10)}...! You can now see its functions in the middle panel.`, 'assistant');
             } else {
-              addAIMessage(`❌ Unknown contract: ${action}`, 'assistant');
+              addAIMessage(`❌ Unknown contract: ${action}. Known contracts: ${Object.keys(KNOWN_CONTRACTS).slice(0,10).join(', ')}...`, 'assistant');
             }
             break;
             
@@ -3498,8 +3500,8 @@ RULES:
             break;
             
           case 'read':
-            if (!currentContract) {
-              addAIMessage(`⚠️ Please load a contract first.`, 'assistant');
+            if (!currentContract || !currentAddress) {
+              addAIMessage(`⚠️ No contract loaded. Current state: address=${currentAddress}, contract=${currentContract ? 'exists' : 'null'}`, 'assistant');
               return;
             }
             
@@ -3510,20 +3512,27 @@ RULES:
               const argsStr = readMatch[2];
               const args = argsStr ? argsStr.split(',').map(a => a.trim().replace(/['"]/g, '')) : [];
               
-              addAIMessage(`📊 Calling ${fnName}()...`, 'assistant');
-              const result = await currentContract[fnName](...args);
-              const formatted = formatResult(result);
-              addAIMessage(`📊 **${fnName}()** result:\n\`\`\`\n${formatted}\n\`\`\``, 'assistant');
+              addAIMessage(`📖 Calling ${fnName}(${args.join(', ')}) on ${currentAddress.slice(0,10)}...`, 'assistant');
+              
+              try {
+                const result = await currentContract[fnName](...args);
+                const formatted = formatResult(result);
+                addAIMessage(`📖 **${fnName}()** result:\n\`\`\`\n${formatted}\n\`\`\``, 'assistant');
+              } catch (readErr) {
+                addAIMessage(`❌ Error calling ${fnName}: ${readErr.message}`, 'assistant');
+              }
+            } else {
+              addAIMessage(`❌ Could not parse function call: ${action}`, 'assistant');
             }
             break;
             
           case 'write':
             if (!signer) {
-              addAIMessage(`⚠️ Please connect your wallet first.`, 'assistant');
+              addAIMessage(`⚠️ Please connect your wallet first. Click "Connect Wallet" in the header.`, 'assistant');
               return;
             }
-            if (!currentContract) {
-              addAIMessage(`⚠️ Please load a contract first.`, 'assistant');
+            if (!currentContract || !currentAddress) {
+              addAIMessage(`⚠️ No contract loaded. Please load a contract first, then try again.`, 'assistant');
               return;
             }
             
@@ -3534,16 +3543,26 @@ RULES:
               const argsStr = writeMatch[2];
               const args = argsStr ? argsStr.split(',').map(a => a.trim().replace(/['"]/g, '')) : [];
               
-              addAIMessage(`✍️ Preparing ${fnName}()... Please confirm in your wallet.`, 'assistant');
+              addAIMessage(`✍️ Preparing ${fnName}(${args.join(', ')}) on ${currentAddress.slice(0,10)}...\n\nPlease confirm in your wallet.`, 'assistant');
               
-              const contractWithSigner = currentContract.connect(signer);
-              const tx = await contractWithSigner[fnName](...args);
-              
-              addAIMessage(`⏳ Transaction submitted: ${tx.hash.slice(0,10)}...`, 'assistant');
-              
-              const receipt = await tx.wait();
-              addAIMessage(`✅ Transaction confirmed!\nHash: ${tx.hash}\nBlock: ${receipt.blockNumber}`, 'assistant');
-              log(`Transaction confirmed: ${tx.hash}`, 'success');
+              try {
+                const contractWithSigner = currentContract.connect(signer);
+                const tx = await contractWithSigner[fnName](...args);
+                
+                addAIMessage(`⏳ Transaction submitted!\nHash: ${tx.hash}\n\nWaiting for confirmation...`, 'assistant');
+                
+                const receipt = await tx.wait();
+                addAIMessage(`✅ Transaction confirmed!\n\nHash: ${tx.hash}\nBlock: ${receipt.blockNumber}\nGas used: ${receipt.gasUsed.toString()}`, 'assistant');
+                log(`Transaction confirmed: ${tx.hash}`, 'success');
+              } catch (txErr) {
+                if (txErr.code === 'ACTION_REJECTED') {
+                  addAIMessage(`❌ Transaction rejected by user.`, 'assistant');
+                } else {
+                  addAIMessage(`❌ Transaction failed: ${txErr.message}`, 'assistant');
+                }
+              }
+            } else {
+              addAIMessage(`❌ Could not parse function call: ${action}`, 'assistant');
             }
             break;
         }
@@ -3556,6 +3575,26 @@ RULES:
     function declineActions() {
       document.querySelectorAll('.ai-action-buttons').forEach(el => el.remove());
       addAIMessage(`👍 No problem! Let me know if you need anything else.`, 'assistant');
+    }
+    
+    // Show current system state in chat
+    function showCurrentState() {
+      let state = `📋 **Current System State:**\n\n`;
+      state += `**Wallet:** ${signer ? '✅ Connected' : '❌ Not connected'}\n`;
+      state += `**Contract Loaded:** ${currentAddress ? `✅ ${document.getElementById('contractName')?.textContent || 'Unknown'} (${currentAddress.slice(0,10)}...)` : '❌ None'}\n`;
+      
+      if (userContracts.lau) {
+        state += `**Your LAU:** ${userContracts.lau.slice(0,10)}...\n`;
+      }
+      if (userContracts.yue) {
+        state += `**Your YUE:** ${userContracts.yue.slice(0,10)}...\n`;
+      }
+      if (userContracts.currentArea) {
+        state += `**Current QING:** ${userContracts.currentArea.slice(0,10)}...\n`;
+      }
+      state += `**CHO Registered:** ${userContracts.registered ? '✅ Yes' : '❌ No'}\n`;
+      
+      addAIMessage(state, 'assistant');
     }
 
     function quickAction(action) {
