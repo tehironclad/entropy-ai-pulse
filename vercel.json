@@ -20,7 +20,11 @@
       "dest": "/api/preview.js"
     },
     {
-      "src": "/(.*)",
+      "src": "/",
+      "dest": "/index.html"
+    },
+    {
+      "src": "/((?!api).*)",
       "dest": "/index.html"
     }
   ]
