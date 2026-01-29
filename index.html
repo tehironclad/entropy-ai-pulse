@@ -684,6 +684,50 @@
       opacity: 0.9;
       color: white;
     }
+    
+    /* AI Activity Log */
+    .ai-activity-log {
+      border-top: 1px solid var(--border-color);
+      background: var(--bg-tertiary);
+    }
+    
+    .ai-activity-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 16px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+    
+    .ai-activity-header:hover {
+      background: var(--bg-card);
+    }
+    
+    .ai-activity-content {
+      max-height: 150px;
+      overflow-y: auto;
+      padding: 0 12px 12px 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+    }
+    
+    .ai-activity-content.collapsed {
+      display: none;
+    }
+    
+    .log-entry {
+      padding: 4px 0;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-muted);
+    }
+    
+    .log-entry.success { color: var(--success); }
+    .log-entry.error { color: var(--error); }
+    .log-entry.warning { color: var(--warning); }
+    .log-entry.info { color: var(--info); }
 
     /* Function List */
     .function-list {
@@ -941,11 +985,21 @@
       </div>
       
       <div class="sidebar-section">
-        <div class="sidebar-title">🔮 Find My Contracts</div>
+        <div class="sidebar-title">🔮 My Dysnomia Identity</div>
+        
+        <div style="font-size: 11px; color: var(--text-secondary); margin-bottom: 8px;">Enter your LAU address to find YUE & QINGs:</div>
         <div class="input-group" style="margin-bottom: 8px;">
-          <input type="text" class="input" id="walletLookup" placeholder="Your wallet address (0x...)">
+          <input type="text" class="input" id="myLauAddress" placeholder="Your LAU contract address (0x...)">
         </div>
-        <button class="btn btn-secondary btn-sm" onclick="findUserContracts()" style="width: 100%;">🔍 Find LAU & YUE</button>
+        <button class="btn btn-primary btn-sm" onclick="lookupFromLau()" style="width: 100%; margin-bottom: 12px;">🔍 Load My Identity</button>
+        
+        <div style="border-top: 1px solid var(--border-color); padding-top: 12px; margin-top: 4px;">
+          <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 6px;">Or search by wallet (requires CHO registration):</div>
+          <div class="input-group" style="margin-bottom: 6px;">
+            <input type="text" class="input" id="walletLookup" placeholder="Wallet address (0x...)" style="font-size: 11px; padding: 8px;">
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="findUserContracts()" style="width: 100%; font-size: 11px;">Search CHO Registry</button>
+        </div>
       </div>
 
       <div class="sidebar-section">
@@ -956,18 +1010,14 @@
       </div>
 
       <div class="sidebar-section">
-        <div class="sidebar-title">Recent</div>
+        <div class="sidebar-title" style="display: flex; justify-content: space-between; align-items: center;">
+          Recent
+          <button class="btn btn-secondary btn-sm" onclick="clearRecentContracts()" style="padding: 2px 8px; font-size: 10px;">Clear</button>
+        </div>
         <div class="contract-list" id="recentContracts">
           <div class="contract-item" style="justify-content: center; color: var(--text-muted);">
             No recent contracts
           </div>
-        </div>
-      </div>
-
-      <div class="sidebar-section">
-        <div class="sidebar-title">Activity Log</div>
-        <div class="output-panel log-panel" id="activityLog">
-          <div class="output-content">Ready.</div>
         </div>
       </div>
     </aside>
@@ -1106,47 +1156,61 @@ Quick tips:
     <aside class="ai-panel">
       <div class="ai-header">
         <div class="ai-title">
-          🧠 <span>Claude Assistant</span>
+          🧠 <span>Dysnomia AI Guide</span>
         </div>
-        <div style="display: flex; gap: 8px;">
-          <button class="btn btn-secondary btn-sm" onclick="clearAIChat()">🗑️ Clear</button>
-          <button class="btn btn-secondary btn-sm" onclick="openApiKeyModal()">⚙️ API Key</button>
+        <div style="display: flex; gap: 6px;">
+          <button class="btn btn-secondary btn-sm" onclick="clearAIChat()" title="Clear chat">🗑️</button>
+          <button class="btn btn-secondary btn-sm" onclick="openApiKeyModal()" title="API Settings">⚙️</button>
         </div>
       </div>
       
       <div class="ai-config" id="aiConfig">
-        <div style="color: var(--text-muted); font-size: 12px; text-align: center; padding: 12px;">
-          Enter your own Anthropic API key to enable AI assistance.<br>
-          <span style="color: var(--text-muted); font-size: 11px;">Get one at <a href="https://console.anthropic.com" target="_blank" style="color: var(--accent-primary);">console.anthropic.com</a></span>
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: var(--bg-tertiary); border-radius: 6px;">
+          <span style="color: var(--text-muted); font-size: 11px;">API Key: Not configured</span>
+          <button class="btn btn-secondary btn-sm" onclick="openApiKeyModal()" style="padding: 4px 10px; font-size: 10px;">Set Key</button>
         </div>
       </div>
 
       <div class="ai-messages" id="aiMessages">
         <div class="ai-message assistant">
-          🔮 Hi! I'm your Dysnomia ecosystem expert.
+          🔮 Hi! I'm your Dysnomia AI Guide.
 
-I have deep knowledge of:
-• The reactor system (SHA, SHIO, modExp64)
-• Core chain (VOID → SIU → YANG → ... → YI)
-• Domains (TANG, SOENG) and spatial system
-• User contracts (LAU, YUE, QING, GWAT)
-• Terraforming layers and META.Beat()
+<b>To get started:</b>
+1. Enter your LAU address in the sidebar
+2. Click "Load My Identity" to find your YUE & QINGs
+3. Ask me "what should I do next?"
 
-Load a contract and ask me anything about the Dysnomia architecture!
+I know the full Dysnomia architecture:
+• Reactor math (SHA, SHIO, modExp64)
+• Core chain & domain contracts
+• Terraforming layers
+• How to execute transactions
+
+<b>Set your API key to enable me!</b>
         </div>
       </div>
 
       <div class="ai-input-container">
         <div class="ai-input-wrapper">
-          <textarea class="ai-input" id="aiInput" placeholder="Ask about Dysnomia, get help with transactions, or learn the math..." rows="3"></textarea>
-          <button class="btn btn-primary" onclick="sendToAI()" style="align-self: flex-end;">Send</button>
+          <textarea class="ai-input" id="aiInput" placeholder="Ask about Dysnomia, get transaction help, learn the math..." rows="4"></textarea>
+          <button class="btn btn-primary" onclick="sendToAI()" style="align-self: flex-end; padding: 12px 20px;">Send</button>
         </div>
         <div class="ai-quick-actions">
           <button class="ai-quick-btn primary" onclick="quickAction('guide')">🧭 What's Next?</button>
-          <button class="ai-quick-btn" onclick="quickAction('explain')">📖 Explain Contract</button>
-          <button class="ai-quick-btn" onclick="quickAction('react')">⚡ How to React</button>
-          <button class="ai-quick-btn" onclick="quickAction('math')">🔢 Explain Math</button>
-          <button class="ai-quick-btn" onclick="quickAction('terraform')">🌍 Terraforming</button>
+          <button class="ai-quick-btn" onclick="quickAction('explain')">📖 Explain</button>
+          <button class="ai-quick-btn" onclick="quickAction('react')">⚡ React</button>
+          <button class="ai-quick-btn" onclick="quickAction('math')">🔢 Math</button>
+          <button class="ai-quick-btn" onclick="quickAction('terraform')">🌍 Terraform</button>
+        </div>
+      </div>
+      
+      <div class="ai-activity-log">
+        <div class="ai-activity-header" onclick="toggleActivityLog()">
+          <span>📋 Activity Log</span>
+          <span id="activityLogArrow">▼</span>
+        </div>
+        <div class="ai-activity-content" id="activityLog">
+          <div class="log-entry">Ready.</div>
         </div>
       </div>
     </aside>
@@ -1156,23 +1220,24 @@ Load a contract and ask me anything about the Dysnomia architecture!
   <div class="modal-overlay" id="apiKeyModal">
     <div class="modal">
       <div class="modal-header">
-        <div class="modal-title">🔑 Anthropic API Key</div>
+        <div class="modal-title">🔑 API Key Settings</div>
         <button class="modal-close" onclick="closeApiKeyModal()">×</button>
       </div>
       <div class="modal-body">
         <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 16px;">
-          Enter your personal Anthropic API key to enable Claude integration.<br>
+          Enter your Anthropic API key to enable the AI assistant.<br>
           Get one at <a href="https://console.anthropic.com" target="_blank" style="color: var(--accent-primary);">console.anthropic.com</a> (~$5 for thousands of queries)
         </p>
         <div class="input-group">
-          <label class="input-label">Your API Key</label>
+          <label class="input-label">Anthropic API Key</label>
           <input type="password" class="input" id="apiKeyInput" placeholder="sk-ant-...">
         </div>
         <p style="color: var(--text-muted); font-size: 11px; margin: 12px 0;">
-          🔒 Your key is stored only in your browser's local storage and sent directly to Anthropic. It never touches our servers.
+          🔒 Stored locally in your browser. Never sent to our servers.
         </p>
         <div style="display: flex; gap: 12px; margin-top: 20px;">
-          <button class="btn btn-secondary" onclick="closeApiKeyModal()" style="flex: 1;">Cancel</button>
+          <button class="btn btn-secondary" onclick="clearApiKey(); closeApiKeyModal();" style="flex: 0.5;">Clear</button>
+          <button class="btn btn-secondary" onclick="closeApiKeyModal()" style="flex: 0.5;">Cancel</button>
           <button class="btn btn-primary" onclick="saveApiKey()" style="flex: 1;">Save Key</button>
         </div>
       </div>
@@ -1764,7 +1829,8 @@ Load a contract and ask me anything about the Dysnomia architecture!
       lau: null,
       yue: null,
       qings: [],
-      currentArea: null
+      currentArea: null,
+      registered: false
     };
     
     async function findUserContracts() {
@@ -1780,30 +1846,20 @@ Load a contract and ask me anything about the Dysnomia architecture!
       
       let results = [];
       
-      // Method 1: Try CHO.GetUserTokenAddress
+      // Method 1: Try CHO.GetUserTokenAddress (requires user to have called Enter())
       try {
-        log('Trying CHO.GetUserTokenAddress...', 'info');
+        log('Checking CHO.GetUserTokenAddress...', 'info');
         const cho = new ethers.Contract(KNOWN_CONTRACTS['CHO'], [
           'function GetUserTokenAddress(address) view returns (address)',
-          'function UserTokens(address) view returns (address)',
+          'function Delegates(address) view returns (uint64 Soul, tuple(address Phi, uint64 Mu, uint64 Xi, address Pi, address Shio, address Ring, uint64 Omicron, uint64 Omega) On, string Username, uint64 Entropy)',
         ], provider);
         
-        let lauAddress = null;
-        try {
-          lauAddress = await cho.GetUserTokenAddress(wallet);
-        } catch (e) {
-          log(`GetUserTokenAddress failed: ${e.message}`, 'warning');
-          // Try alternate function
-          try {
-            lauAddress = await cho.UserTokens(wallet);
-          } catch (e2) {
-            log(`UserTokens failed: ${e2.message}`, 'warning');
-          }
-        }
+        const lauAddress = await cho.GetUserTokenAddress(wallet);
         
         if (lauAddress && lauAddress !== ethers.ZeroAddress) {
-          log(`✅ Found LAU: ${lauAddress}`, 'success');
+          log(`✅ Found registered LAU: ${lauAddress}`, 'success');
           userContracts.lau = lauAddress;
+          userContracts.registered = true;
           
           const lau = new ethers.Contract(lauAddress, [
             'function name() view returns (string)',
@@ -1814,7 +1870,7 @@ Load a contract and ask me anything about the Dysnomia architecture!
           let lauName = 'Your LAU';
           try { lauName = await lau.name(); } catch {}
           
-          results.push(`✅ LAU: ${lauName} (${lauAddress.slice(0,10)}...)`);
+          results.push(`✅ LAU (registered): ${lauName} (${lauAddress.slice(0,10)}...)`);
           addDiscoveredContract(lauName, lauAddress, 'LAU');
           
           // Get current area (QING) from LAU
@@ -1838,16 +1894,47 @@ Load a contract and ask me anything about the Dysnomia architecture!
             log(`No CurrentArea on LAU: ${e.message}`, 'info');
           }
         } else {
-          results.push(`❌ No LAU found via CHO`);
+          log('No LAU registered in CHO - checking if user has called Enter()', 'info');
+          results.push(`⚠️ No LAU registered in CHO`);
+          results.push(`   → You may need to call CHO.Enter(yourLauAddress) to register`);
         }
       } catch (e) {
-        log(`CHO lookup failed: ${e.message}`, 'error');
-        results.push(`❌ CHO lookup error: ${e.message}`);
+        log(`CHO lookup error: ${e.message}`, 'warning');
+        results.push(`⚠️ CHO lookup error: ${e.message.slice(0,50)}...`);
       }
       
-      // Method 2: Try CHAN.Yan for YUE
+      // Method 2: Check known LAUs for ownership
+      if (!userContracts.lau) {
+        log('Checking known LAUs for ownership...', 'info');
+        const knownLaus = Object.entries(KNOWN_CONTRACTS).filter(([k]) => k.startsWith('LAU'));
+        
+        for (const [name, addr] of knownLaus) {
+          try {
+            const lau = new ethers.Contract(addr, [
+              'function owner(address) view returns (bool)',
+              'function isOwner(address) view returns (bool)',
+              'function balanceOf(address) view returns (uint256)',
+            ], provider);
+            
+            let isOwner = false;
+            try { isOwner = await lau.owner(wallet); } catch {}
+            if (!isOwner) try { isOwner = await lau.isOwner(wallet); } catch {}
+            
+            if (isOwner) {
+              log(`✅ Found LAU ownership: ${name} at ${addr}`, 'success');
+              userContracts.lau = addr;
+              results.push(`✅ LAU (owned, not registered): ${name}`);
+              results.push(`   → Call CHO.Enter("${addr}") to register`);
+              addDiscoveredContract(name + ' (unregistered)', addr, 'LAU');
+              break;
+            }
+          } catch {}
+        }
+      }
+      
+      // Method 3: Try CHAN.Yan for YUE
       try {
-        log('Trying CHAN.Yan for YUE...', 'info');
+        log('Checking CHAN.Yan for YUE...', 'info');
         const chan = new ethers.Contract(KNOWN_CONTRACTS['CHAN'], [
           'function Yan(address) view returns (address)',
         ], provider);
@@ -1867,27 +1954,351 @@ Load a contract and ask me anything about the Dysnomia architecture!
           results.push(`✅ YUE: ${yueName} (${yueAddress.slice(0,10)}...)`);
           addDiscoveredContract(yueName, yueAddress, 'YUE');
         } else {
-          results.push(`❌ No YUE found - call SEI.Start() to create one`);
+          results.push(`❌ No YUE found`);
+          results.push(`   → Call SEI.Start(yourLauAddress, name, symbol) to create`);
         }
       } catch (e) {
-        log(`CHAN.Yan failed: ${e.message}`, 'warning');
-        results.push(`❌ YUE lookup error: ${e.message}`);
+        log(`CHAN.Yan error: ${e.message}`, 'warning');
+        results.push(`⚠️ YUE lookup error`);
       }
       
-      // Display results
-      setOutput(`🔮 Dysnomia Contract Discovery\n\nWallet: ${wallet}\n\n${results.join('\n')}\n\n💡 Tip: Ask the AI "what should I do next?" for guidance!`);
+      // Summary
+      let summary = `🔮 Dysnomia Contract Discovery\n\nWallet: ${wallet}\n\n${results.join('\n')}`;
       
-      // Update AI context
+      if (!userContracts.registered && userContracts.lau) {
+        summary += `\n\n⚠️ Your LAU exists but isn't registered in CHO.`;
+        summary += `\nTo register, call: CHO.Enter("${userContracts.lau}")`;
+      } else if (!userContracts.lau) {
+        summary += `\n\n💡 No LAU found. To create one:`;
+        summary += `\n1. Deploy a new LAU contract, or`;
+        summary += `\n2. Check if you own one at a different address`;
+      }
+      
+      summary += `\n\n💡 Ask the AI "what should I do next?" for guidance!`;
+      
+      setOutput(summary);
       updateAIContext();
     }
     
     function updateAIContext() {
-      // Store user context for AI to access
       window.userDysnomiaContext = {
         ...userContracts,
         loadedContract: currentAddress,
         loadedType: document.getElementById('contractType')?.textContent,
       };
+    }
+    
+    // LAU-first lookup - the primary way to find your identity
+    async function lookupFromLau() {
+      const lauAddress = document.getElementById('myLauAddress').value.trim();
+      
+      if (!lauAddress || !ethers.isAddress(lauAddress)) {
+        log('Please enter a valid LAU contract address', 'error');
+        return;
+      }
+      
+      log(`🔍 Loading identity from LAU: ${lauAddress.slice(0,10)}...`, 'info');
+      
+      let results = [];
+      results.push(`🔮 DYSNOMIA IDENTITY LOOKUP`);
+      results.push(`${'═'.repeat(40)}`);
+      
+      try {
+        const lau = new ethers.Contract(lauAddress, [
+          'function Type() view returns (string)',
+          'function name() view returns (string)',
+          'function symbol() view returns (string)',
+          'function Username() view returns (string)',
+          'function Saat(uint256) view returns (uint64)',
+          'function CurrentArea() view returns (address)',
+          'function Eta() view returns (address)',
+          'function On() view returns (tuple(address Phi, uint64 Mu, uint64 Xi, address Pi, address Shio, address Ring, uint64 Omicron, uint64 Omega))',
+        ], provider);
+        
+        // Verify it's a LAU
+        let contractType = '';
+        try { contractType = await lau.Type(); } catch {}
+        
+        if (contractType !== 'LAU') {
+          log(`Warning: Type is "${contractType || 'unknown'}", expected "LAU"`, 'warning');
+          results.push(`⚠️ Contract type: ${contractType || 'unknown'} (expected LAU)`);
+        }
+        
+        // Get LAU details
+        let name = '', symbol = '', username = '';
+        let pole = '', soul = '', aura = '';
+        
+        try { name = await lau.name(); } catch {}
+        try { symbol = await lau.symbol(); } catch {}
+        try { username = await lau.Username(); } catch {}
+        try { pole = (await lau.Saat(0)).toString(); } catch {}
+        try { soul = (await lau.Saat(1)).toString(); } catch {}
+        try { aura = (await lau.Saat(2)).toString(); } catch {}
+        
+        userContracts.lau = lauAddress;
+        
+        results.push(``);
+        results.push(`👤 LAU TOKEN`);
+        results.push(`   Address: ${lauAddress}`);
+        results.push(`   Name: ${name || 'Unknown'}`);
+        results.push(`   Symbol: ${symbol || 'Unknown'}`);
+        if (username) results.push(`   Username: ${username}`);
+        results.push(`   Saat[0] Pole: ${pole}`);
+        results.push(`   Saat[1] Soul: ${soul}`);
+        results.push(`   Saat[2] Aura: ${aura}`);
+        
+        addDiscoveredContract(name || 'My LAU', lauAddress, 'LAU');
+        log(`✅ LAU loaded: ${name || lauAddress.slice(0,10)}`, 'success');
+        
+        // Get VOID reference
+        try {
+          const voidAddr = await lau.Eta();
+          if (voidAddr && voidAddr !== ethers.ZeroAddress) {
+            results.push(`   VOID: ${voidAddr.slice(0,10)}...`);
+          }
+        } catch {}
+        
+        // Get Current QING
+        results.push(``);
+        try {
+          const currentArea = await lau.CurrentArea();
+          if (currentArea && currentArea !== ethers.ZeroAddress) {
+            userContracts.currentArea = currentArea;
+            userContracts.qings.push(currentArea);
+            
+            const qing = new ethers.Contract(currentArea, [
+              'function name() view returns (string)',
+              'function symbol() view returns (string)',
+              'function Waat() view returns (uint256)',
+              'function Entropy() view returns (uint64)',
+            ], provider);
+            
+            let qingName = '', qingSymbol = '', waat = '', entropy = '';
+            try { qingName = await qing.name(); } catch {}
+            try { qingSymbol = await qing.symbol(); } catch {}
+            try { waat = (await qing.Waat()).toString(); } catch {}
+            try { entropy = (await qing.Entropy()).toString(); } catch {}
+            
+            results.push(`📍 CURRENT QING (Territory)`);
+            results.push(`   Address: ${currentArea}`);
+            results.push(`   Name: ${qingName || 'Unknown'}`);
+            if (waat) results.push(`   Waat: ${waat}`);
+            if (entropy) results.push(`   Entropy: ${entropy}`);
+            
+            addDiscoveredContract(qingName || 'My QING', currentArea, 'QING');
+            log(`✅ QING found: ${qingName || currentArea.slice(0,10)}`, 'success');
+          } else {
+            results.push(`📍 CURRENT QING: None (not in any territory)`);
+            results.push(`   → Enter a QING to start terraforming`);
+          }
+        } catch (e) {
+          results.push(`📍 CURRENT QING: Unable to read (${e.message.slice(0,30)})`);
+        }
+        
+        // Try to find YUE via CHAN
+        results.push(``);
+        try {
+          // First get the On struct to find the Shio
+          const onData = await lau.On();
+          if (onData && onData.Shio && onData.Shio !== ethers.ZeroAddress) {
+            results.push(`⚛️ SHIO (Reactor)`);
+            results.push(`   Address: ${onData.Shio}`);
+            addDiscoveredContract('My SHIO', onData.Shio, 'SHIO');
+          }
+        } catch {}
+        
+        // Check for YUE - need wallet address for this
+        const walletInput = document.getElementById('walletLookup').value.trim();
+        if (walletInput && ethers.isAddress(walletInput)) {
+          try {
+            const chan = new ethers.Contract(KNOWN_CONTRACTS['CHAN'], [
+              'function Yan(address) view returns (address)',
+            ], provider);
+            
+            const yueAddress = await chan.Yan(walletInput);
+            
+            if (yueAddress && yueAddress !== ethers.ZeroAddress) {
+              userContracts.yue = yueAddress;
+              userContracts.wallet = walletInput;
+              
+              const yue = new ethers.Contract(yueAddress, [
+                'function name() view returns (string)',
+                'function symbol() view returns (string)',
+              ], provider);
+              
+              let yueName = '';
+              try { yueName = await yue.name(); } catch {}
+              
+              results.push(`🌐 YUE (IOT Bridge)`);
+              results.push(`   Address: ${yueAddress}`);
+              results.push(`   Name: ${yueName || 'Unknown'}`);
+              
+              addDiscoveredContract(yueName || 'My YUE', yueAddress, 'YUE');
+              log(`✅ YUE found: ${yueName || yueAddress.slice(0,10)}`, 'success');
+            } else {
+              results.push(`🌐 YUE: Not found for wallet ${walletInput.slice(0,10)}...`);
+              results.push(`   → Call SEI.Start() to create one`);
+            }
+          } catch (e) {
+            results.push(`🌐 YUE: Lookup failed`);
+          }
+        } else {
+          results.push(`🌐 YUE: Enter wallet address to find YUE`);
+        }
+        
+        // Summary
+        results.push(``);
+        results.push(`${'═'.repeat(40)}`);
+        results.push(`💡 Ask the AI "what should I do next?" for guidance!`);
+        
+        setOutput(results.join('\n'));
+        updateAIContext();
+        
+      } catch (e) {
+        log(`Error loading LAU: ${e.message}`, 'error');
+        setOutput(`Error loading LAU:\n${e.message}\n\nMake sure this is a valid LAU contract address.`);
+      }
+    }
+    
+    function clearRecentContracts() {
+      recentContracts = [];
+      localStorage.removeItem('entropyAI_recent');
+      updateRecentList();
+      log('Recent contracts cleared', 'info');
+    }
+    
+    function toggleActivityLog() {
+      const content = document.getElementById('activityLog');
+      const arrow = document.getElementById('activityLogArrow');
+      if (content.classList.contains('collapsed')) {
+        content.classList.remove('collapsed');
+        arrow.textContent = '▼';
+      } else {
+        content.classList.add('collapsed');
+        arrow.textContent = '▶';
+      }
+    }
+    
+    function clearApiKey() {
+      apiKey = null;
+      localStorage.removeItem('entropyAI_apiKey');
+      document.getElementById('aiConfig').innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: var(--bg-tertiary); border-radius: 6px;">
+          <span style="color: var(--text-muted); font-size: 11px;">API Key: Not configured</span>
+          <button class="btn btn-secondary btn-sm" onclick="openApiKeyModal()" style="padding: 4px 10px; font-size: 10px;">Set Key</button>
+        </div>
+      `;
+      log('API key cleared', 'info');
+    }
+    
+    async function verifyLauOwnership() {
+      const lauAddress = document.getElementById('manualLauAddress').value.trim();
+      const wallet = document.getElementById('walletLookup').value.trim();
+      
+      if (!lauAddress || !ethers.isAddress(lauAddress)) {
+        log('Please enter a valid LAU contract address', 'error');
+        return;
+      }
+      
+      if (!wallet || !ethers.isAddress(wallet)) {
+        log('Please enter your wallet address first', 'error');
+        return;
+      }
+      
+      log(`🔍 Verifying LAU ownership...`, 'info');
+      
+      try {
+        const lau = new ethers.Contract(lauAddress, [
+          'function Type() view returns (string)',
+          'function name() view returns (string)',
+          'function symbol() view returns (string)',
+          'function owner(address) view returns (bool)',
+          'function isOwner(address) view returns (bool)',
+          'function Saat(uint256) view returns (uint64)',
+          'function Username() view returns (string)',
+          'function CurrentArea() view returns (address)',
+          'function Eta() view returns (address)',
+        ], provider);
+        
+        // Check if it's a LAU
+        let contractType = '';
+        try { contractType = await lau.Type(); } catch {}
+        
+        if (contractType !== 'LAU') {
+          log(`This doesn't appear to be a LAU contract (Type: ${contractType || 'unknown'})`, 'warning');
+        }
+        
+        // Check ownership
+        let isOwner = false;
+        try { isOwner = await lau.owner(wallet); } catch (e) {
+          log(`owner() failed: ${e.message}`, 'warning');
+        }
+        if (!isOwner) {
+          try { isOwner = await lau.isOwner(wallet); } catch {}
+        }
+        
+        // Get LAU details
+        let name = '', symbol = '', username = '', soul = '';
+        try { name = await lau.name(); } catch {}
+        try { symbol = await lau.symbol(); } catch {}
+        try { username = await lau.Username(); } catch {}
+        try { soul = (await lau.Saat(1)).toString(); } catch {}
+        
+        let results = [];
+        results.push(`LAU Contract: ${lauAddress}`);
+        results.push(`Name: ${name || 'Unknown'}`);
+        results.push(`Symbol: ${symbol || 'Unknown'}`);
+        results.push(`Type: ${contractType || 'Unknown'}`);
+        if (username) results.push(`Username: ${username}`);
+        if (soul) results.push(`Soul (Saat[1]): ${soul}`);
+        results.push('');
+        results.push(`Wallet: ${wallet}`);
+        results.push(`Ownership: ${isOwner ? '✅ YOU OWN THIS LAU!' : '❌ Not owned by this wallet'}`);
+        
+        if (isOwner) {
+          userContracts.lau = lauAddress;
+          userContracts.wallet = wallet;
+          addDiscoveredContract(name || 'Your LAU', lauAddress, 'LAU');
+          
+          // Check if registered in CHO
+          try {
+            const cho = new ethers.Contract(KNOWN_CONTRACTS['CHO'], [
+              'function GetUserTokenAddress(address) view returns (address)',
+            ], provider);
+            const registeredLau = await cho.GetUserTokenAddress(wallet);
+            if (registeredLau === lauAddress) {
+              results.push(`CHO Registration: ✅ Registered`);
+              userContracts.registered = true;
+            } else if (registeredLau === ethers.ZeroAddress) {
+              results.push(`CHO Registration: ❌ Not registered`);
+              results.push(`→ Call CHO.Enter("${lauAddress}") to register`);
+            } else {
+              results.push(`CHO Registration: ⚠️ Different LAU registered (${registeredLau.slice(0,10)}...)`);
+            }
+          } catch {}
+          
+          // Get current area
+          try {
+            const currentArea = await lau.CurrentArea();
+            if (currentArea && currentArea !== ethers.ZeroAddress) {
+              userContracts.currentArea = currentArea;
+              results.push(`Current QING: ${currentArea}`);
+              addDiscoveredContract('Your QING', currentArea, 'QING');
+            }
+          } catch {}
+          
+          log(`✅ LAU ownership verified!`, 'success');
+        } else {
+          log(`❌ Wallet does not own this LAU`, 'warning');
+        }
+        
+        setOutput(results.join('\n'));
+        updateAIContext();
+        
+      } catch (e) {
+        log(`Error verifying LAU: ${e.message}`, 'error');
+        setOutput(`Error verifying LAU:\n${e.message}\n\nMake sure the address is a valid LAU contract.`);
+      }
     }
     
     function addDiscoveredContract(name, address, type) {
@@ -1992,8 +2403,9 @@ Read functions still work! Only write functions need a wallet.`);
       // Check API key
       if (apiKey) {
         document.getElementById('aiConfig').innerHTML = `
-          <div style="display: flex; align-items: center; gap: 8px; color: var(--success); font-size: 12px;">
-            <span>✓</span> API key configured
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: rgba(34, 197, 94, 0.1); border: 1px solid var(--success); border-radius: 6px;">
+            <span style="color: var(--success); font-size: 11px;">✓ API key configured</span>
+            <button class="btn btn-secondary btn-sm" onclick="openApiKeyModal()" style="padding: 4px 10px; font-size: 10px;">Change</button>
           </div>
         `;
       }
@@ -2560,8 +2972,9 @@ Or drag this file to a browser tab on a dApp site like app.pulsex.com`;
         apiKey = key;
         localStorage.setItem('entropyAI_apiKey', key);
         document.getElementById('aiConfig').innerHTML = `
-          <div style="display: flex; align-items: center; gap: 8px; color: var(--success); font-size: 12px;">
-            <span>✓</span> API key configured
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: rgba(34, 197, 94, 0.1); border: 1px solid var(--success); border-radius: 6px;">
+            <span style="color: var(--success); font-size: 11px;">✓ API key configured</span>
+            <button class="btn btn-secondary btn-sm" onclick="openApiKeyModal()" style="padding: 4px 10px; font-size: 10px;">Change</button>
           </div>
         `;
         closeApiKeyModal();
