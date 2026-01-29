@@ -639,8 +639,8 @@
       color: var(--text-primary);
       font-family: inherit;
       font-size: 14px;
-      resize: none;
-      min-height: 50px;
+      resize: vertical;
+      min-height: 100px;
     }
 
     .ai-input:focus {
@@ -648,11 +648,22 @@
       border-color: var(--accent-primary);
       box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
     }
+    
+    .ai-input-container {
+      padding: 16px 20px;
+      border-top: 1px solid var(--border-color);
+      background: var(--bg-secondary);
+    }
+
+    .ai-input-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
 
     .ai-quick-actions {
       display: flex;
       gap: 8px;
-      margin-top: 12px;
       flex-wrap: wrap;
     }
 
@@ -689,27 +700,29 @@
     .ai-activity-log {
       border-top: 1px solid var(--border-color);
       background: var(--bg-tertiary);
+      max-height: 200px;
     }
     
     .ai-activity-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 10px 16px;
+      padding: 8px 16px;
       cursor: pointer;
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 500;
-      color: var(--text-secondary);
+      color: var(--text-muted);
     }
     
     .ai-activity-header:hover {
       background: var(--bg-card);
+      color: var(--text-secondary);
     }
     
     .ai-activity-content {
-      max-height: 150px;
+      max-height: 120px;
       overflow-y: auto;
-      padding: 0 12px 12px 12px;
+      padding: 0 12px 8px 12px;
       font-family: 'JetBrains Mono', monospace;
       font-size: 10px;
     }
@@ -719,15 +732,44 @@
     }
     
     .log-entry {
-      padding: 4px 0;
+      padding: 3px 0;
       border-bottom: 1px solid var(--border-color);
       color: var(--text-muted);
+      font-size: 10px;
     }
     
     .log-entry.success { color: var(--success); }
     .log-entry.error { color: var(--error); }
     .log-entry.warning { color: var(--warning); }
     .log-entry.info { color: var(--info); }
+    
+    /* Provider Toggle */
+    .provider-toggle {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .provider-btn {
+      flex: 1;
+      padding: 10px 16px;
+      background: var(--bg-tertiary);
+      border: 2px solid var(--border-color);
+      border-radius: 8px;
+      color: var(--text-secondary);
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .provider-btn:hover {
+      border-color: var(--accent-primary);
+    }
+    
+    .provider-btn.active {
+      background: var(--accent-gradient);
+      border-color: transparent;
+      color: white;
+    }
 
     /* Function List */
     .function-list {
@@ -1182,7 +1224,7 @@ Quick tips:
 
 I know the full Dysnomia architecture:
 • Reactor math (SHA, SHIO, modExp64)
-• Core chain & domain contracts
+• Core chain & domain contracts  
 • Terraforming layers
 • How to execute transactions
 
@@ -1190,26 +1232,27 @@ I know the full Dysnomia architecture:
         </div>
       </div>
 
-      <div class="ai-input-container">
+      <div class="ai-input-container" style="flex-shrink: 0;">
         <div class="ai-input-wrapper">
-          <textarea class="ai-input" id="aiInput" placeholder="Ask about Dysnomia, get transaction help, learn the math..." rows="4"></textarea>
-          <button class="btn btn-primary" onclick="sendToAI()" style="align-self: flex-end; padding: 12px 20px;">Send</button>
-        </div>
-        <div class="ai-quick-actions">
-          <button class="ai-quick-btn primary" onclick="quickAction('guide')">🧭 What's Next?</button>
-          <button class="ai-quick-btn" onclick="quickAction('explain')">📖 Explain</button>
-          <button class="ai-quick-btn" onclick="quickAction('react')">⚡ React</button>
-          <button class="ai-quick-btn" onclick="quickAction('math')">🔢 Math</button>
-          <button class="ai-quick-btn" onclick="quickAction('terraform')">🌍 Terraform</button>
+          <textarea class="ai-input" id="aiInput" placeholder="Ask about Dysnomia, get transaction help, learn the math..." rows="6"></textarea>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div class="ai-quick-actions" style="margin: 0;">
+              <button class="ai-quick-btn primary" onclick="quickAction('guide')">🧭 Next?</button>
+              <button class="ai-quick-btn" onclick="quickAction('explain')">📖 Explain</button>
+              <button class="ai-quick-btn" onclick="quickAction('react')">⚡ React</button>
+              <button class="ai-quick-btn" onclick="quickAction('math')">🔢 Math</button>
+            </div>
+            <button class="btn btn-primary" onclick="sendToAI()" style="padding: 12px 24px; font-size: 14px;">Send</button>
+          </div>
         </div>
       </div>
       
-      <div class="ai-activity-log">
+      <div class="ai-activity-log" style="flex-shrink: 0;">
         <div class="ai-activity-header" onclick="toggleActivityLog()">
           <span>📋 Activity Log</span>
-          <span id="activityLogArrow">▼</span>
+          <span id="activityLogArrow">▶</span>
         </div>
-        <div class="ai-activity-content" id="activityLog">
+        <div class="ai-activity-content collapsed" id="activityLog">
           <div class="log-entry">Ready.</div>
         </div>
       </div>
@@ -1220,25 +1263,49 @@ I know the full Dysnomia architecture:
   <div class="modal-overlay" id="apiKeyModal">
     <div class="modal">
       <div class="modal-header">
-        <div class="modal-title">🔑 API Key Settings</div>
+        <div class="modal-title">🔑 AI Configuration</div>
         <button class="modal-close" onclick="closeApiKeyModal()">×</button>
       </div>
       <div class="modal-body">
-        <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 16px;">
-          Enter your Anthropic API key to enable the AI assistant.<br>
-          Get one at <a href="https://console.anthropic.com" target="_blank" style="color: var(--accent-primary);">console.anthropic.com</a> (~$5 for thousands of queries)
-        </p>
-        <div class="input-group">
-          <label class="input-label">Anthropic API Key</label>
-          <input type="password" class="input" id="apiKeyInput" placeholder="sk-ant-...">
+        <div class="input-group" style="margin-bottom: 16px;">
+          <label class="input-label">AI Provider</label>
+          <div class="provider-toggle">
+            <button class="provider-btn active" id="providerClaude" onclick="selectProvider('claude')">
+              Claude (Anthropic)
+            </button>
+            <button class="provider-btn" id="providerGemini" onclick="selectProvider('gemini')">
+              Gemini (Google)
+            </button>
+          </div>
         </div>
+        
+        <div id="claudeConfig">
+          <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 12px;">
+            Get a Claude API key at <a href="https://console.anthropic.com" target="_blank" style="color: var(--accent-primary);">console.anthropic.com</a>
+          </p>
+          <div class="input-group">
+            <label class="input-label">Anthropic API Key</label>
+            <input type="password" class="input" id="apiKeyInput" placeholder="sk-ant-...">
+          </div>
+        </div>
+        
+        <div id="geminiConfig" style="display: none;">
+          <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 12px;">
+            Get a Gemini API key at <a href="https://aistudio.google.com/apikey" target="_blank" style="color: var(--accent-primary);">aistudio.google.com</a>
+          </p>
+          <div class="input-group">
+            <label class="input-label">Google AI API Key</label>
+            <input type="password" class="input" id="geminiKeyInput" placeholder="AIza...">
+          </div>
+        </div>
+        
         <p style="color: var(--text-muted); font-size: 11px; margin: 12px 0;">
-          🔒 Stored locally in your browser. Never sent to our servers.
+          🔒 Keys are stored in your browser only and sent directly to the provider.
         </p>
         <div style="display: flex; gap: 12px; margin-top: 20px;">
-          <button class="btn btn-secondary" onclick="clearApiKey(); closeApiKeyModal();" style="flex: 0.5;">Clear</button>
+          <button class="btn btn-secondary" onclick="clearAllApiKeys()" style="flex: 0.5;">Clear All</button>
           <button class="btn btn-secondary" onclick="closeApiKeyModal()" style="flex: 0.5;">Cancel</button>
-          <button class="btn btn-primary" onclick="saveApiKey()" style="flex: 1;">Save Key</button>
+          <button class="btn btn-primary" onclick="saveApiKey()" style="flex: 1;">Save</button>
         </div>
       </div>
     </div>
@@ -1258,6 +1325,8 @@ I know the full Dysnomia architecture:
     let currentBytecode = null;
     let selectedFunction = null;
     let apiKey = localStorage.getItem('entropyAI_apiKey') || null;
+    let geminiKey = localStorage.getItem('entropyAI_geminiKey') || null;
+    let aiProvider = localStorage.getItem('entropyAI_provider') || 'claude';
     let recentContracts = JSON.parse(localStorage.getItem('entropyAI_recent') || '[]');
 
     // Constants
@@ -2179,18 +2248,6 @@ I know the full Dysnomia architecture:
       }
     }
     
-    function clearApiKey() {
-      apiKey = null;
-      localStorage.removeItem('entropyAI_apiKey');
-      document.getElementById('aiConfig').innerHTML = `
-        <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: var(--bg-tertiary); border-radius: 6px;">
-          <span style="color: var(--text-muted); font-size: 11px;">API Key: Not configured</span>
-          <button class="btn btn-secondary btn-sm" onclick="openApiKeyModal()" style="padding: 4px 10px; font-size: 10px;">Set Key</button>
-        </div>
-      `;
-      log('API key cleared', 'info');
-    }
-    
     async function verifyLauOwnership() {
       const lauAddress = document.getElementById('manualLauAddress').value.trim();
       const wallet = document.getElementById('walletLookup').value.trim();
@@ -2400,15 +2457,8 @@ Read functions still work! Only write functions need a wallet.`);
       // Update recent
       updateRecentList();
 
-      // Check API key
-      if (apiKey) {
-        document.getElementById('aiConfig').innerHTML = `
-          <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: rgba(34, 197, 94, 0.1); border: 1px solid var(--success); border-radius: 6px;">
-            <span style="color: var(--success); font-size: 11px;">✓ API key configured</span>
-            <button class="btn btn-secondary btn-sm" onclick="openApiKeyModal()" style="padding: 4px 10px; font-size: 10px;">Change</button>
-          </div>
-        `;
-      }
+      // Check API key status
+      updateAIConfigStatus();
 
       log('Ready', 'success');
     }
@@ -2957,8 +3007,16 @@ Or drag this file to a browser tab on a dApp site like app.pulsex.com`;
 
     function openApiKeyModal() {
       document.getElementById('apiKeyModal').classList.add('active');
+      
+      // Set current provider toggle
+      selectProvider(aiProvider);
+      
+      // Fill in existing keys
       if (apiKey) {
         document.getElementById('apiKeyInput').value = apiKey;
+      }
+      if (geminiKey) {
+        document.getElementById('geminiKeyInput').value = geminiKey;
       }
     }
 
@@ -2966,22 +3024,74 @@ Or drag this file to a browser tab on a dApp site like app.pulsex.com`;
       document.getElementById('apiKeyModal').classList.remove('active');
     }
 
+    function selectProvider(provider) {
+      aiProvider = provider;
+      
+      // Update toggle UI
+      document.getElementById('providerClaude').classList.toggle('active', provider === 'claude');
+      document.getElementById('providerGemini').classList.toggle('active', provider === 'gemini');
+      
+      // Show/hide config sections
+      document.getElementById('claudeConfig').style.display = provider === 'claude' ? 'block' : 'none';
+      document.getElementById('geminiConfig').style.display = provider === 'gemini' ? 'block' : 'none';
+    }
+
     function saveApiKey() {
-      const key = document.getElementById('apiKeyInput').value.trim();
-      if (key && key.startsWith('sk-ant-')) {
-        apiKey = key;
-        localStorage.setItem('entropyAI_apiKey', key);
-        document.getElementById('aiConfig').innerHTML = `
-          <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: rgba(34, 197, 94, 0.1); border: 1px solid var(--success); border-radius: 6px;">
-            <span style="color: var(--success); font-size: 11px;">✓ API key configured</span>
-            <button class="btn btn-secondary btn-sm" onclick="openApiKeyModal()" style="padding: 4px 10px; font-size: 10px;">Change</button>
-          </div>
-        `;
-        closeApiKeyModal();
-        log('API key saved', 'success');
+      if (aiProvider === 'claude') {
+        const key = document.getElementById('apiKeyInput').value.trim();
+        if (key && key.startsWith('sk-ant-')) {
+          apiKey = key;
+          localStorage.setItem('entropyAI_apiKey', key);
+          localStorage.setItem('entropyAI_provider', 'claude');
+          updateAIConfigStatus();
+          closeApiKeyModal();
+          log('Claude API key saved', 'success');
+        } else {
+          alert('Invalid Anthropic API key. Should start with sk-ant-');
+        }
       } else {
-        alert('Invalid API key format. Should start with sk-ant-');
+        const key = document.getElementById('geminiKeyInput').value.trim();
+        if (key && key.startsWith('AIza')) {
+          geminiKey = key;
+          localStorage.setItem('entropyAI_geminiKey', key);
+          localStorage.setItem('entropyAI_provider', 'gemini');
+          updateAIConfigStatus();
+          closeApiKeyModal();
+          log('Gemini API key saved', 'success');
+        } else {
+          alert('Invalid Google AI API key. Should start with AIza...');
+        }
       }
+    }
+    
+    function clearAllApiKeys() {
+      apiKey = null;
+      geminiKey = null;
+      localStorage.removeItem('entropyAI_apiKey');
+      localStorage.removeItem('entropyAI_geminiKey');
+      localStorage.removeItem('entropyAI_provider');
+      aiProvider = 'claude';
+      document.getElementById('apiKeyInput').value = '';
+      document.getElementById('geminiKeyInput').value = '';
+      updateAIConfigStatus();
+      log('All API keys cleared', 'info');
+    }
+
+    function updateAIConfigStatus() {
+      const hasKey = (aiProvider === 'claude' && apiKey) || (aiProvider === 'gemini' && geminiKey);
+      const providerName = aiProvider === 'claude' ? 'Claude' : 'Gemini';
+      
+      document.getElementById('aiConfig').innerHTML = hasKey ? `
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: rgba(34, 197, 94, 0.1); border: 1px solid var(--success); border-radius: 6px;">
+          <span style="color: var(--success); font-size: 11px;">✓ ${providerName} configured</span>
+          <button class="btn btn-secondary btn-sm" onclick="openApiKeyModal()" style="padding: 4px 10px; font-size: 10px;">Change</button>
+        </div>
+      ` : `
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: var(--bg-tertiary); border-radius: 6px;">
+          <span style="color: var(--text-muted); font-size: 11px;">API Key: Not configured</span>
+          <button class="btn btn-secondary btn-sm" onclick="openApiKeyModal()" style="padding: 4px 10px; font-size: 10px;">Set Key</button>
+        </div>
+      `;
     }
 
     async function sendToAI() {
@@ -2992,53 +3102,126 @@ Or drag this file to a browser tab on a dApp site like app.pulsex.com`;
       addAIMessage(input, 'user');
       document.getElementById('aiInput').value = '';
 
-      if (!apiKey) {
-        // No API key - copy to clipboard
+      // Check if we have an API key for the selected provider
+      const currentKey = aiProvider === 'claude' ? apiKey : geminiKey;
+      if (!currentKey) {
         const context = buildContext();
         const prompt = `${context}\n\nUser question: ${input}`;
         navigator.clipboard.writeText(prompt);
-        addAIMessage('📋 No API key configured. I\'ve copied a formatted prompt to your clipboard that you can paste into Claude directly.', 'assistant');
+        addAIMessage(`📋 No ${aiProvider === 'claude' ? 'Claude' : 'Gemini'} API key configured. I've copied a formatted prompt to your clipboard.`, 'assistant');
         return;
       }
 
-      // Call Anthropic API
       addAIMessage('<div class="loader"></div> Thinking...', 'assistant');
 
       try {
         const context = buildContext();
-        
-        const response = await fetch('/api/chat', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey
-          },
-          body: JSON.stringify({
-            model: 'claude-sonnet-4-20250514',
-            max_tokens: 4096,
-            messages: [{
-              role: 'user',
-              content: `${context}\n\nUser question: ${input}`
-            }]
-          })
-        });
+        let responseText;
 
-        const data = await response.json();
+        if (aiProvider === 'claude') {
+          // Claude API via serverless function
+          const response = await fetch('/api/chat', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-api-key': apiKey
+            },
+            body: JSON.stringify({
+              model: 'claude-sonnet-4-20250514',
+              max_tokens: 4096,
+              messages: [{
+                role: 'user',
+                content: `${context}\n\nUser question: ${input}`
+              }]
+            })
+          });
+
+          const data = await response.json();
+          
+          if (data.content && data.content[0]) {
+            responseText = data.content[0].text;
+          } else {
+            throw new Error(data.error?.message || 'Unknown Claude error');
+          }
+        } else {
+          // Gemini API (direct call)
+          const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiKey}`;
+          
+          // Build system prompt for Gemini (same Dysnomia knowledge)
+          const systemPrompt = buildGeminiPrompt(context, input);
+          
+          const response = await fetch(geminiUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              contents: [{
+                parts: [{ text: systemPrompt }]
+              }],
+              generationConfig: {
+                maxOutputTokens: 4096
+              }
+            })
+          });
+
+          const data = await response.json();
+          
+          if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
+            responseText = data.candidates[0].content.parts[0].text;
+          } else {
+            throw new Error(data.error?.message || JSON.stringify(data));
+          }
+        }
         
         // Remove loading message
         const messages = document.getElementById('aiMessages');
         messages.removeChild(messages.lastChild);
 
-        if (data.content && data.content[0]) {
-          addAIMessage(data.content[0].text, 'assistant');
-        } else {
-          addAIMessage('Error: ' + (data.error?.message || 'Unknown error'), 'assistant');
-        }
+        addAIMessage(responseText, 'assistant');
       } catch (e) {
         const messages = document.getElementById('aiMessages');
         messages.removeChild(messages.lastChild);
         addAIMessage('Error: ' + e.message, 'assistant');
       }
+    }
+    
+    function buildGeminiPrompt(context, input) {
+      return `You are the Dysnomia AI Assistant - an expert guide for the Dysnomia mathematical smart contract ecosystem on PulseChain.
+
+=== DYSNOMIA ARCHITECTURE ===
+
+MOTZKIN PRIME: 953467954114363 (fundamental modulus for all operations)
+
+CORE CHAIN:
+VOID → SIU → YANG → YAU → ZHOU → ZHENG → YI → SHIO
+
+REACTOR SYSTEM:
+- SHA: Single reactor with 13-variable Fa state
+- SHIO: Paired reactor (Rod + Cone), symmetric outputs required
+- React(Pi) → XOR with Monopole → modExp64 → (Omicron, Omega)
+
+DOMAINS:
+- TANG: CHEON → SEI (heavenly layer)
+- SOENG: META → RING → PANG → ZI → CHOA → SEI → CHAN → XIE → XIA → MAI → QI → MAP
+
+USER LAYER:
+- CHO: User interaction (GetUserTokenAddress, Enter)
+- LAU: User token with Saat[3] (pole, soul, aura)
+- YUE: IOT bridge (Bar → Hypobar/Epibar)
+- QING: Territory with Waat coordinate
+
+TERRAFORMING:
+- Layer 0 (Physics): Mathematical foundation
+- Layer 1 (Terra): LAU data
+- Layer 2 (Firma): Personal GWATs
+- Layer 3 (Life): YUE + IOT
+
+${context}
+
+User question: ${input}
+
+Provide helpful, technical guidance about Dysnomia. Include specific function calls and ethers.js code when useful.`;
     }
 
     function addAIMessage(content, role) {
