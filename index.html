@@ -793,15 +793,24 @@
       right: 8px;
       padding: 4px 10px;
       font-size: 10px;
-      background: var(--bg-tertiary);
-      border: 1px solid var(--border-color);
+      background: transparent;
+      border: 1px solid transparent;
       border-radius: 4px;
       cursor: pointer;
       color: var(--text-muted);
+      opacity: 0.3;
       z-index: 10;
+      transition: all 0.2s ease;
+    }
+
+    .ai-message:hover .copy-msg-btn {
+      opacity: 0.7;
+      background: var(--bg-tertiary);
+      border-color: var(--border-color);
     }
 
     .ai-message .copy-msg-btn:hover {
+      opacity: 1;
       background: var(--accent-primary);
       color: white;
       border-color: var(--accent-primary);
@@ -815,6 +824,10 @@
     }
 
     .ai-message.user .copy-msg-btn {
+      color: rgba(255,255,255,0.5);
+    }
+    
+    .ai-message.user:hover .copy-msg-btn {
       background: rgba(255,255,255,0.2);
       border-color: rgba(255,255,255,0.3);
       color: white;
@@ -822,6 +835,7 @@
 
     .ai-message.user .copy-msg-btn:hover {
       background: rgba(255,255,255,0.4);
+      opacity: 1;
     }
 
     .ai-message.assistant {
@@ -1411,7 +1425,7 @@
       
       <div class="ai-messages" id="aiMessages">
         <div class="ai-message assistant">
-          <button class="copy-msg-btn" onclick="copyInitialMsg(this)">📋 Copy</button>
+          <button class="copy-msg-btn" onclick="copyInitialMsg(this)">📋</button>
           <div>🔮 Hi! I'm your Dysnomia AI Guide.
 
 <b>To get started:</b>
@@ -1469,7 +1483,7 @@ I know the full Dysnomia architecture:
         <div class="contract-panel-section active" id="tabOutput">
           <div class="output-panel-compact">
             <div style="display: flex; justify-content: flex-end; margin-bottom: 8px;">
-              <button class="btn btn-secondary btn-sm" onclick="copyOutput()" style="font-size: 10px; padding: 4px 8px;">📋 Copy</button>
+              <button class="btn btn-secondary btn-sm" onclick="copyOutput()" style="font-size: 10px; padding: 4px 8px;">📋</button>
             </div>
             <div class="output-content" id="outputContent" style="font-size: 12px; line-height: 1.5;">
 Enter a contract address to begin.
@@ -4083,21 +4097,39 @@ Be helpful and suggest actions when appropriate. User confirms before execution.
       const div = document.createElement('div');
       div.className = 'ai-message ' + role;
       
+      // Store original content for copying (strip markdown syntax for cleaner copy)
+      const cleanContent = content
+        .replace(/```(\w+)?\n([\s\S]*?)```/g, '$2')  // Remove code blocks but keep content
+        .replace(/\*\*([^*]+)\*\*/g, '$1')           // Remove bold markers
+        .replace(/`([^`]+)`/g, '$1')                 // Remove inline code markers
+        .replace(/<[^>]+>/g, '')                     // Remove any HTML tags
+        .trim();
+      
       // Add copy button
       const copyBtn = document.createElement('button');
       copyBtn.className = 'copy-msg-btn';
-      copyBtn.textContent = '📋 Copy';
-      copyBtn.onclick = () => {
-        navigator.clipboard.writeText(content);
-        copyBtn.textContent = '✓ Copied!';
-        setTimeout(() => copyBtn.textContent = '📋 Copy', 1500);
+      copyBtn.textContent = '📋';
+      copyBtn.title = 'Copy to clipboard';
+      copyBtn.onclick = (e) => {
+        e.stopPropagation();
+        navigator.clipboard.writeText(cleanContent).then(() => {
+          copyBtn.textContent = '✓';
+          setTimeout(() => copyBtn.textContent = '📋', 1500);
+        }).catch(err => {
+          console.error('Copy failed:', err);
+          copyBtn.textContent = '❌';
+          setTimeout(() => copyBtn.textContent = '📋', 1500);
+        });
       };
       
       div.appendChild(copyBtn);
       
       // Add content
       const contentDiv = document.createElement('div');
-      contentDiv.innerHTML = content.replace(/```(\w+)?\n([\s\S]*?)```/g, '<pre>$2</pre>').replace(/`([^`]+)`/g, '<code>$1</code>');
+      contentDiv.innerHTML = content
+        .replace(/```(\w+)?\n([\s\S]*?)```/g, '<pre>$2</pre>')
+        .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+        .replace(/`([^`]+)`/g, '<code>$1</code>');
       div.appendChild(contentDiv);
       
       messages.appendChild(div);
@@ -4108,10 +4140,13 @@ Be helpful and suggest actions when appropriate. User confirms before execution.
     // Copy helper for initial hardcoded message
     function copyInitialMsg(btn) {
       const msgDiv = btn.parentElement;
-      const textContent = msgDiv.querySelector('div').textContent;
-      navigator.clipboard.writeText(textContent);
-      btn.textContent = '✓ Copied!';
-      setTimeout(() => btn.textContent = '📋 Copy', 1500);
+      const textContent = msgDiv.textContent.replace('📋', '').replace('✓', '').trim();
+      navigator.clipboard.writeText(textContent).then(() => {
+        btn.textContent = '✓';
+        setTimeout(() => btn.textContent = '📋', 1500);
+      }).catch(err => {
+        console.error('Copy failed:', err);
+      });
     }
 
     // Contract Panel Tab Switching
@@ -4159,7 +4194,7 @@ Be helpful and suggest actions when appropriate. User confirms before execution.
           </div>
         </div>
         <div style="margin-top: 16px; display: flex; gap: 8px;">
-          <button class="btn btn-secondary btn-sm" onclick="copyAddress()" style="flex: 1;">📋 Copy</button>
+          <button class="btn btn-secondary btn-sm" onclick="copyAddress()" style="flex: 1;">📋</button>
           <button class="btn btn-secondary btn-sm" onclick="viewOnScan()" style="flex: 1;">🔗 Scan</button>
         </div>
       `;
@@ -4201,7 +4236,7 @@ Be helpful and suggest actions when appropriate. User confirms before execution.
       
       document.getElementById('aiMessages').innerHTML = `
         <div class="ai-message assistant">
-          <button class="copy-msg-btn" onclick="copyInitialMsg(this)">📋 Copy</button>
+          <button class="copy-msg-btn" onclick="copyInitialMsg(this)">📋</button>
           <div>🔮 Chat cleared! Conversation history reset.
           
 I remember the full Dysnomia ecosystem and will guide you through:
