@@ -175,7 +175,7 @@
     /* Main Layout */
     .main {
       display: grid;
-      grid-template-columns: 350px 1fr 380px;
+      grid-template-columns: 300px 1fr 450px;
       gap: 0;
       min-height: calc(100vh - 73px);
     }
@@ -532,14 +532,15 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
     }
 
     .ai-title {
-      font-size: 14px;
-      font-weight: 600;
+      font-size: 16px;
+      font-weight: 700;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
     }
 
     .ai-title span {
@@ -549,79 +550,103 @@
     }
 
     .ai-config {
-      padding: 16px 20px;
+      padding: 12px 20px;
       border-bottom: 1px solid var(--border-color);
+      background: var(--bg-tertiary);
     }
 
     .ai-messages {
       flex: 1;
       overflow-y: auto;
-      padding: 16px;
+      padding: 20px;
+      background: var(--bg-primary);
     }
 
     .ai-message {
-      margin-bottom: 16px;
-      padding: 14px 16px;
+      margin-bottom: 20px;
+      padding: 16px 20px;
       border-radius: 12px;
-      font-size: 13px;
-      line-height: 1.6;
+      font-size: 14px;
+      line-height: 1.7;
+      white-space: pre-wrap;
     }
 
     .ai-message.user {
       background: var(--accent-gradient);
       color: white;
-      margin-left: 24px;
+      margin-left: 40px;
+      border-bottom-right-radius: 4px;
     }
 
     .ai-message.assistant {
-      background: var(--bg-tertiary);
+      background: var(--bg-card);
       border: 1px solid var(--border-color);
-      margin-right: 24px;
+      margin-right: 20px;
+      border-bottom-left-radius: 4px;
     }
 
     .ai-message pre {
-      background: var(--bg-primary);
-      padding: 12px;
-      border-radius: 6px;
-      margin: 12px 0;
+      background: var(--bg-secondary);
+      padding: 14px;
+      border-radius: 8px;
+      margin: 14px 0;
       overflow-x: auto;
       font-family: 'JetBrains Mono', monospace;
       font-size: 12px;
+      border: 1px solid var(--border-color);
     }
 
     .ai-message code {
       font-family: 'JetBrains Mono', monospace;
-      background: var(--bg-primary);
-      padding: 2px 6px;
+      background: var(--bg-secondary);
+      padding: 3px 8px;
       border-radius: 4px;
       font-size: 12px;
+      color: var(--accent-primary);
+    }
+    
+    .ai-message h3, .ai-message h4 {
+      margin: 16px 0 8px 0;
+      color: var(--accent-primary);
+    }
+    
+    .ai-message ul, .ai-message ol {
+      margin: 8px 0;
+      padding-left: 20px;
+    }
+    
+    .ai-message li {
+      margin: 4px 0;
     }
 
     .ai-input-container {
-      padding: 16px;
+      padding: 16px 20px;
       border-top: 1px solid var(--border-color);
+      background: var(--bg-secondary);
     }
 
     .ai-input-wrapper {
       display: flex;
-      gap: 10px;
+      gap: 12px;
     }
 
     .ai-input {
       flex: 1;
-      padding: 12px 16px;
+      padding: 14px 18px;
       background: var(--bg-primary);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
+      border: 2px solid var(--border-color);
+      border-radius: 10px;
       color: var(--text-primary);
       font-family: inherit;
-      font-size: 13px;
+      font-size: 14px;
       resize: none;
+      min-height: 50px;
     }
 
     .ai-input:focus {
       outline: none;
       border-color: var(--accent-primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
     }
 
     .ai-quick-actions {
@@ -632,19 +657,32 @@
     }
 
     .ai-quick-btn {
-      padding: 6px 12px;
+      padding: 8px 14px;
       background: var(--bg-tertiary);
       border: 1px solid var(--border-color);
-      border-radius: 6px;
+      border-radius: 8px;
       color: var(--text-secondary);
-      font-size: 11px;
+      font-size: 12px;
       cursor: pointer;
       transition: all 0.2s;
+      font-weight: 500;
     }
 
     .ai-quick-btn:hover {
       border-color: var(--accent-primary);
       color: var(--accent-primary);
+      background: rgba(99, 102, 241, 0.1);
+    }
+    
+    .ai-quick-btn.primary {
+      background: var(--accent-gradient);
+      color: white;
+      border: none;
+    }
+    
+    .ai-quick-btn.primary:hover {
+      opacity: 0.9;
+      color: white;
     }
 
     /* Function List */
@@ -1100,14 +1138,15 @@ Load a contract and ask me anything about the Dysnomia architecture!
 
       <div class="ai-input-container">
         <div class="ai-input-wrapper">
-          <textarea class="ai-input" id="aiInput" placeholder="Ask Claude about this contract..." rows="2"></textarea>
-          <button class="btn btn-primary" onclick="sendToAI()">Send</button>
+          <textarea class="ai-input" id="aiInput" placeholder="Ask about Dysnomia, get help with transactions, or learn the math..." rows="3"></textarea>
+          <button class="btn btn-primary" onclick="sendToAI()" style="align-self: flex-end;">Send</button>
         </div>
         <div class="ai-quick-actions">
-          <button class="ai-quick-btn" onclick="quickAction('explain')">Explain Contract</button>
-          <button class="ai-quick-btn" onclick="quickAction('functions')">List Functions</button>
-          <button class="ai-quick-btn" onclick="quickAction('unknown')">Analyze Unknown</button>
-          <button class="ai-quick-btn" onclick="quickAction('decode')">Decode Bytecode</button>
+          <button class="ai-quick-btn primary" onclick="quickAction('guide')">🧭 What's Next?</button>
+          <button class="ai-quick-btn" onclick="quickAction('explain')">📖 Explain Contract</button>
+          <button class="ai-quick-btn" onclick="quickAction('react')">⚡ How to React</button>
+          <button class="ai-quick-btn" onclick="quickAction('math')">🔢 Explain Math</button>
+          <button class="ai-quick-btn" onclick="quickAction('terraform')">🌍 Terraforming</button>
         </div>
       </div>
     </aside>
@@ -1719,7 +1758,15 @@ Load a contract and ask me anything about the Dysnomia architecture!
       renderEcosystemContracts();
     }
     
-    // Find user's LAU and YUE
+    // Find user's LAU, YUE, and QINGs
+    let userContracts = {
+      wallet: null,
+      lau: null,
+      yue: null,
+      qings: [],
+      currentArea: null
+    };
+    
     async function findUserContracts() {
       const wallet = document.getElementById('walletLookup').value.trim();
       
@@ -1728,37 +1775,79 @@ Load a contract and ask me anything about the Dysnomia architecture!
         return;
       }
       
-      log(`Looking up contracts for ${wallet.slice(0,8)}...`, 'info');
+      userContracts.wallet = wallet;
+      log(`🔍 Searching for contracts owned by ${wallet.slice(0,8)}...`, 'info');
       
+      let results = [];
+      
+      // Method 1: Try CHO.GetUserTokenAddress
       try {
-        // Find LAU via CHO.GetUserTokenAddress(wallet)
+        log('Trying CHO.GetUserTokenAddress...', 'info');
         const cho = new ethers.Contract(KNOWN_CONTRACTS['CHO'], [
           'function GetUserTokenAddress(address) view returns (address)',
+          'function UserTokens(address) view returns (address)',
         ], provider);
         
-        const lauAddress = await cho.GetUserTokenAddress(wallet);
-        
-        if (lauAddress && lauAddress !== ethers.ZeroAddress) {
-          log(`Found LAU: ${lauAddress}`, 'success');
-          
-          // Get LAU name
+        let lauAddress = null;
+        try {
+          lauAddress = await cho.GetUserTokenAddress(wallet);
+        } catch (e) {
+          log(`GetUserTokenAddress failed: ${e.message}`, 'warning');
+          // Try alternate function
           try {
-            const lau = new ethers.Contract(lauAddress, ['function name() view returns (string)'], provider);
-            const lauName = await lau.name();
-            setOutput(`✅ Found your LAU!\n\nName: ${lauName}\nAddress: ${lauAddress}\n\nClick to load it.`);
-            
-            // Add to quick load
-            addDiscoveredContract(lauName + ' (Your LAU)', lauAddress, 'LAU');
-          } catch {
-            setOutput(`✅ Found your LAU!\n\nAddress: ${lauAddress}\n\nClick to load it.`);
-            addDiscoveredContract('Your LAU', lauAddress, 'LAU');
+            lauAddress = await cho.UserTokens(wallet);
+          } catch (e2) {
+            log(`UserTokens failed: ${e2.message}`, 'warning');
           }
-        } else {
-          log('No LAU found for this wallet', 'warning');
-          setOutput(`No LAU found for ${wallet.slice(0,8)}...\n\nYou may need to call VOID.Enter() first to create your user token.`);
         }
         
-        // Find YUE via CHAN.Yan(wallet)
+        if (lauAddress && lauAddress !== ethers.ZeroAddress) {
+          log(`✅ Found LAU: ${lauAddress}`, 'success');
+          userContracts.lau = lauAddress;
+          
+          const lau = new ethers.Contract(lauAddress, [
+            'function name() view returns (string)',
+            'function symbol() view returns (string)',
+            'function CurrentArea() view returns (address)',
+          ], provider);
+          
+          let lauName = 'Your LAU';
+          try { lauName = await lau.name(); } catch {}
+          
+          results.push(`✅ LAU: ${lauName} (${lauAddress.slice(0,10)}...)`);
+          addDiscoveredContract(lauName, lauAddress, 'LAU');
+          
+          // Get current area (QING) from LAU
+          try {
+            const currentArea = await lau.CurrentArea();
+            if (currentArea && currentArea !== ethers.ZeroAddress) {
+              userContracts.currentArea = currentArea;
+              log(`✅ Found Current QING: ${currentArea}`, 'success');
+              
+              const qing = new ethers.Contract(currentArea, [
+                'function name() view returns (string)',
+              ], provider);
+              let qingName = 'Your QING';
+              try { qingName = await qing.name(); } catch {}
+              
+              results.push(`✅ Current QING: ${qingName} (${currentArea.slice(0,10)}...)`);
+              addDiscoveredContract(qingName, currentArea, 'QING');
+              userContracts.qings.push(currentArea);
+            }
+          } catch (e) {
+            log(`No CurrentArea on LAU: ${e.message}`, 'info');
+          }
+        } else {
+          results.push(`❌ No LAU found via CHO`);
+        }
+      } catch (e) {
+        log(`CHO lookup failed: ${e.message}`, 'error');
+        results.push(`❌ CHO lookup error: ${e.message}`);
+      }
+      
+      // Method 2: Try CHAN.Yan for YUE
+      try {
+        log('Trying CHAN.Yan for YUE...', 'info');
         const chan = new ethers.Contract(KNOWN_CONTRACTS['CHAN'], [
           'function Yan(address) view returns (address)',
         ], provider);
@@ -1766,23 +1855,39 @@ Load a contract and ask me anything about the Dysnomia architecture!
         const yueAddress = await chan.Yan(wallet);
         
         if (yueAddress && yueAddress !== ethers.ZeroAddress) {
-          log(`Found YUE: ${yueAddress}`, 'success');
+          log(`✅ Found YUE: ${yueAddress}`, 'success');
+          userContracts.yue = yueAddress;
           
-          // Get YUE name
-          try {
-            const yue = new ethers.Contract(yueAddress, ['function name() view returns (string)'], provider);
-            const yueName = await yue.name();
-            addDiscoveredContract(yueName + ' (Your YUE)', yueAddress, 'YUE');
-          } catch {
-            addDiscoveredContract('Your YUE', yueAddress, 'YUE');
-          }
+          const yue = new ethers.Contract(yueAddress, [
+            'function name() view returns (string)',
+          ], provider);
+          let yueName = 'Your YUE';
+          try { yueName = await yue.name(); } catch {}
+          
+          results.push(`✅ YUE: ${yueName} (${yueAddress.slice(0,10)}...)`);
+          addDiscoveredContract(yueName, yueAddress, 'YUE');
         } else {
-          log('No YUE found - call SEI.Start() to create one', 'info');
+          results.push(`❌ No YUE found - call SEI.Start() to create one`);
         }
-        
       } catch (e) {
-        log(`Error finding contracts: ${e.message}`, 'error');
+        log(`CHAN.Yan failed: ${e.message}`, 'warning');
+        results.push(`❌ YUE lookup error: ${e.message}`);
       }
+      
+      // Display results
+      setOutput(`🔮 Dysnomia Contract Discovery\n\nWallet: ${wallet}\n\n${results.join('\n')}\n\n💡 Tip: Ask the AI "what should I do next?" for guidance!`);
+      
+      // Update AI context
+      updateAIContext();
+    }
+    
+    function updateAIContext() {
+      // Store user context for AI to access
+      window.userDysnomiaContext = {
+        ...userContracts,
+        loadedContract: currentAddress,
+        loadedType: document.getElementById('contractType')?.textContent,
+      };
     }
     
     function addDiscoveredContract(name, address, type) {
@@ -2550,9 +2655,22 @@ Load a contract and ask me anything!
     }
 
     function buildContext() {
-      let context = 'Current context:\n';
+      let context = '=== CURRENT ENTROPY AI STATE ===\n\n';
+      
+      // User's discovered contracts
+      if (userContracts.wallet) {
+        context += `USER WALLET: ${userContracts.wallet}\n`;
+        if (userContracts.lau) context += `USER LAU: ${userContracts.lau}\n`;
+        if (userContracts.yue) context += `USER YUE: ${userContracts.yue}\n`;
+        if (userContracts.currentArea) context += `USER CURRENT QING: ${userContracts.currentArea}\n`;
+        if (userContracts.qings.length > 0) context += `USER QINGs: ${userContracts.qings.join(', ')}\n`;
+        context += '\n';
+      }
+      
+      // Currently loaded contract
       if (currentAddress) {
-        context += `- Contract Address: ${currentAddress}\n`;
+        context += `LOADED CONTRACT:\n`;
+        context += `- Address: ${currentAddress}\n`;
         context += `- Name: ${document.getElementById('contractName').textContent}\n`;
         context += `- Type: ${document.getElementById('contractType').textContent}\n`;
         context += `- Verified: ${document.getElementById('contractVerified').textContent}\n`;
@@ -2562,67 +2680,36 @@ Load a contract and ask me anything!
           const reads = fns.filter(f => f.stateMutability === 'view' || f.stateMutability === 'pure');
           const writes = fns.filter(f => f.stateMutability !== 'view' && f.stateMutability !== 'pure');
           
-          context += `\nIdentified Read Functions (${reads.length}):\n`;
+          context += `\nREAD FUNCTIONS (${reads.length}):\n`;
           reads.forEach(f => {
-            context += `  - ${f.name}(${f.inputs.map(i => i.type).join(', ')})${f.outputs?.length ? ' → ' + f.outputs.map(o => o.type).join(', ') : ''}\n`;
+            context += `  ${f.name}(${f.inputs.map(i => i.type).join(', ')})${f.outputs?.length ? ' → ' + f.outputs.map(o => o.type).join(', ') : ''}\n`;
           });
           
-          context += `\nIdentified Write Functions (${writes.length}):\n`;
+          context += `\nWRITE FUNCTIONS (${writes.length}):\n`;
           writes.forEach(f => {
-            context += `  - ${f.name}(${f.inputs.map(i => i.type).join(', ')})\n`;
+            context += `  ${f.name}(${f.inputs.map(i => i.type).join(', ')})\n`;
           });
         }
         
         if (currentBytecode) {
           const bytecodeSize = (currentBytecode.length - 2) / 2;
-          context += `\n- Bytecode size: ${bytecodeSize} bytes\n`;
+          context += `\nBytecode size: ${bytecodeSize} bytes\n`;
           
           // Include selector analysis
           const selectors = extractSelectors(currentBytecode);
-          const identified = [];
-          const unknown = [];
-          
-          for (const sel of selectors) {
-            const known = KNOWN_SELECTORS[sel];
-            if (known) {
-              identified.push({ selector: sel, sig: known.sig, view: known.view });
-            } else {
-              unknown.push(sel);
-            }
-          }
+          const unknown = selectors.filter(sel => !KNOWN_SELECTORS[sel]);
           
           if (unknown.length > 0) {
-            context += `\nUnknown Selectors (${unknown.length}):\n`;
-            unknown.forEach(sel => {
-              context += `  - 0x${sel}\n`;
-              
-              // Find this selector in bytecode and show surrounding context
-              const hex = currentBytecode.slice(2);
-              const idx = hex.indexOf(sel);
-              if (idx !== -1) {
-                // Show 100 bytes before and 200 bytes after the selector
-                const start = Math.max(0, idx - 200);
-                const end = Math.min(hex.length, idx + 400);
-                context += `    Bytecode context: ...${hex.slice(start, end)}...\n`;
-              }
-            });
-          }
-          
-          // Include function dispatcher (first ~2KB usually has the jump table)
-          context += `\nBytecode - Function Dispatcher (first 2000 bytes):\n${currentBytecode.slice(0, 4002)}\n`;
-          
-          // If bytecode is small enough, include it all (up to 16KB for context)
-          if (currentBytecode.length <= 32000) {
-            context += `\nFull Bytecode:\n${currentBytecode}\n`;
-          } else {
-            // For larger contracts, include strategic sections
-            context += `\nBytecode - Middle section:\n${currentBytecode.slice(Math.floor(currentBytecode.length/3), Math.floor(currentBytecode.length/3) + 4000)}\n`;
-            context += `\nBytecode - End section:\n${currentBytecode.slice(-4000)}\n`;
+            context += `\nUNKNOWN SELECTORS (${unknown.length}): ${unknown.map(s => '0x'+s).join(', ')}\n`;
           }
         }
       } else {
-        context += '- No contract loaded\n';
+        context += 'NO CONTRACT LOADED - User can ask general Dysnomia questions\n';
       }
+      
+      // Add connection status
+      context += `\nWALLET CONNECTED: ${signer ? 'Yes' : 'No'}\n`;
+      
       return context;
     }
 
@@ -2630,11 +2717,23 @@ Load a contract and ask me anything!
       let prompt = '';
       
       switch (action) {
+        case 'guide':
+          prompt = `Based on my current state (wallet, LAU, YUE, loaded contract), what should I do next in Dysnomia? Give me specific steps and the exact function calls with parameters.`;
+          break;
         case 'explain':
-          prompt = 'Explain what this contract does and its main purpose.';
+          prompt = 'Explain what this contract does in the Dysnomia ecosystem, what its role is, and how it connects to other contracts.';
+          break;
+        case 'react':
+          prompt = 'Explain how to call React() on this contract. What parameters do I need? What will happen? Show me the exact ethers.js code to execute it.';
+          break;
+        case 'math':
+          prompt = 'Explain the mathematical operations in this contract - modExp64, XOR chains, MotzkinPrime, etc. How does the reactor math work? Show examples with actual numbers.';
+          break;
+        case 'terraform':
+          prompt = 'Explain how this contract fits into the terraforming layers (Physics, Terra, Firma, Life). How do I use it to accumulate Hypobar/Epibar on my YUE? What are the steps?';
           break;
         case 'functions':
-          prompt = 'List and explain the main functions of this contract.';
+          prompt = 'List and explain the main functions of this contract, especially the Dysnomia-specific ones.';
           break;
         case 'unknown':
           prompt = 'Help me identify any unknown function selectors in this contract.';
