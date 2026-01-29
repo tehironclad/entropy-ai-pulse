@@ -1018,25 +1018,30 @@
       background: var(--bg-tertiary);
       border-radius: 8px;
       border: 1px solid var(--border-color);
+      position: relative;
+      z-index: 100;
     }
     
     .action-btn {
-      padding: 8px 16px;
+      padding: 10px 18px;
       background: var(--bg-card);
-      border: 1px solid var(--accent-primary);
+      border: 2px solid var(--accent-primary);
       border-radius: 6px;
       color: var(--accent-primary);
-      font-size: 12px;
+      font-size: 13px;
+      font-weight: 600;
       cursor: pointer;
       transition: all 0.2s;
       display: flex;
       align-items: center;
       gap: 6px;
+      pointer-events: auto;
     }
     
     .action-btn:hover {
       background: var(--accent-primary);
       color: white;
+      transform: translateY(-1px);
     }
     
     .action-btn.write {
@@ -2805,19 +2810,42 @@ Read functions still work! Only write functions need a wallet.`);
           const accounts = await window.ethereum.request({ method: 'eth_accounts' });
           if (accounts.length > 0) {
             updateWalletStatus(accounts[0]);
+            // Also create signer if already connected
+            const browserProvider = new ethers.BrowserProvider(window.ethereum);
+            signer = await browserProvider.getSigner();
+            provider = browserProvider;
+            log('Auto-connected wallet: ' + accounts[0].slice(0, 8) + '...', 'success');
           }
-        } catch (e) {}
+        } catch (e) {
+          log('Auto-connect check failed: ' + e.message, 'warning');
+        }
 
-        window.ethereum.on('accountsChanged', (accounts) => {
+        window.ethereum.on('accountsChanged', async (accounts) => {
           if (accounts.length > 0) {
             updateWalletStatus(accounts[0]);
+            // Update signer when account changes
+            const browserProvider = new ethers.BrowserProvider(window.ethereum);
+            signer = await browserProvider.getSigner();
+            provider = browserProvider;
+            // Reconnect current contract
+            if (currentAddress && currentABI) {
+              currentContract = new ethers.Contract(currentAddress, currentABI, provider);
+            }
+            log('Account changed: ' + accounts[0].slice(0, 8) + '...', 'info');
           } else {
             document.getElementById('walletStatus').innerHTML = `
               <span class="status-dot"></span>
               <span>Disconnected</span>
             `;
             document.getElementById('walletStatus').classList.remove('connected');
+            signer = null;
+            log('Wallet disconnected', 'warning');
           }
+        });
+        
+        window.ethereum.on('chainChanged', () => {
+          log('Chain changed, reloading...', 'info');
+          window.location.reload();
         });
       }
 
@@ -2859,21 +2887,33 @@ Or drag this file to a browser tab on a dApp site like app.pulsex.com`;
 
       if (!window.ethereum) {
         alert('No wallet detected! Please install Rabby or MetaMask.');
+        log('No wallet detected', 'error');
         return;
       }
 
       try {
-        log('Connecting wallet...', 'info');
+        log('Requesting accounts...', 'info');
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        
+        if (!accounts || accounts.length === 0) {
+          log('No accounts returned', 'error');
+          return;
+        }
+        
+        log('Got account: ' + accounts[0].slice(0, 8) + '...', 'success');
         
         // Switch to PulseChain
         try {
+          log('Switching to PulseChain...', 'info');
           await window.ethereum.request({
             method: 'wallet_switchEthereumChain',
             params: [{ chainId: '0x171' }],
           });
+          log('Switched to PulseChain', 'success');
         } catch (switchError) {
+          log('Switch error: ' + switchError.message, 'warning');
           if (switchError.code === 4902) {
+            log('Adding PulseChain...', 'info');
             await window.ethereum.request({
               method: 'wallet_addEthereumChain',
               params: [{
@@ -2889,12 +2929,24 @@ Or drag this file to a browser tab on a dApp site like app.pulsex.com`;
 
         updateWalletStatus(accounts[0]);
         
+        // Create browser provider and signer
+        log('Creating signer...', 'info');
         const browserProvider = new ethers.BrowserProvider(window.ethereum);
         signer = await browserProvider.getSigner();
         
-        log('Wallet connected: ' + accounts[0].slice(0, 8) + '...', 'success');
+        // Also update the provider to use the browser provider for better compatibility
+        provider = browserProvider;
+        
+        // Reconnect current contract with new provider if one is loaded
+        if (currentAddress && currentABI) {
+          currentContract = new ethers.Contract(currentAddress, currentABI, provider);
+          log('Reconnected contract with browser provider', 'info');
+        }
+        
+        log('✅ Wallet connected: ' + accounts[0].slice(0, 8) + '...', 'success');
       } catch (e) {
         log('Wallet connection failed: ' + e.message, 'error');
+        console.error('Wallet error:', e);
       }
     }
 
@@ -3570,10 +3622,24 @@ Or drag this file to a browser tab on a dApp site like app.pulsex.com`;
         
         addAIMessage(cleanResponse, 'assistant');
         
-        // Process any suggestions and show action buttons
+        // Process any suggestions
         const suggestions = processAISuggestions(responseText);
-        if (suggestions.length > 0) {
-          const buttonsHtml = createActionButtons(suggestions);
+        
+        // Auto-execute navigate, load, read - only show buttons for write
+        const writeActions = [];
+        for (const suggestion of suggestions) {
+          if (suggestion.type === 'write') {
+            writeActions.push(suggestion);
+          } else {
+            // Auto-execute non-write actions immediately
+            log(`Auto-executing: ${suggestion.type} - ${suggestion.action}`, 'info');
+            await executeAIAction(suggestion.type, suggestion.action);
+          }
+        }
+        
+        // Only show buttons for write actions (need wallet confirmation)
+        if (writeActions.length > 0) {
+          const buttonsHtml = createActionButtons(writeActions);
           // Append buttons to the last message
           const lastMsg = document.querySelector('.ai-messages .ai-message:last-child');
           if (lastMsg) {
@@ -3914,12 +3980,24 @@ RULES:
     
     // Decode and execute action
     function executeAIActionEncoded(type, encodedAction) {
-      const action = atob(encodedAction);
-      executeAIAction(type, action);
+      console.log('executeAIActionEncoded called:', type, encodedAction);
+      try {
+        const action = atob(encodedAction);
+        console.log('Decoded action:', action);
+        executeAIAction(type, action);
+      } catch (e) {
+        console.error('Error decoding action:', e);
+        addAIMessage(`❌ Error decoding action: ${e.message}`, 'assistant');
+      }
     }
     
     // Execute a confirmed action
     async function executeAIAction(type, action) {
+      console.log('executeAIAction called:', type, action);
+      console.log('currentContract:', currentContract);
+      console.log('currentAddress:', currentAddress);
+      console.log('signer:', signer);
+      
       log(`Executing: ${type} - ${action}`, 'info');
       log(`Current contract: ${currentAddress || 'none'}`, 'info');
       log(`Signer: ${signer ? 'connected' : 'not connected'}`, 'info');
@@ -3990,7 +4068,34 @@ RULES:
               const argsStr = writeMatch[2];
               const args = argsStr ? argsStr.split(',').map(a => a.trim().replace(/['"]/g, '')) : [];
               
-              addAIMessage(`✍️ Preparing ${fnName}(${args.join(', ')}) on ${currentAddress.slice(0,10)}...\n\nPlease confirm in your wallet.`, 'assistant');
+              // Try to simulate/preview the transaction first
+              let simulationMsg = '';
+              try {
+                const previewResponse = await fetch('/api/preview', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    category: 'general',
+                    operation: fnName.toLowerCase(),
+                    params: { args, contractType: currentContractType }
+                  })
+                });
+                
+                if (previewResponse.ok) {
+                  const preview = await previewResponse.json();
+                  if (preview.gasEstimate) {
+                    simulationMsg = `\n📊 **Simulation:**\nEstimated Gas: ~${preview.gasEstimate.toLocaleString()}\n`;
+                  }
+                  if (preview.steps) {
+                    simulationMsg += `Steps: ${preview.steps.join(' → ')}\n`;
+                  }
+                }
+              } catch (simErr) {
+                // Simulation failed, continue without it
+                log('Simulation skipped: ' + simErr.message, 'info');
+              }
+              
+              addAIMessage(`✍️ **${fnName}(${args.join(', ')})**\nContract: ${currentAddress.slice(0,10)}...${simulationMsg}\n⏳ Please confirm in your wallet.`, 'assistant');
               
               try {
                 const contractWithSigner = currentContract.connect(signer);
