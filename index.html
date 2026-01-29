@@ -1332,6 +1332,29 @@
         </div>
       </div>
 
+      <!-- QING / Territory Section -->
+      <div class="sidebar-section" style="padding-bottom: 12px; border-bottom: 1px solid var(--border-color); margin-bottom: 12px;">
+        <div class="sidebar-title">📍 Territory (QING)</div>
+        <div id="currentQingStatus" style="font-size: 10px; color: var(--text-muted); margin-bottom: 6px;">
+          Not in a QING
+        </div>
+        <div class="input-group" style="margin-bottom: 6px;">
+          <input type="text" class="input" id="qingAddress" placeholder="QING address (0x...)" style="font-size: 11px;">
+        </div>
+        <div style="display: flex; gap: 4px;">
+          <button class="btn btn-primary btn-sm" onclick="joinQing()" style="flex: 1; font-size: 10px;">Join</button>
+          <button class="btn btn-secondary btn-sm" onclick="loadQingInfo()" style="flex: 1; font-size: 10px;">Info</button>
+          <button class="btn btn-secondary btn-sm" onclick="leaveQing()" style="flex: 1; font-size: 10px;">Leave</button>
+        </div>
+        <div style="margin-top: 6px;">
+          <select id="knownQings" class="input" style="font-size: 10px; padding: 6px;" onchange="selectKnownQing()">
+            <option value="">-- Known QINGs --</option>
+            <option value="0xb0Ba7D36B7F0505879179ecE7401F24eB653c6E1">Zürich</option>
+            <option value="0xD127839B83cBf537c29B7d268c135f745a0Da2E8">Illinois</option>
+          </select>
+        </div>
+      </div>
+
       <!-- Tabbed Contract Browser -->
       <div class="sidebar-tabs">
         <div class="sidebar-tab active" onclick="showSidebarTab('core')">Core</div>
@@ -2360,6 +2383,187 @@ Quick tips:
         loadedContract: currentAddress,
         loadedType: currentContractType,
       };
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // QING / TERRITORY OPERATIONS
+    // ═══════════════════════════════════════════════════════════════════════════
+    
+    function selectKnownQing() {
+      const select = document.getElementById('knownQings');
+      const address = select.value;
+      if (address) {
+        document.getElementById('qingAddress').value = address;
+        loadQingInfo();
+      }
+    }
+    
+    async function loadQingInfo() {
+      const qingAddress = document.getElementById('qingAddress').value.trim();
+      if (!qingAddress || !ethers.isAddress(qingAddress)) {
+        log('Enter a valid QING address', 'error');
+        return;
+      }
+      
+      log(`Loading QING info: ${qingAddress.slice(0,10)}...`, 'info');
+      showContractTab('output');
+      setOutput('Loading QING info...');
+      
+      try {
+        const qing = new ethers.Contract(qingAddress, [
+          'function Type() view returns (string)',
+          'function name() view returns (string)',
+          'function Waat() view returns (uint64)',
+          'function Entropy() view returns (uint64)',
+          'function Asset() view returns (address)',
+          'function Cover() view returns (uint256)',
+          'function Rod() view returns (address)',
+          'function Cone() view returns (address)',
+          'function Admitted(address) view returns (bool)',
+        ], provider);
+        
+        const [type, name, waat, entropy, asset, cover] = await Promise.all([
+          qing.Type().catch(() => 'Unknown'),
+          qing.name().catch(() => 'Unknown'),
+          qing.Waat().catch(() => 0n),
+          qing.Entropy().catch(() => 0n),
+          qing.Asset().catch(() => '0x0'),
+          qing.Cover().catch(() => 0n),
+        ]);
+        
+        let output = `📍 QING: ${name}\n`;
+        output += `${'═'.repeat(40)}\n`;
+        output += `Address: ${qingAddress}\n`;
+        output += `Type: ${type}\n`;
+        output += `Waat: ${waat.toString()}\n`;
+        output += `Entropy: ${entropy.toString()}\n`;
+        output += `Asset: ${asset}\n`;
+        output += `Cover Charge: ${ethers.formatEther(cover)} tokens\n`;
+        
+        // Check if user's LAU is admitted
+        if (userContracts.lau) {
+          const admitted = await qing.Admitted(userContracts.lau).catch(() => false);
+          output += `\nYour LAU Admitted: ${admitted ? '✅ Yes' : '❌ No'}\n`;
+          
+          if (!admitted) {
+            output += `\n💡 To join this QING:\n`;
+            output += `1. Pay cover charge in the Asset token, OR\n`;
+            output += `2. Hold 25+ CROWS tokens, OR\n`;
+            output += `3. Hold ≥1/32 of Asset's total supply\n`;
+          }
+        }
+        
+        // Store current QING
+        userContracts.currentQing = qingAddress;
+        userContracts.currentQingName = name;
+        document.getElementById('currentQingStatus').innerHTML = `<span style="color: var(--success);">📍 ${name}</span>`;
+        
+        setOutput(output);
+        log(`QING loaded: ${name}`, 'success');
+        
+      } catch (e) {
+        log(`Error loading QING: ${e.message}`, 'error');
+        setOutput(`Error loading QING: ${e.message}`);
+      }
+    }
+    
+    async function joinQing() {
+      const qingAddress = document.getElementById('qingAddress').value.trim();
+      if (!qingAddress || !ethers.isAddress(qingAddress)) {
+        log('Enter a valid QING address', 'error');
+        return;
+      }
+      
+      if (!signer) {
+        log('Connect wallet first', 'error');
+        addAIMessage('⚠️ Please connect your wallet to join a QING.', 'assistant');
+        return;
+      }
+      
+      if (!userContracts.lau) {
+        log('Load your LAU first', 'error');
+        addAIMessage('⚠️ Load your LAU identity first, then join a QING.', 'assistant');
+        return;
+      }
+      
+      log(`Joining QING: ${qingAddress.slice(0,10)}...`, 'info');
+      showContractTab('output');
+      
+      try {
+        // Load the QING contract with signer
+        const qing = new ethers.Contract(qingAddress, [
+          'function Join(address lau) external',
+          'function name() view returns (string)',
+        ], signer);
+        
+        const name = await qing.name().catch(() => 'QING');
+        
+        setOutput(`Joining ${name}...\n\nCalling Join(${userContracts.lau})\n\nPlease confirm in your wallet.`);
+        
+        const tx = await qing.Join(userContracts.lau);
+        setOutput(`Transaction submitted!\nHash: ${tx.hash}\n\nWaiting for confirmation...`);
+        
+        const receipt = await tx.wait();
+        
+        userContracts.currentQing = qingAddress;
+        userContracts.currentQingName = name;
+        document.getElementById('currentQingStatus').innerHTML = `<span style="color: var(--success);">📍 ${name}</span>`;
+        
+        setOutput(`✅ Joined ${name}!\n\nTransaction: ${tx.hash}\nBlock: ${receipt.blockNumber}\nGas: ${receipt.gasUsed.toString()}\n\nYou can now terraform in this territory!`);
+        log(`Joined QING: ${name}`, 'success');
+        
+      } catch (e) {
+        if (e.code === 'ACTION_REJECTED') {
+          setOutput('Transaction rejected by user.');
+        } else {
+          setOutput(`Error joining QING: ${e.message}`);
+        }
+        log(`Join error: ${e.message}`, 'error');
+      }
+    }
+    
+    async function leaveQing() {
+      if (!signer) {
+        log('Connect wallet first', 'error');
+        return;
+      }
+      
+      if (!userContracts.lau) {
+        log('Load your LAU first', 'error');
+        return;
+      }
+      
+      log('Leaving current QING...', 'info');
+      showContractTab('output');
+      
+      try {
+        const lau = new ethers.Contract(userContracts.lau, [
+          'function Leave() external',
+        ], signer);
+        
+        setOutput(`Leaving current QING...\n\nCalling LAU.Leave()\n\nPlease confirm in your wallet.`);
+        
+        const tx = await lau.Leave();
+        setOutput(`Transaction submitted!\nHash: ${tx.hash}\n\nWaiting for confirmation...`);
+        
+        const receipt = await tx.wait();
+        
+        userContracts.currentQing = null;
+        userContracts.currentQingName = null;
+        document.getElementById('currentQingStatus').innerHTML = 'Not in a QING';
+        document.getElementById('qingAddress').value = '';
+        
+        setOutput(`✅ Left QING!\n\nTransaction: ${tx.hash}\nBlock: ${receipt.blockNumber}`);
+        log('Left QING', 'success');
+        
+      } catch (e) {
+        if (e.code === 'ACTION_REJECTED') {
+          setOutput('Transaction rejected by user.');
+        } else {
+          setOutput(`Error leaving QING: ${e.message}`);
+        }
+        log(`Leave error: ${e.message}`, 'error');
+      }
     }
     
     // LAU-first lookup - the primary way to find your identity
