@@ -776,15 +776,15 @@
       margin-bottom: 20px;
       padding: 20px 24px;
       border-radius: 12px;
-      font-size: 15px;
-      line-height: 1.8;
+      font-size: 14px;
+      line-height: 1.7;
       white-space: pre-wrap;
       word-wrap: break-word;
       word-break: break-word;
       overflow-wrap: break-word;
       position: relative;
       max-width: 100%;
-      overflow: hidden;
+      overflow: visible;
     }
 
     .ai-message .copy-msg-btn {
@@ -833,17 +833,18 @@
 
     .ai-message pre {
       background: var(--bg-secondary);
-      padding: 16px;
+      padding: 12px;
       border-radius: 8px;
-      margin: 16px 0;
-      overflow-x: auto;
+      margin: 12px 0;
+      overflow: auto;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 12px;
+      font-size: 11px;
       border: 1px solid var(--border-color);
       line-height: 1.4;
       max-width: 100%;
+      max-height: 400px;
       white-space: pre-wrap;
-      word-break: break-word;
+      word-break: break-all;
     }
 
     .ai-message code {
@@ -851,9 +852,9 @@
       background: var(--bg-secondary);
       padding: 2px 6px;
       border-radius: 4px;
-      font-size: 12px;
+      font-size: 11px;
       color: var(--accent-primary);
-      word-break: break-word;
+      word-break: break-all;
     }
     
     .ai-message h1, .ai-message h2 {
