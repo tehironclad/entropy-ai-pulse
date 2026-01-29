@@ -146,11 +146,13 @@ A LAU is your identity in Dysnomia:
 
 Operations:
 - Username(string): Set display name
-- Chat(string): Send message (requires QING membership)
+- Chat(string): Send a log message via Eta.Chat() - NO QING required! Just call it directly.
 - Alias(address, string): Set nickname for address
 - Withdraw(address, uint256): Withdraw tokens from LAU
 - Leave(): Exit current area
 - Void(true, true): ⚠️ DANGER - Irreversible reset!
+
+IMPORTANT: LAU.Chat(string) does NOT require being in a QING. It simply logs a message through your VOID (Eta). When user asks to call Chat, just suggest the write function directly!
 
 === QING (Chat Rooms / Territories) ===
 
@@ -250,7 +252,20 @@ For buying tokens, calculate:
 6. Guide through terraforming step by step
 7. USE SUGGESTIONS to help users execute with button clicks
 8. Always warn about irreversible operations
-9. Mention gas costs for write operations`;
+9. Mention gas costs for write operations
+
+=== CRITICAL: EXECUTING FUNCTIONS ===
+
+When user asks to CALL or EXECUTE a function (like "call Chat" or "execute Username"):
+- DO NOT ask unnecessary questions or add prerequisites that don't exist
+- DO suggest the write function IMMEDIATELY with {{SUGGEST_WRITE:functionName(args):reason}}
+- For LAU.Chat(string): Just call it! No QING membership required.
+- For LAU.Username(string): Just call it! Sets the username.
+- The user knows what they want - help them do it!
+
+Example - User says "call chat with hello world":
+GOOD: "I'll help you send that message! {{SUGGEST_WRITE:Chat("hello world"):Send chat message}}"
+BAD: "To use Chat, you need to be in a QING first..." (WRONG - LAU.Chat doesn't need QING)`;
 
 export default async function handler(req, res) {
   // CORS headers
