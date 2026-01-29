@@ -307,24 +307,26 @@
     .sidebar {
       background: var(--bg-secondary);
       border-right: 1px solid var(--border-color);
-      padding: 20px;
+      padding: 12px;
       overflow-y: auto;
+      display: flex;
+      flex-direction: column;
     }
 
     .sidebar-section {
-      margin-bottom: 24px;
+      margin-bottom: 12px;
     }
 
     .sidebar-title {
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 600;
       color: var(--accent-primary);
       text-transform: uppercase;
-      letter-spacing: 1.5px;
-      margin-bottom: 12px;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
     }
 
     .sidebar-title::after {
@@ -332,6 +334,86 @@
       flex: 1;
       height: 1px;
       background: linear-gradient(90deg, var(--border-color), transparent);
+    }
+
+    /* Sidebar Tabs */
+    .sidebar-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2px;
+      margin-bottom: 8px;
+      background: var(--bg-tertiary);
+      border-radius: 6px;
+      padding: 3px;
+    }
+
+    .sidebar-tab {
+      flex: 1;
+      min-width: 45px;
+      padding: 6px 4px;
+      text-align: center;
+      font-size: 9px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+
+    .sidebar-tab:hover {
+      color: var(--text-secondary);
+      background: rgba(99, 102, 241, 0.1);
+    }
+
+    .sidebar-tab.active {
+      color: var(--accent-primary);
+      background: var(--bg-card);
+    }
+
+    .sidebar-tab-content {
+      flex: 1;
+      overflow-y: auto;
+      max-height: calc(100vh - 420px);
+    }
+
+    .sidebar-contract-list {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .sidebar-contract-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 8px;
+      background: var(--bg-tertiary);
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.15s;
+      font-size: 11px;
+    }
+
+    .sidebar-contract-item:hover {
+      background: var(--bg-card);
+      border-left: 2px solid var(--accent-primary);
+    }
+
+    .sidebar-contract-item .icon {
+      font-size: 12px;
+    }
+
+    .sidebar-contract-item .name {
+      flex: 1;
+      font-weight: 500;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .contract-list.collapsed {
+      display: none;
     }
 
     /* Input styles */
@@ -756,37 +838,7 @@
     }
 
     .ai-input-container {
-      padding: 16px 20px;
-      border-top: 1px solid var(--border-color);
-      background: var(--bg-secondary);
-    }
-
-    .ai-input-wrapper {
-      display: flex;
-      gap: 12px;
-    }
-
-    .ai-input {
-      flex: 1;
-      padding: 12px 16px;
-      background: var(--bg-primary);
-      border: 2px solid var(--border-color);
-      border-radius: 10px;
-      color: var(--text-primary);
-      font-family: inherit;
-      font-size: 14px;
-      resize: vertical;
-      min-height: 60px;
-    }
-
-    .ai-input:focus {
-      outline: none;
-      border-color: var(--accent-primary);
-      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
-    }
-    
-    .ai-input-container {
-      padding: 12px 20px;
+      padding: 10px 16px;
       border-top: 1px solid var(--border-color);
       background: var(--bg-secondary);
     }
@@ -794,7 +846,26 @@
     .ai-input-wrapper {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
+    }
+
+    .ai-input {
+      flex: 1;
+      padding: 10px 14px;
+      background: var(--bg-primary);
+      border: 2px solid var(--border-color);
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 14px;
+      resize: vertical;
+      min-height: 50px;
+    }
+
+    .ai-input:focus {
+      outline: none;
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
     }
 
     .ai-quick-actions {
@@ -832,7 +903,7 @@
       color: white;
     }
     
-    /* AI Activity Log */
+    /* AI Activity Log - minimal */
     .ai-activity-log {
       border-top: 1px solid var(--border-color);
       background: var(--bg-tertiary);
@@ -842,9 +913,9 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 6px 16px;
+      padding: 4px 12px;
       cursor: pointer;
-      font-size: 10px;
+      font-size: 9px;
       font-weight: 500;
       color: var(--text-muted);
     }
@@ -855,11 +926,11 @@
     }
     
     .ai-activity-content {
-      max-height: 80px;
+      max-height: 60px;
       overflow-y: auto;
-      padding: 0 12px 6px 12px;
+      padding: 0 12px 4px 12px;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 10px;
+      font-size: 9px;
     }
     
     .ai-activity-content.collapsed {
@@ -867,10 +938,10 @@
     }
     
     .log-entry {
-      padding: 3px 0;
+      padding: 2px 0;
       border-bottom: 1px solid var(--border-color);
       color: var(--text-muted);
-      font-size: 10px;
+      font-size: 9px;
     }
     
     .log-entry.success { color: var(--success); }
@@ -1200,51 +1271,52 @@
 
   <!-- Main -->
   <main class="main">
-    <!-- Left Sidebar -->
+    <!-- Left Sidebar - TABBED -->
     <aside class="sidebar">
-      <div class="sidebar-section">
+      <!-- Load Contract - Always visible -->
+      <div class="sidebar-section" style="padding-bottom: 12px; border-bottom: 1px solid var(--border-color); margin-bottom: 12px;">
         <div class="sidebar-title">Load Contract</div>
         <div class="input-group">
           <div class="input-with-btn">
-            <input type="text" class="input" id="contractAddress" placeholder="0x... or contract name">
+            <input type="text" class="input" id="contractAddress" placeholder="0x... or name">
             <button class="btn btn-primary" onclick="loadContract()">Load</button>
           </div>
         </div>
       </div>
       
-      <div class="sidebar-section">
-        <div class="sidebar-title">🔮 My Dysnomia Identity</div>
-        
-        <div style="font-size: 11px; color: var(--text-secondary); margin-bottom: 8px;">Enter your LAU address to find YUE & QINGs:</div>
-        <div class="input-group" style="margin-bottom: 8px;">
-          <input type="text" class="input" id="myLauAddress" placeholder="Your LAU contract address (0x...)">
+      <!-- My Identity - Always visible -->
+      <div class="sidebar-section" style="padding-bottom: 12px; border-bottom: 1px solid var(--border-color); margin-bottom: 12px;">
+        <div class="sidebar-title">🔮 My Identity</div>
+        <div class="input-group" style="margin-bottom: 6px;">
+          <input type="text" class="input" id="myLauAddress" placeholder="Your LAU address (0x...)" style="font-size: 11px;">
         </div>
-        <button class="btn btn-primary btn-sm" onclick="lookupFromLau()" style="width: 100%; margin-bottom: 12px;">🔍 Load My Identity</button>
-        
-        <div style="border-top: 1px solid var(--border-color); padding-top: 12px; margin-top: 4px;">
-          <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 6px;">Or search by wallet (requires CHO registration):</div>
-          <div class="input-group" style="margin-bottom: 6px;">
-            <input type="text" class="input" id="walletLookup" placeholder="Wallet address (0x...)" style="font-size: 11px; padding: 8px;">
-          </div>
-          <button class="btn btn-secondary btn-sm" onclick="findUserContracts()" style="width: 100%; font-size: 11px;">Search CHO Registry</button>
+        <button class="btn btn-primary btn-sm" onclick="lookupFromLau()" style="width: 100%; font-size: 11px;">🔍 Load Identity</button>
+        <div style="margin-top: 8px;">
+          <input type="text" class="input" id="walletLookup" placeholder="Wallet (0x...)" style="font-size: 10px; padding: 6px;">
         </div>
       </div>
 
-      <div class="sidebar-section">
-        <div class="sidebar-title">Dysnomia Ecosystem</div>
-        <div class="contract-list" id="ecosystemContracts" style="max-height: 400px; overflow-y: auto;">
-          <!-- Populated by JS -->
-        </div>
+      <!-- Tabbed Contract Browser -->
+      <div class="sidebar-tabs">
+        <div class="sidebar-tab active" onclick="showSidebarTab('core')">Core</div>
+        <div class="sidebar-tab" onclick="showSidebarTab('soeng')">Soeng</div>
+        <div class="sidebar-tab" onclick="showSidebarTab('spatial')">Spatial</div>
+        <div class="sidebar-tab" onclick="showSidebarTab('users')">Users</div>
+        <div class="sidebar-tab" onclick="showSidebarTab('tokens')">Tokens</div>
+      </div>
+      
+      <div class="sidebar-tab-content" id="sidebarTabContent">
+        <!-- Populated by JS -->
       </div>
 
-      <div class="sidebar-section">
-        <div class="sidebar-title" style="display: flex; justify-content: space-between; align-items: center;">
-          Recent
-          <button class="btn btn-secondary btn-sm" onclick="clearRecentContracts()" style="padding: 2px 8px; font-size: 10px;">Clear</button>
+      <!-- Recent - collapsible at bottom -->
+      <div class="sidebar-section" style="margin-top: auto; padding-top: 12px; border-top: 1px solid var(--border-color);">
+        <div class="sidebar-title" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;" onclick="toggleRecentContracts()">
+          Recent <span id="recentArrow">▶</span>
         </div>
-        <div class="contract-list" id="recentContracts">
+        <div class="contract-list collapsed" id="recentContracts">
           <div class="contract-item" style="justify-content: center; color: var(--text-muted);">
-            No recent contracts
+            No recent
           </div>
         </div>
       </div>
@@ -1283,7 +1355,7 @@ I know the full Dysnomia architecture:
 
       <div class="ai-input-container" style="flex-shrink: 0;">
         <div class="ai-input-wrapper">
-          <textarea class="ai-input" id="aiInput" placeholder="Ask about Dysnomia, get transaction help, learn the math..." rows="3"></textarea>
+          <textarea class="ai-input" id="aiInput" placeholder="Ask about Dysnomia, get transaction help, learn the math..." rows="2"></textarea>
           <div style="display: flex; justify-content: space-between; align-items: center;">
             <div class="ai-quick-actions" style="margin: 0;">
               <button class="ai-quick-btn primary" onclick="quickAction('guide')">🧭 Next?</button>
@@ -1931,38 +2003,91 @@ Quick tips:
     }
 
     // ═══════════════════════════════════════════════════════════════════════════
-    // ECOSYSTEM EXPLORER
+    // SIDEBAR TAB SYSTEM
     // ═══════════════════════════════════════════════════════════════════════════
 
-    // Track collapsed state
-    let collapsedCategories = new Set(['PulseChain', 'Atropa']); // Start with some collapsed
-    
-    function renderEcosystemContracts() {
-      const container = document.getElementById('ecosystemContracts');
+    // Tab definitions - what contracts appear in each tab
+    const SIDEBAR_TABS = {
+      'core': {
+        label: 'Core',
+        categories: {
+          'Chain': ['VOID', 'SIU', 'YANG', 'YAU', 'ZHOU', 'ZHENG', 'YI'],
+          'Reactors': ['SHIO', 'SHAFactory', 'SHIOFactory'],
+        }
+      },
+      'soeng': {
+        label: 'Soeng',
+        categories: {
+          'SOENG': ['META', 'RING', 'PANG', 'ZI', 'CHOA', 'SEI', 'CHAN', 'XIE', 'XIA', 'MAI', 'QI'],
+          'TANG': ['CHEON'],
+        }
+      },
+      'spatial': {
+        label: 'Spatial',
+        categories: {
+          'Spatial': ['MAP', 'HECKE', 'CHO'],
+          'QINGs': ['QING Zürich', 'QING Illinois'],
+        }
+      },
+      'users': {
+        label: 'Users',
+        categories: {
+          'LAUs': ['LAU IronChad', 'LAU mariarahel', 'LAU cLAUde', 'LAU EnterTeh'],
+          'YUEs': ['YUE enteh'],
+        }
+      },
+      'tokens': {
+        label: 'Tokens',
+        categories: {
+          'Atropa': ['atropa', 'AFFECTION', 'CROWS', 'Neptune', 'LOL', 'Buckingham'],
+          'Libraries': ['libAtropaMath', 'ReactionsLib', 'LibAttribute'],
+          'PulseChain': ['WPLS', 'PLSX', 'INC', 'HEX', 'pDAI', 'pUSDC'],
+        }
+      }
+    };
+
+    let currentSidebarTab = 'core';
+
+    function showSidebarTab(tabName) {
+      currentSidebarTab = tabName;
+      
+      // Update tab buttons
+      document.querySelectorAll('.sidebar-tab').forEach(tab => {
+        tab.classList.remove('active');
+        if (tab.textContent.toLowerCase() === tabName || 
+            tab.textContent.toLowerCase().startsWith(tabName.slice(0,4))) {
+          tab.classList.add('active');
+        }
+      });
+      
+      // Render content
+      renderSidebarTabContent(tabName);
+    }
+
+    function renderSidebarTabContent(tabName) {
+      const container = document.getElementById('sidebarTabContent');
+      const tabData = SIDEBAR_TABS[tabName];
+      
+      if (!tabData) {
+        container.innerHTML = '<div style="color: var(--text-muted); text-align: center; padding: 20px;">No contracts</div>';
+        return;
+      }
+
       let html = '';
       
-      Object.entries(CONTRACT_CATEGORIES).forEach(([category, contracts]) => {
-        const isCollapsed = collapsedCategories.has(category);
-        const icon = getCategoryIcon(category);
-        
-        html += `
-          <div class="ecosystem-category">
-            <div class="category-header" onclick="toggleCategory('${category}')">
-              <span>${icon} ${category}</span>
-              <span class="category-arrow">${isCollapsed ? '▶' : '▼'}</span>
-            </div>
-            <div class="category-contracts" style="display: ${isCollapsed ? 'none' : 'block'}">
-        `;
+      Object.entries(tabData.categories).forEach(([category, contracts]) => {
+        html += `<div style="margin-bottom: 8px;">`;
+        html += `<div style="font-size: 9px; color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase;">${category}</div>`;
+        html += `<div class="sidebar-contract-list">`;
         
         contracts.forEach(name => {
           const addr = KNOWN_CONTRACTS[name];
           if (addr) {
+            const icon = getContractIcon(name);
             html += `
-              <div class="contract-item" onclick="loadContract('${addr}')">
-                <div>
-                  <div class="contract-item-name">${name}</div>
-                  <div class="contract-item-addr">${addr.slice(0, 8)}...${addr.slice(-6)}</div>
-                </div>
+              <div class="sidebar-contract-item" onclick="loadContract('${addr}')">
+                <span class="icon">${icon}</span>
+                <span class="name">${name}</span>
               </div>
             `;
           }
@@ -1972,6 +2097,38 @@ Quick tips:
       });
       
       container.innerHTML = html;
+    }
+
+    function getContractIcon(name) {
+      if (name.startsWith('LAU')) return '👤';
+      if (name.startsWith('YUE')) return '🌐';
+      if (name.startsWith('QING')) return '📍';
+      if (name.includes('SHIO') || name.includes('SHA')) return '⚛️';
+      if (['VOID', 'SIU', 'YANG', 'YAU', 'ZHOU', 'ZHENG', 'YI'].includes(name)) return '🔗';
+      if (['META', 'RING', 'PANG', 'ZI', 'CHOA', 'SEI', 'CHAN', 'XIE', 'XIA', 'MAI', 'QI'].includes(name)) return '🔮';
+      if (['MAP', 'HECKE', 'CHO'].includes(name)) return '🗺️';
+      if (name === 'CHEON') return '☁️';
+      if (['atropa', 'AFFECTION', 'CROWS', 'Neptune', 'LOL', 'Buckingham'].includes(name)) return '🌿';
+      if (name.startsWith('lib') || name.includes('Lib')) return '📚';
+      return '💎';
+    }
+
+    function toggleRecentContracts() {
+      const list = document.getElementById('recentContracts');
+      const arrow = document.getElementById('recentArrow');
+      list.classList.toggle('collapsed');
+      arrow.textContent = list.classList.contains('collapsed') ? '▶' : '▼';
+    }
+    
+    // Initialize sidebar on load
+    function initSidebar() {
+      renderSidebarTabContent('core');
+    }
+    
+    // Old function for compatibility - now a no-op
+    function renderEcosystemContracts() {
+      // Now handled by sidebar tabs
+      initSidebar();
     }
     
     function getCategoryIcon(category) {
@@ -2161,7 +2318,7 @@ Quick tips:
       window.userDysnomiaContext = {
         ...userContracts,
         loadedContract: currentAddress,
-        loadedType: document.getElementById('contractType')?.textContent,
+        loadedType: currentContractType,
       };
     }
     
@@ -3444,8 +3601,8 @@ Be helpful and suggest actions when appropriate. User confirms before execution.
       div.className = 'ai-message ' + role;
       div.innerHTML = content.replace(/```(\w+)?\n([\s\S]*?)```/g, '<pre>$2</pre>').replace(/`([^`]+)`/g, '<code>$1</code>');
       messages.appendChild(div);
-      // Scroll so the TOP of the new message is visible, not the bottom
-      div.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // Scroll within the messages container only, not the whole page
+      messages.scrollTop = div.offsetTop - messages.offsetTop;
     }
 
     // Contract Panel Tab Switching
@@ -3571,9 +3728,8 @@ Load a contract and ask me anything!
       if (currentAddress) {
         context += `=== LOADED CONTRACT ===\n`;
         context += `Address: ${currentAddress}\n`;
-        context += `Name: ${document.getElementById('contractName').textContent}\n`;
-        context += `Type: ${document.getElementById('contractType').textContent}\n`;
-        context += `Verified: ${document.getElementById('contractVerified').textContent}\n`;
+        context += `Name: ${currentContractName || 'Unknown'}\n`;
+        context += `Type: ${currentContractType || 'Unknown'}\n`;
         
         if (currentABI) {
           const fns = currentABI.filter(x => x.type === 'function');
@@ -3801,7 +3957,7 @@ RULES:
     function showCurrentState() {
       let state = `📋 **Current System State:**\n\n`;
       state += `**Wallet:** ${signer ? '✅ Connected' : '❌ Not connected'}\n`;
-      state += `**Contract Loaded:** ${currentAddress ? `✅ ${document.getElementById('contractName')?.textContent || 'Unknown'} (${currentAddress.slice(0,10)}...)` : '❌ None'}\n`;
+      state += `**Contract Loaded:** ${currentAddress ? `✅ ${currentContractName || 'Unknown'} (${currentAddress.slice(0,10)}...)` : '❌ None'}\n`;
       
       if (userContracts.lau) {
         state += `**Your LAU:** ${userContracts.lau.slice(0,10)}...\n`;
@@ -3928,7 +4084,7 @@ RULES:
     // Initialize on load
     window.addEventListener('load', init);
 
-    // Allow Enter key in AI input
+    // Allow Enter key in AI input and initialize sidebar
     document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('aiInput').addEventListener('keydown', (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
@@ -3936,6 +4092,9 @@ RULES:
           sendToAI();
         }
       });
+      
+      // Initialize sidebar tabs
+      initSidebar();
     });
   </script>
 </body>
