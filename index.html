@@ -1959,6 +1959,14 @@ Quick tips:
         'function Chat(address,string)',
         'function Withdraw(address,uint256)',
       ],
+      MAP: [
+        'function Cho() view returns (address)',
+        'function Offset() view returns (uint256)',
+        'function GetQing(uint256) view returns (address)',
+        'function GetMapQing(int256,int256) view returns (address)',
+        'function Forbidden(address) view returns (bool)',
+        'function New(address) returns (address)',
+      ],
       SEI: [
         'function Chan() view returns (address)',
         'function Chi() view returns (address,address)',
@@ -4092,6 +4100,46 @@ User question: ${input}
 Be helpful and suggest actions when appropriate. User confirms before execution.`;
     }
 
+    // Helper function to copy text with fallback
+    function copyToClipboard(text, successCallback, errorCallback) {
+      // Try modern clipboard API first
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text)
+          .then(successCallback)
+          .catch(() => {
+            // Fallback to execCommand
+            fallbackCopy(text, successCallback, errorCallback);
+          });
+      } else {
+        // Use fallback directly
+        fallbackCopy(text, successCallback, errorCallback);
+      }
+    }
+    
+    function fallbackCopy(text, successCallback, errorCallback) {
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-9999px';
+      textArea.style.top = '0';
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      
+      try {
+        const successful = document.execCommand('copy');
+        document.body.removeChild(textArea);
+        if (successful) {
+          successCallback();
+        } else {
+          errorCallback(new Error('execCommand failed'));
+        }
+      } catch (err) {
+        document.body.removeChild(textArea);
+        errorCallback(err);
+      }
+    }
+
     function addAIMessage(content, role) {
       const messages = document.getElementById('aiMessages');
       const div = document.createElement('div');
@@ -4112,14 +4160,19 @@ Be helpful and suggest actions when appropriate. User confirms before execution.
       copyBtn.title = 'Copy to clipboard';
       copyBtn.onclick = (e) => {
         e.stopPropagation();
-        navigator.clipboard.writeText(cleanContent).then(() => {
-          copyBtn.textContent = '✓';
-          setTimeout(() => copyBtn.textContent = '📋', 1500);
-        }).catch(err => {
-          console.error('Copy failed:', err);
-          copyBtn.textContent = '❌';
-          setTimeout(() => copyBtn.textContent = '📋', 1500);
-        });
+        e.preventDefault();
+        copyToClipboard(
+          cleanContent,
+          () => {
+            copyBtn.textContent = '✓';
+            setTimeout(() => copyBtn.textContent = '📋', 1500);
+          },
+          (err) => {
+            console.error('Copy failed:', err);
+            copyBtn.textContent = '❌';
+            setTimeout(() => copyBtn.textContent = '📋', 1500);
+          }
+        );
       };
       
       div.appendChild(copyBtn);
@@ -4140,13 +4193,19 @@ Be helpful and suggest actions when appropriate. User confirms before execution.
     // Copy helper for initial hardcoded message
     function copyInitialMsg(btn) {
       const msgDiv = btn.parentElement;
-      const textContent = msgDiv.textContent.replace('📋', '').replace('✓', '').trim();
-      navigator.clipboard.writeText(textContent).then(() => {
-        btn.textContent = '✓';
-        setTimeout(() => btn.textContent = '📋', 1500);
-      }).catch(err => {
-        console.error('Copy failed:', err);
-      });
+      const textContent = msgDiv.textContent.replace('📋', '').replace('✓', '').replace('❌', '').trim();
+      copyToClipboard(
+        textContent,
+        () => {
+          btn.textContent = '✓';
+          setTimeout(() => btn.textContent = '📋', 1500);
+        },
+        (err) => {
+          console.error('Copy failed:', err);
+          btn.textContent = '❌';
+          setTimeout(() => btn.textContent = '📋', 1500);
+        }
+      );
     }
 
     // Contract Panel Tab Switching
