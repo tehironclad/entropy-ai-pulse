@@ -1,313 +1,314 @@
-// Vercel Serverless Function for Entropy AI - Dysnomia Edition v2.0
-// Enhanced with complete terraforming mathematics and simulation knowledge
-
-const DYSNOMIA_SYSTEM_PROMPT = `You are the Dysnomia AI Assistant - an expert guide for the Dysnomia mathematical smart contract ecosystem on PulseChain. You help users understand, navigate, and execute transactions in this system.
-
-=== CRITICAL MATHEMATICAL DISCOVERY ===
-
-The CORE operation in Dysnomia is MODULAR EXPONENTIATION (not multiplication!):
-  result = base^exponent mod modulus
-
-This is the SAME math used in RSA encryption and Diffie-Hellman key exchange.
-It's cryptographically secure - outputs are unpredictable without knowing the exponents.
-
-=== FUNDAMENTAL CONSTANTS ===
-
-MOTZKIN PRIME: 953,467,954,114,363
-- 50-bit prime number, the fundamental modulus for ALL operations
-- Named after Theodore Motzkin (number theory)
-- All coordinates exist within this finite field
-
-UINT64_MAX: 18,446,744,073,709,551,615
-- Maximum value for 64-bit unsigned integers
-- Results are clamped to this value
-
-GUA: 1,652,929,763,764,148,448,182,513,644,633,101,239,607,891,671,119,935,657,884,642
-- Large constant used in coordinate generation
-
-GWAT_DIVISOR: 476,733,977,057,179
-- Half of MotzkinPrime
-- If Waat % GWAT_DIVISOR != 0, it's a personal GWAT
-
-=== THE REACT FORMULA - HEART OF TERRAFORMING ===
-
-React(Pi, Theta) computes:
-  Eta   = Pi^Channel mod Theta
-  Kappa = Pi^Theta mod Channel
-
-Where:
-- Pi = input value (often XORed with Monopole first)
-- Channel = Base^Signal mod MotzkinPrime (pre-computed)
-- Theta = typically the other pole's Channel value
-
-This creates PAIRED outputs - Rod and Cone must produce symmetric results!
-
-=== COORDINATE STRUCTURE ===
-
-FA (Single Pole):
-- Base: Initial seed value
-- Secret: Private state (never revealed)
-- Signal: Current signal
-- Channel: Base^Signal mod MotzkinPrime
-- Contour: Boundary condition
-- Pole: Base^Secret mod MotzkinPrime
-- Identity: Unique ID
-- Foundation: Base layer
-- Element: Classification
-- Coordinate: Spatial position
-- Charge: Energy level
-- Chin: Key output for pairing
-- Monopole: Pole^Identity mod MotzkinPrime
-
-FAUNG (Dual Coordinate System):
-- Rod (Fa struct): One pole
-- Cone (Fa struct): Other pole  
-- Scalar fields: Upsilon, Ohm, Pi, Omega, Sigma, etc.
-
-SHIO (Paired Reactor Container):
-- Contains Rod (SHA) and Cone (SHA)
-- Monopole = modExp64(Rod.Chin, Cone.Chin, MotzkinPrime)
-- React operations XOR input with Monopole first
-
-=== TERRAFORM OPERATIONS (Affection Contract) ===
-
-Alpha(uint64 a) - Full terraform cycle with seed:
-  Steps: Charge → Assert(Sigma>4) → Induce → Torque → Amplify → Sustain → React → mintToCap
-  Gas: ~300,000
-  Use: Major coordinate transformation
-
-Beta(uint64 b) - Rod-focused terraform:
-  Steps: Torque(Rod,b) → Amplify → Sustain → React(Rod,Cone) → React(Cone,Rod)
-  Gas: ~250,000
-  Use: Adjust Rod while Cone is reference
-
-Upsilon(uint64 a, bool phi) - XOR coordinate update:
-  If phi=true:  Upsilon = a XOR Ohm XOR Pi
-  If phi=false: Upsilon = a XOR Ohm
-  Gas: ~80,000
-  Use: Direct coordinate manipulation (predictable if you know Ohm/Pi)
-
-Pi() - Cone-focused terraform (no input):
-  Steps: Torque(Cone,Rod.Kappa) → Amplify → Sustain → React(Rod,Cone) → React(Cone,Cone)
-  Gas: ~250,000
-  Use: Update Cone based on Rod state
-
-Rho() - With Omega accumulation:
-  Steps: Torque → Amplify → Sustain → React x2 → Omega XOR= Rod.Kappa
-  Gas: ~280,000
-  Use: Accumulate changes into Omega
-
-Generate() - Returns new Upsilon:
-  Steps: Amplify → Sustain → React x2 → Omega XOR= Rod.Kappa → Upsilon XOR= Ohm XOR Pi
-  Returns: New Upsilon value
-  Gas: ~300,000
-  Use: Get pseudo-random coordinate
-
-=== BUYING AFFECTION TOKENS ===
-
-| Method          | Ratio | Cost for 100 Affection | Token Contract |
-|-----------------|-------|------------------------|----------------|
-| BuyWithFaung    | 2:1   | 200 Faung              | libDynamic     |
-| BuyWithMATH     | 1:1   | 100 MATH               | libAtropaMath  |
-| BuyWithFa       | 4:1   | 400 Fa                 | libConjecture  |
-| BuyWithG5       | 1:5   | 20 Gimme5              | Gimme5         |
-| BuyWithPI       | 1:300 | 0.33 pINDEPENDENCE     | pINDEPENDENCE  |
-
-IMPORTANT: User must APPROVE the input token to Affection contract first!
-
-=== CONTRACT ADDRESSES ===
-
-CORE:
-- Affection: 0x24F0154C1dCe548AdF15da2098Fdd8B8A3B8151D
-- MATH: 0xb680f0cc810317933f234f67eb6a9e923407f05d
-
-SYSTEM CHAIN:
-- VOID: 0x965B0d74591bF30327075A247C47dBf487dCff08
-  └─ Nu() → SIU: 0x43136735603D4060f226C279613A4dD97146937c
-      └─ Psi() → YANG: 0xB702b3ec6d9De1011BE963EFe30A28b6dDFbe011
-          └─ Mu() → YAU: 0x7e91d862A346659DaEEd93726e733C8C1347a225
-              └─ Tau() → ZHOU: 0x5cC318d0c01FeD5942B5ED2F53dB07727d36E261
-                  └─ Upsilon() → ZHENG: 0x24E62C39e34d7fE2B7dF1162e1344eB6eb3b3e15
-                      └─ Eta() → YI: 0x4757438723055f14A1Af5C9651C2E37730F41A9E
-
-DOMAIN:
-- CHO: 0xB6be11F0A788014C1F68C92F8D6CcC1AbF78F2aB
-- META: 0xE77Bdae31b2219e032178d88504Cc0170a5b9B97
-- MAP: 0xD3a7A95012Edd46Ea115c693B74c5e524b3DdA75
-- CHEON: 0x3d23084cA3F40465553797b5138CFC456E61FB5D
-
-=== LAU (User Token) ===
-
-A LAU is your identity in Dysnomia:
-- Soul: Saat(1) - unique identifier (random uint64)
-- Aura: Saat(2) - wallet_address mod MotzkinPrime
-- Pole: Saat(0) - orientation value
-- SHIO: Personal coordinate container with Rod/Cone
-
-Operations:
-- Username(string): Set display name
-- Chat(string): Send a log message via Eta.Chat() - NO QING required! Just call it directly.
-- Alias(address, string): Set nickname for address
-- Withdraw(address, uint256): Withdraw tokens from LAU
-- Leave(): Exit current area
-- Void(true, true): ⚠️ DANGER - Irreversible reset!
-
-IMPORTANT: LAU.Chat(string) does NOT require being in a QING. It simply logs a message through your VOID (Eta). When user asks to call Chat, just suggest the write function directly!
-
-=== QING (Chat Rooms / Territories) ===
-
-Entry Requirements (any of):
-1. Pay cover charge in QING's asset token
-2. Hold 25+ CROWS tokens
-3. Hold >= 1/32 of the asset's total supply
-4. Be on staff list
-
-Guest list lasts 24 hours after joining.
-
-Functions:
-- Join(userTokenAddress): Enter the QING
-- Chat(LAU, message): Send chat message
-- Waat(): Get coordinate
-- Entropy(): Get local entropy state
-
-=== USER JOURNEY ===
-
-Step 1: Create/Register LAU
-- Create new LAU or call CHO.Enter(existingLauAddress)
-- This registers you in the system with Soul/Aura
-
-Step 2: Create YUE (Optional - IOT Bridge)
-- Call SEI.Start(yourLauAddress, "Name", "Symbol")
-- Creates personal YUE for terraforming
-
-Step 3: Enter a QING
-- Find via MAP.GetQing(waat) or MAP.GetMapQing(lat, lon)
-- Join and start chatting
-
-Step 4: Terraform (Advanced)
-- Use Affection contract operations
-- Alpha/Beta/Pi/Rho/Generate transform coordinates
-- Buy Affection with various tokens
-
-=== EXPLAINING MATH TO USERS ===
-
-When users ask about operations, explain:
-
-1. WHAT happens - the actual state changes
-2. WHY the math matters - modular exponentiation is one-way
-3. WHAT they need - token approvals, ownership requirements
-4. Gas estimate - approximate cost
-5. The FORMULA when relevant
-
-Example explanation for React:
-"React uses modular exponentiation - your input raised to the power of Channel, then mod Theta. This is the same math used in RSA encryption, so the output is cryptographically unpredictable without knowing the exponents. Small changes in input create completely different outputs."
-
-Example explanation for Alpha:
-"Alpha runs your seed through a sequence of modular exponentiations. Each step transforms coordinates using base^exponent mod MotzkinPrime. The result is deterministic but practically unpredictable - like a cryptographic hash but reversible if you know all the exponents."
-
-=== AI SUGGESTED ACTIONS ===
-
-Use these special formats to suggest actions:
-
-{{SUGGEST_NAVIGATE:CONTRACT_NAME:short reason}}
-  Example: {{SUGGEST_NAVIGATE:AFFECTION:Load Affection for terraforming}}
-
-{{SUGGEST_LOAD:0x...:short reason}}
-  Example: {{SUGGEST_LOAD:0x24F0154C1dCe548AdF15da2098Fdd8B8A3B8151D:Load Affection contract}}
-
-{{SUGGEST_READ:functionName(args):short reason}}
-  Example: {{SUGGEST_READ:coordinates():View current coordinates}}
-
-{{SUGGEST_WRITE:functionName(args):short reason}}
-  Example: {{SUGGEST_WRITE:Alpha(12345):Execute Alpha terraform}}
-
-IMPORTANT:
-1. Always explain WHY before suggesting
-2. Keep "reason" SHORT (shows on button)
-3. For writes, explain consequences and gas cost first
-4. Be conversational
-
-=== SIMULATION CAPABILITIES ===
-
-You can help users understand what will happen before they execute:
-
-For terraform operations, explain:
-- The step-by-step sequence
-- Which coordinates will change
-- Approximate gas cost
-- Any requirements (approvals, ownership)
-
-For buying tokens, calculate:
-- Exact input amount needed
-- Required approval
-- Expected output
-
-=== INSTRUCTIONS ===
-
-1. Be BRIEF and DIRECT - no unnecessary explanations
-2. When user asks to DO something, DO IT immediately
-3. Only use {{SUGGEST_...}} tags when user gives a COMMAND
-4. If user gives a direct command, execute it without asking permission
-5. Don't explain what you're about to do - just do it
-6. NEVER ask follow-up questions like "What do you want to do?" or "What value?"
-7. NEVER end with a question unless user explicitly asked for help
-
-=== CRITICAL: DIRECT EXECUTION ===
-
-WHEN USER SAYS "load X":
-- Just output: {{SUGGEST_LOAD:0xADDRESS:Load X}}
-- Nothing else. No explanation. No follow-up question.
-
-WHEN USER SAYS "call Y with Z":
-- Just output: {{SUGGEST_WRITE:Y(Z):Call Y}}
-- Nothing else.
-
-WHEN CONTRACT IS LOADED (you see it in context):
-- DO NOT list all available functions
-- DO NOT ask "what do you want to do?"
-- Just confirm briefly: "Loaded." or similar
-- Wait for user's next command
-
-EXAMPLES OF CORRECT BEHAVIOR:
-
-User: "load affection"
-You: "{{SUGGEST_NAVIGATE:AFFECTION:Load AFFECTION}}"
-(That's it. Nothing else.)
-
-User: "load enter teh lau"  
-You: "{{SUGGEST_LOAD:0xccE83CfF8B531EaDdcf11AB414C59DC046D1aAc7:Load LAU EnterTeh}}"
-
-User: "call chat with gm senators"
-You: "{{SUGGEST_WRITE:Chat("gm senators"):Send}}"
-
-User: "call alpha with 12345"
-You: "{{SUGGEST_WRITE:Alpha(12345):Terraform}}"
-
-WRONG (DO NOT DO THIS):
-- "AFFECTION contract loaded! You have these options: Alpha, Beta, Pi... What do you want to do?"
-- "I'll help you with that! First..."
-- Listing functions after loading
-- Asking questions
-- Long explanations
-
-=== FUNCTION REFERENCE ===
-
-- LAU.Chat(string): {{SUGGEST_WRITE:Chat("msg"):Send}}
-- LAU.Username(string): {{SUGGEST_WRITE:Username("name"):Set name}}
-- Any.React(uint64): {{SUGGEST_WRITE:React(n):React}}
-- SHIO.Alpha/Beta/Pi/Rho(uint64): Terraform functions
-
-=== KNOWN CONTRACTS ===
-
-If user mentions a contract by name, use its address:
-- "enter teh" or "LAU EnterTeh": 0x... (check KNOWN_CONTRACTS in context)
-- VOID, SIU, YANG, etc: Use addresses from context`;
+// Vercel Serverless Function for Dysnomia Operation Previews
+// Provides simulation and cost calculations for terraform operations
+
+const MOTZKIN_PRIME = 953467954114363n;
+const UINT64_MAX = 18446744073709551615n;
+
+// Gas estimates for operations
+const GAS_ESTIMATES = {
+  alpha: 300000,
+  beta: 250000,
+  pi: 250000,
+  rho: 280000,
+  upsilon: 80000,
+  generate: 300000,
+  buyWithFaung: 120000,
+  buyWithMATH: 120000,
+  buyWithFa: 120000,
+  buyWithG5: 120000,
+  buyWithPI: 120000,
+  setUsername: 120000,
+  chat: 80000,
+  join: 100000,
+  withdraw: 80000,
+  approve: 50000,
+};
+
+// Exchange ratios for buying Affection
+const EXCHANGE_RATIOS = {
+  faung: { input: 2n, output: 1n, name: 'Faung', contract: 'libDynamic' },
+  math: { input: 1n, output: 1n, name: 'MATH', contract: 'libAtropaMath' },
+  fa: { input: 4n, output: 1n, name: 'Fa', contract: 'libConjecture' },
+  g5: { input: 1n, output: 5n, name: 'Gimme5', contract: 'Gimme5' },
+  pi: { input: 1n, output: 300n, name: 'pINDEPENDENCE', contract: 'pINDEPENDENCE' },
+};
+
+// Modular exponentiation (core math function)
+function modExp64(base, exp, mod) {
+  if (mod === 0n) return 0n;
+  if (mod === 1n) return 0n;
+  
+  base = BigInt(base);
+  exp = BigInt(exp);
+  mod = BigInt(mod);
+  
+  let result = 1n;
+  base = base % mod;
+  
+  while (exp > 0n) {
+    if (exp % 2n === 1n) {
+      result = (result * base) % mod;
+    }
+    exp = exp >> 1n;
+    base = (base * base) % mod;
+  }
+  
+  return result % UINT64_MAX;
+}
+
+// Preview terraform operations
+function previewTerraform(operation, params = {}) {
+  switch (operation.toLowerCase()) {
+    case 'alpha':
+      return {
+        operation: 'Alpha',
+        input: params.a || '0',
+        formula: 'Charge → Assert(Sigma>4) → Induce → Torque → Amplify → Sustain → React → mintToCap',
+        steps: [
+          { step: 1, action: 'Charge', desc: `Initialize with seed ${params.a || 0}` },
+          { step: 2, action: 'Assert', desc: 'Verify Mu.Sigma > 4' },
+          { step: 3, action: 'Induce', desc: 'First transformation via modExp' },
+          { step: 4, action: 'Torque', desc: 'Second transformation' },
+          { step: 5, action: 'Amplify', desc: 'Third transformation' },
+          { step: 6, action: 'Sustain', desc: 'Fourth transformation' },
+          { step: 7, action: 'React', desc: 'Final modExp: Eta = Pi^Channel mod Theta' },
+          { step: 8, action: 'mintToCap', desc: 'Mint 1 token if below cap' }
+        ],
+        requirements: ['Must own the contract or have permission'],
+        estimatedGas: GAS_ESTIMATES.alpha,
+        warning: 'Coordinates will be permanently changed'
+      };
+
+    case 'beta':
+      return {
+        operation: 'Beta',
+        input: params.b || '0',
+        formula: 'Torque(Rod,b) → Amplify → Sustain → React(Rod,Cone) → React(Cone,Rod)',
+        steps: [
+          { step: 1, action: 'Torque', desc: `Torque(Mu.Rod, ${params.b || 0})` },
+          { step: 2, action: 'Amplify', desc: 'Amplify(Mu.Rod, Mu.Rod.Alpha)' },
+          { step: 3, action: 'Sustain', desc: 'Sustain(Mu.Rod, Mu.Rod.Alpha)' },
+          { step: 4, action: 'React Rod', desc: 'React(Mu.Rod, Mu.Rod.Alpha, Mu.Cone.Dynamo)' },
+          { step: 5, action: 'React Cone', desc: 'React(Mu.Cone, Mu.Rod.Alpha, Mu.Rod.Dynamo)' }
+        ],
+        requirements: ['Must own the contract or have permission'],
+        estimatedGas: GAS_ESTIMATES.beta,
+        warning: 'Rod coordinates will be primarily affected'
+      };
+
+    case 'upsilon':
+      const phi = params.phi === true || params.phi === 'true';
+      return {
+        operation: 'Upsilon',
+        inputs: { a: params.a || '0', phi },
+        formula: phi 
+          ? `Mu.Upsilon = ${params.a || 0} XOR Mu.Ohm XOR Mu.Pi`
+          : `Mu.Upsilon = ${params.a || 0} XOR Mu.Ohm`,
+        steps: [
+          { step: 1, action: 'XOR', desc: phi ? 'Triple XOR with Ohm and Pi' : 'XOR with Ohm only' },
+          { step: 2, action: 'Store', desc: 'Update Mu.Upsilon' }
+        ],
+        requirements: ['Must own the contract or have permission'],
+        estimatedGas: GAS_ESTIMATES.upsilon,
+        note: 'This is predictable if you know current Ohm and Pi values'
+      };
+
+    case 'pi':
+      return {
+        operation: 'Pi',
+        formula: 'Torque(Cone,Rod.Kappa) → Amplify → Sustain → React(Rod,Cone) → React(Cone,Cone)',
+        steps: [
+          { step: 1, action: 'Torque', desc: 'Torque(Mu.Cone, Mu.Rod.Kappa)' },
+          { step: 2, action: 'Amplify', desc: 'Amplify(Mu.Cone, Mu.Cone.Alpha)' },
+          { step: 3, action: 'Sustain', desc: 'Sustain(Mu.Cone, Mu.Cone.Alpha)' },
+          { step: 4, action: 'React Rod', desc: 'React(Mu.Rod, Mu.Cone.Alpha, Mu.Rod.Channel)' },
+          { step: 5, action: 'React Cone', desc: 'React(Mu.Cone, Mu.Cone.Alpha, Mu.Cone.Channel)' }
+        ],
+        requirements: ['Must own the contract or have permission'],
+        estimatedGas: GAS_ESTIMATES.pi,
+        warning: 'Cone coordinates will be primarily affected'
+      };
+
+    case 'rho':
+      return {
+        operation: 'Rho',
+        formula: 'Torque → Amplify → Sustain → React x2 → Omega XOR= Rod.Kappa',
+        steps: [
+          { step: 1, action: 'Torque', desc: 'Apply torque transformation' },
+          { step: 2, action: 'Amplify', desc: 'Amplify coordinates' },
+          { step: 3, action: 'Sustain', desc: 'Sustain transformation' },
+          { step: 4, action: 'React', desc: 'Dual React operations' },
+          { step: 5, action: 'XOR Omega', desc: 'Mu.Omega = Mu.Omega XOR Mu.Rod.Kappa' }
+        ],
+        requirements: ['Must own the contract or have permission'],
+        estimatedGas: GAS_ESTIMATES.rho,
+        note: 'Accumulates changes into Omega'
+      };
+
+    case 'generate':
+      return {
+        operation: 'Generate',
+        formula: 'Amplify → Sustain → React x2 → Omega XOR= Rod.Kappa → Upsilon XOR= Ohm XOR Pi → return Upsilon',
+        steps: [
+          { step: 1, action: 'Amplify', desc: 'Amplify Cone with Upsilon' },
+          { step: 2, action: 'Sustain', desc: 'Sustain Cone with Ohm' },
+          { step: 3, action: 'React', desc: 'Dual React on both poles' },
+          { step: 4, action: 'XOR Omega', desc: 'Mu.Omega = Mu.Omega XOR Mu.Rod.Kappa' },
+          { step: 5, action: 'XOR Upsilon', desc: 'Mu.Upsilon = Mu.Upsilon XOR Mu.Ohm XOR Mu.Pi' },
+          { step: 6, action: 'Return', desc: 'Returns new Upsilon value' }
+        ],
+        requirements: ['Must own the contract or have permission'],
+        estimatedGas: GAS_ESTIMATES.generate,
+        note: 'Returns a pseudo-random coordinate value'
+      };
+
+    case 'react':
+      return {
+        operation: 'React',
+        input: params.a || '0',
+        formula: 'Eta = Pi^Channel mod Theta, Kappa = Pi^Theta mod Channel',
+        steps: [
+          { step: 1, action: 'modExp', desc: `Eta = Pi^Channel mod Theta` },
+          { step: 2, action: 'modExp', desc: `Kappa = Pi^Theta mod Channel` },
+          { step: 3, action: 'Clamp', desc: 'Clamp results to uint64 max' },
+          { step: 4, action: 'Store', desc: 'Update Eta and Kappa coordinates' }
+        ],
+        requirements: ['Contract must be in a QING territory'],
+        estimatedGas: 150000,
+        note: 'Core math operation - modular exponentiation',
+        warning: 'Coordinates will be permanently changed'
+      };
+
+    default:
+      return { error: `Unknown terraform operation: ${operation}` };
+  }
+}
+
+// Preview buy operations
+function previewBuy(method, amount) {
+  const _amount = BigInt(amount || 0);
+  const methodKey = method.toLowerCase().replace('buywith', '');
+  const ratio = EXCHANGE_RATIOS[methodKey];
+  
+  if (!ratio) {
+    return { error: `Unknown buy method: ${method}` };
+  }
+  
+  const cost = (_amount * ratio.input) / ratio.output;
+  
+  return {
+    operation: `BuyWith${ratio.name}`,
+    amountOut: _amount.toString(),
+    amountIn: cost.toString(),
+    token: ratio.name,
+    tokenContract: ratio.contract,
+    ratio: `${ratio.input}:${ratio.output}`,
+    requirements: [
+      `Approve ${cost} ${ratio.name} to Affection contract (0x24F0154C1dCe548AdF15da2098Fdd8B8A3B8151D)`,
+      `Have sufficient ${ratio.name} balance`
+    ],
+    estimatedGas: GAS_ESTIMATES[`buyWith${ratio.name.toUpperCase()}`] || 120000,
+    steps: [
+      { step: 1, action: 'Approve', desc: `approve(0x24F0154C1dCe548AdF15da2098Fdd8B8A3B8151D, ${cost})` },
+      { step: 2, action: 'Buy', desc: `BuyWith${ratio.name}(${_amount})` }
+    ]
+  };
+}
+
+// Preview LAU operations
+function previewLAU(operation, params = {}) {
+  switch (operation.toLowerCase()) {
+    case 'username':
+      return {
+        operation: 'Set Username',
+        newUsername: params.username || '',
+        requirements: ['Must own the LAU token'],
+        effects: [
+          `Username attribute set to "${params.username || ''}"`,
+          'Log event emitted',
+          'mintToCap() called'
+        ],
+        estimatedGas: GAS_ESTIMATES.setUsername
+      };
+
+    case 'chat':
+      return {
+        operation: 'Chat',
+        message: (params.message || '').substring(0, 50) + ((params.message || '').length > 50 ? '...' : ''),
+        requirements: [
+          'Must own the LAU token',
+          'Must be admitted to a QING',
+          'Cover charge paid (if applicable)'
+        ],
+        effects: ['LogEvent emitted with message'],
+        estimatedGas: GAS_ESTIMATES.chat
+      };
+
+    case 'withdraw':
+      return {
+        operation: 'Withdraw',
+        token: params.token || '0x...',
+        amount: params.amount || '0',
+        requirements: ['Must own the LAU token', `LAU must have >= ${params.amount || 0} of token`],
+        effects: [`${params.amount || 0} tokens transferred to your wallet`],
+        estimatedGas: GAS_ESTIMATES.withdraw
+      };
+
+    case 'void':
+      return {
+        operation: 'Void (Reset)',
+        requirements: ['Must own the LAU token', 'Must pass really1=true AND really2=true'],
+        effects: [
+          'LAU state COMPLETELY RESET',
+          'New Saat values generated',
+          'New On (Bao) created'
+        ],
+        estimatedGas: 500000,
+        warning: '⚠️ THIS IS IRREVERSIBLE! All your coordinates will be lost!'
+      };
+
+    default:
+      return { error: `Unknown LAU operation: ${operation}` };
+  }
+}
+
+// Calculate React result (for educational purposes)
+function calculateReact(pi, channel, theta) {
+  try {
+    const _pi = BigInt(pi);
+    const _channel = BigInt(channel);
+    const _theta = BigInt(theta);
+    
+    const eta = modExp64(_pi, _channel, _theta);
+    const kappa = modExp64(_pi, _theta, _channel);
+    
+    return {
+      operation: 'React',
+      inputs: {
+        pi: _pi.toString(),
+        channel: _channel.toString(),
+        theta: _theta.toString()
+      },
+      outputs: {
+        eta: eta.toString(),
+        kappa: kappa.toString()
+      },
+      formula: {
+        eta: `${_pi}^${_channel} mod ${_theta} = ${eta}`,
+        kappa: `${_pi}^${_theta} mod ${_channel} = ${kappa}`
+      },
+      valid: eta !== 0n && kappa !== 0n
+    };
+  } catch (e) {
+    return { error: e.message };
+  }
+}
 
 export default async function handler(req, res) {
   // CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-api-key');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
@@ -317,29 +318,46 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const apiKey = req.headers['x-api-key'];
-  if (!apiKey) {
-    return res.status(400).json({ error: 'Missing API key' });
-  }
-
   try {
-    let body = req.body;
-    
-    // Add system parameter with enhanced Dysnomia knowledge
-    body.system = DYSNOMIA_SYSTEM_PROMPT;
+    const { category, operation, params } = req.body;
 
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01'
-      },
-      body: JSON.stringify(body)
-    });
+    let result;
 
-    const data = await response.json();
-    return res.status(response.status).json(data);
+    switch (category) {
+      case 'terraform':
+        result = previewTerraform(operation, params || {});
+        break;
+      
+      case 'buy':
+        result = previewBuy(operation, params?.amount);
+        break;
+      
+      case 'lau':
+        result = previewLAU(operation, params || {});
+        break;
+      
+      case 'react':
+        result = calculateReact(params?.pi, params?.channel, params?.theta);
+        break;
+      
+      case 'gas':
+        result = { estimates: GAS_ESTIMATES };
+        break;
+      
+      case 'ratios':
+        result = { ratios: Object.fromEntries(
+          Object.entries(EXCHANGE_RATIOS).map(([k, v]) => [
+            k, 
+            { ...v, input: v.input.toString(), output: v.output.toString() }
+          ])
+        )};
+        break;
+
+      default:
+        result = { error: `Unknown category: ${category}` };
+    }
+
+    return res.status(200).json(result);
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
