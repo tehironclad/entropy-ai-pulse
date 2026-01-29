@@ -175,7 +175,7 @@
     /* Main Layout */
     .main {
       display: grid;
-      grid-template-columns: 300px 1fr 450px;
+      grid-template-columns: 280px 1fr 520px;
       gap: 0;
       min-height: calc(100vh - 73px);
     }
@@ -768,6 +768,57 @@
     .provider-btn.active {
       background: var(--accent-gradient);
       border-color: transparent;
+      color: white;
+    }
+    
+    /* AI Action Buttons */
+    .ai-action-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+      padding: 12px;
+      background: var(--bg-tertiary);
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+    }
+    
+    .action-btn {
+      padding: 8px 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--accent-primary);
+      border-radius: 6px;
+      color: var(--accent-primary);
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .action-btn:hover {
+      background: var(--accent-primary);
+      color: white;
+    }
+    
+    .action-btn.write {
+      border-color: var(--warning);
+      color: var(--warning);
+    }
+    
+    .action-btn.write:hover {
+      background: var(--warning);
+      color: white;
+    }
+    
+    .action-btn.decline {
+      border-color: var(--text-muted);
+      color: var(--text-muted);
+    }
+    
+    .action-btn.decline:hover {
+      background: var(--text-muted);
       color: white;
     }
 
@@ -3178,7 +3229,26 @@ Or drag this file to a browser tab on a dApp site like app.pulsex.com`;
         const messages = document.getElementById('aiMessages');
         messages.removeChild(messages.lastChild);
 
-        addAIMessage(responseText, 'assistant');
+        // Clean the response of suggestion syntax for display
+        const cleanResponse = responseText
+          .replace(/\{\{SUGGEST_NAVIGATE:\w+:[^}]+\}\}/g, '')
+          .replace(/\{\{SUGGEST_LOAD:0x[a-fA-F0-9]+:[^}]+\}\}/g, '')
+          .replace(/\{\{SUGGEST_READ:[^}]+\}\}/g, '')
+          .replace(/\{\{SUGGEST_WRITE:[^}]+\}\}/g, '')
+          .trim();
+        
+        addAIMessage(cleanResponse, 'assistant');
+        
+        // Process any suggestions and show action buttons
+        const suggestions = processAISuggestions(responseText);
+        if (suggestions.length > 0) {
+          const buttonsHtml = createActionButtons(suggestions);
+          // Append buttons to the last message
+          const lastMsg = document.querySelector('.ai-messages .ai-message:last-child');
+          if (lastMsg) {
+            lastMsg.innerHTML += buttonsHtml;
+          }
+        }
       } catch (e) {
         const messages = document.getElementById('aiMessages');
         messages.removeChild(messages.lastChild);
@@ -3189,39 +3259,45 @@ Or drag this file to a browser tab on a dApp site like app.pulsex.com`;
     function buildGeminiPrompt(context, input) {
       return `You are the Dysnomia AI Assistant - an expert guide for the Dysnomia mathematical smart contract ecosystem on PulseChain.
 
+You can SUGGEST actions for the user to confirm. Use these formats:
+
+{{SUGGEST_NAVIGATE:CONTRACT_NAME:short reason}} - Suggest loading a known contract
+{{SUGGEST_LOAD:0x...:short reason}} - Suggest loading by address  
+{{SUGGEST_READ:functionName(args):short reason}} - Suggest reading data
+{{SUGGEST_WRITE:functionName(args):short reason}} - Suggest a write transaction
+
+The user will see buttons to confirm. Examples:
+"I can load SEI to help create your YUE. {{SUGGEST_NAVIGATE:SEI:Load SEI contract}}"
+"Let me check your balance. {{SUGGEST_READ:balanceOf(0x...):Check balance}}"
+
+RULES:
+1. Always explain WHY before suggesting
+2. Keep the "reason" part short (shows on button)
+3. For writes, explain consequences first
+
 === DYSNOMIA ARCHITECTURE ===
 
-MOTZKIN PRIME: 953467954114363 (fundamental modulus for all operations)
+MOTZKIN PRIME: 953467954114363
 
-CORE CHAIN:
-VOID → SIU → YANG → YAU → ZHOU → ZHENG → YI → SHIO
+CORE CHAIN: VOID → SIU → YANG → YAU → ZHOU → ZHENG → YI → SHIO
 
-REACTOR SYSTEM:
-- SHA: Single reactor with 13-variable Fa state
-- SHIO: Paired reactor (Rod + Cone), symmetric outputs required
-- React(Pi) → XOR with Monopole → modExp64 → (Omicron, Omega)
-
-DOMAINS:
-- TANG: CHEON → SEI (heavenly layer)
-- SOENG: META → RING → PANG → ZI → CHOA → SEI → CHAN → XIE → XIA → MAI → QI → MAP
+KEY CONTRACTS:
+- VOID: 0x965B0d74591bF30327075A247C47dBf487dCff08
+- CHEON: 0x3d23084cA3F40465553797b5138CFC456E61FB5D  
+- SEI: 0x3dC54d46e030C42979f33C9992348a990acb6067
+- CHO: 0xB6be11F0A788014C1F68C92F8D6CcC1AbF78F2aB
+- MAP: 0xD3a7A95012Edd46Ea115c693B74c5e524b3DdA75
 
 USER LAYER:
-- CHO: User interaction (GetUserTokenAddress, Enter)
 - LAU: User token with Saat[3] (pole, soul, aura)
-- YUE: IOT bridge (Bar → Hypobar/Epibar)
+- YUE: IOT bridge (created via SEI.Start)
 - QING: Territory with Waat coordinate
-
-TERRAFORMING:
-- Layer 0 (Physics): Mathematical foundation
-- Layer 1 (Terra): LAU data
-- Layer 2 (Firma): Personal GWATs
-- Layer 3 (Life): YUE + IOT
 
 ${context}
 
 User question: ${input}
 
-Provide helpful, technical guidance about Dysnomia. Include specific function calls and ethers.js code when useful.`;
+Be helpful and suggest actions when appropriate. User confirms before execution.`;
     }
 
     function addAIMessage(content, role) {
@@ -3253,23 +3329,31 @@ Load a contract and ask me anything!
     function buildContext() {
       let context = '=== CURRENT ENTROPY AI STATE ===\n\n';
       
-      // User's discovered contracts
-      if (userContracts.wallet) {
-        context += `USER WALLET: ${userContracts.wallet}\n`;
-        if (userContracts.lau) context += `USER LAU: ${userContracts.lau}\n`;
-        if (userContracts.yue) context += `USER YUE: ${userContracts.yue}\n`;
-        if (userContracts.currentArea) context += `USER CURRENT QING: ${userContracts.currentArea}\n`;
-        if (userContracts.qings.length > 0) context += `USER QINGs: ${userContracts.qings.join(', ')}\n`;
+      // User's discovered contracts from "Load My Identity"
+      if (userContracts.lau || userContracts.wallet) {
+        context += `=== USER IDENTITY ===\n`;
+        if (userContracts.wallet) context += `Wallet: ${userContracts.wallet}\n`;
+        if (userContracts.lau) context += `LAU: ${userContracts.lau}\n`;
+        if (userContracts.yue) context += `YUE: ${userContracts.yue}\n`;
+        if (userContracts.currentArea) context += `Current QING: ${userContracts.currentArea}\n`;
+        if (userContracts.qings && userContracts.qings.length > 0) context += `All QINGs: ${userContracts.qings.join(', ')}\n`;
+        context += `Registered in CHO: ${userContracts.registered ? 'Yes' : 'No'}\n`;
         context += '\n';
+      }
+      
+      // Include the Output Panel content (results from Load My Identity, etc.)
+      const outputContent = document.getElementById('outputContent')?.textContent || '';
+      if (outputContent && outputContent.length > 50 && !outputContent.includes('Enter a contract')) {
+        context += `=== LAST LOOKUP RESULT ===\n${outputContent}\n\n`;
       }
       
       // Currently loaded contract
       if (currentAddress) {
-        context += `LOADED CONTRACT:\n`;
-        context += `- Address: ${currentAddress}\n`;
-        context += `- Name: ${document.getElementById('contractName').textContent}\n`;
-        context += `- Type: ${document.getElementById('contractType').textContent}\n`;
-        context += `- Verified: ${document.getElementById('contractVerified').textContent}\n`;
+        context += `=== LOADED CONTRACT ===\n`;
+        context += `Address: ${currentAddress}\n`;
+        context += `Name: ${document.getElementById('contractName').textContent}\n`;
+        context += `Type: ${document.getElementById('contractType').textContent}\n`;
+        context += `Verified: ${document.getElementById('contractVerified').textContent}\n`;
         
         if (currentABI) {
           const fns = currentABI.filter(x => x.type === 'function');
@@ -3277,36 +3361,201 @@ Load a contract and ask me anything!
           const writes = fns.filter(f => f.stateMutability !== 'view' && f.stateMutability !== 'pure');
           
           context += `\nREAD FUNCTIONS (${reads.length}):\n`;
-          reads.forEach(f => {
+          reads.slice(0, 20).forEach(f => {
             context += `  ${f.name}(${f.inputs.map(i => i.type).join(', ')})${f.outputs?.length ? ' → ' + f.outputs.map(o => o.type).join(', ') : ''}\n`;
           });
+          if (reads.length > 20) context += `  ... and ${reads.length - 20} more\n`;
           
           context += `\nWRITE FUNCTIONS (${writes.length}):\n`;
-          writes.forEach(f => {
+          writes.slice(0, 15).forEach(f => {
             context += `  ${f.name}(${f.inputs.map(i => i.type).join(', ')})\n`;
           });
-        }
-        
-        if (currentBytecode) {
-          const bytecodeSize = (currentBytecode.length - 2) / 2;
-          context += `\nBytecode size: ${bytecodeSize} bytes\n`;
-          
-          // Include selector analysis
-          const selectors = extractSelectors(currentBytecode);
-          const unknown = selectors.filter(sel => !KNOWN_SELECTORS[sel]);
-          
-          if (unknown.length > 0) {
-            context += `\nUNKNOWN SELECTORS (${unknown.length}): ${unknown.map(s => '0x'+s).join(', ')}\n`;
-          }
+          if (writes.length > 15) context += `  ... and ${writes.length - 15} more\n`;
         }
       } else {
-        context += 'NO CONTRACT LOADED - User can ask general Dysnomia questions\n';
+        context += `=== NO CONTRACT LOADED ===\n`;
+        context += `User can load a contract or ask general Dysnomia questions.\n`;
       }
       
-      // Add connection status
-      context += `\nWALLET CONNECTED: ${signer ? 'Yes' : 'No'}\n`;
+      // Connection status
+      context += `\n=== CONNECTION ===\n`;
+      context += `Wallet Connected: ${signer ? 'Yes' : 'No'}\n`;
+      if (signer) {
+        context += `Can execute write functions: Yes\n`;
+      }
+      
+      // Available actions the AI can SUGGEST (user confirms)
+      context += `\n=== AI SUGGESTED ACTIONS ===
+You can SUGGEST actions for the user to confirm. Use these formats:
+
+{{SUGGEST_NAVIGATE:CONTRACT_NAME:reason}} - Suggest loading a known contract
+{{SUGGEST_LOAD:0x...:reason}} - Suggest loading a contract by address  
+{{SUGGEST_READ:functionName(args):reason}} - Suggest reading data
+{{SUGGEST_WRITE:functionName(args):reason}} - Suggest a write transaction
+
+The user will see buttons to confirm or decline. Examples:
+
+"To check your YUE status, I need to load the SEI contract. {{SUGGEST_NAVIGATE:SEI:Load SEI to check YUE creation}}"
+
+"Let me check your current territory. {{SUGGEST_READ:CurrentArea():Check which QING you're in}}"
+
+"To create your YUE, we need to call Start(). {{SUGGEST_WRITE:Start(0x..., 'name', 'SYM'):Create your YUE token}}"
+
+RULES:
+1. Always explain WHY you're suggesting an action
+2. For write functions, explain gas costs and consequences
+3. Wait for user confirmation before they execute
+4. You can suggest multiple actions - user picks which to run
+5. Keep the "reason" part short (it shows on the button)
+`;
       
       return context;
+    }
+    
+    // Pending actions waiting for user confirmation
+    let pendingActions = [];
+    
+    // Process AI suggestions and create confirmation buttons
+    function processAISuggestions(responseText) {
+      const suggestions = [];
+      
+      // Find all suggestions
+      const patterns = [
+        { regex: /\{\{SUGGEST_NAVIGATE:(\w+):([^}]+)\}\}/g, type: 'navigate' },
+        { regex: /\{\{SUGGEST_LOAD:(0x[a-fA-F0-9]{40}):([^}]+)\}\}/g, type: 'load' },
+        { regex: /\{\{SUGGEST_READ:(\w+\([^)]*\)):([^}]+)\}\}/g, type: 'read' },
+        { regex: /\{\{SUGGEST_WRITE:(\w+\([^)]*\)):([^}]+)\}\}/g, type: 'write' },
+      ];
+      
+      for (const pattern of patterns) {
+        let match;
+        while ((match = pattern.regex.exec(responseText)) !== null) {
+          suggestions.push({
+            type: pattern.type,
+            action: match[1],
+            reason: match[2],
+            id: `action_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+          });
+        }
+      }
+      
+      return suggestions;
+    }
+    
+    // Create HTML for action buttons
+    function createActionButtons(suggestions) {
+      if (suggestions.length === 0) return '';
+      
+      let html = '<div class="ai-action-buttons">';
+      
+      for (const suggestion of suggestions) {
+        const icon = {
+          'navigate': '📂',
+          'load': '📂',
+          'read': '📖',
+          'write': '✍️'
+        }[suggestion.type];
+        
+        const btnClass = suggestion.type === 'write' ? 'action-btn write' : 'action-btn';
+        
+        html += `
+          <button class="${btnClass}" onclick="executeAIAction('${suggestion.type}', '${suggestion.action.replace(/'/g, "\\'")}')">
+            ${icon} ${suggestion.reason}
+          </button>
+        `;
+      }
+      
+      html += '<button class="action-btn decline" onclick="declineActions()">❌ No thanks</button>';
+      html += '</div>';
+      
+      return html;
+    }
+    
+    // Execute a confirmed action
+    async function executeAIAction(type, action) {
+      log(`Executing: ${type} - ${action}`, 'info');
+      
+      // Remove action buttons
+      document.querySelectorAll('.ai-action-buttons').forEach(el => el.remove());
+      
+      try {
+        switch (type) {
+          case 'navigate':
+            const address = KNOWN_CONTRACTS[action];
+            if (address) {
+              addAIMessage(`✅ Loading ${action}...`, 'assistant');
+              await loadContract(address);
+              addAIMessage(`✅ ${action} loaded! You can now see its functions in the middle panel.`, 'assistant');
+            } else {
+              addAIMessage(`❌ Unknown contract: ${action}`, 'assistant');
+            }
+            break;
+            
+          case 'load':
+            addAIMessage(`✅ Loading contract ${action.slice(0,10)}...`, 'assistant');
+            await loadContract(action);
+            addAIMessage(`✅ Contract loaded!`, 'assistant');
+            break;
+            
+          case 'read':
+            if (!currentContract) {
+              addAIMessage(`⚠️ Please load a contract first.`, 'assistant');
+              return;
+            }
+            
+            // Parse function call
+            const readMatch = action.match(/(\w+)\((.*)\)/);
+            if (readMatch) {
+              const fnName = readMatch[1];
+              const argsStr = readMatch[2];
+              const args = argsStr ? argsStr.split(',').map(a => a.trim().replace(/['"]/g, '')) : [];
+              
+              addAIMessage(`📊 Calling ${fnName}()...`, 'assistant');
+              const result = await currentContract[fnName](...args);
+              const formatted = formatResult(result);
+              addAIMessage(`📊 **${fnName}()** result:\n\`\`\`\n${formatted}\n\`\`\``, 'assistant');
+            }
+            break;
+            
+          case 'write':
+            if (!signer) {
+              addAIMessage(`⚠️ Please connect your wallet first.`, 'assistant');
+              return;
+            }
+            if (!currentContract) {
+              addAIMessage(`⚠️ Please load a contract first.`, 'assistant');
+              return;
+            }
+            
+            // Parse function call
+            const writeMatch = action.match(/(\w+)\((.*)\)/);
+            if (writeMatch) {
+              const fnName = writeMatch[1];
+              const argsStr = writeMatch[2];
+              const args = argsStr ? argsStr.split(',').map(a => a.trim().replace(/['"]/g, '')) : [];
+              
+              addAIMessage(`✍️ Preparing ${fnName}()... Please confirm in your wallet.`, 'assistant');
+              
+              const contractWithSigner = currentContract.connect(signer);
+              const tx = await contractWithSigner[fnName](...args);
+              
+              addAIMessage(`⏳ Transaction submitted: ${tx.hash.slice(0,10)}...`, 'assistant');
+              
+              const receipt = await tx.wait();
+              addAIMessage(`✅ Transaction confirmed!\nHash: ${tx.hash}\nBlock: ${receipt.blockNumber}`, 'assistant');
+              log(`Transaction confirmed: ${tx.hash}`, 'success');
+            }
+            break;
+        }
+      } catch (e) {
+        addAIMessage(`❌ Error: ${e.message}`, 'assistant');
+        log(`Action error: ${e.message}`, 'error');
+      }
+    }
+    
+    function declineActions() {
+      document.querySelectorAll('.ai-action-buttons').forEach(el => el.remove());
+      addAIMessage(`👍 No problem! Let me know if you need anything else.`, 'assistant');
     }
 
     function quickAction(action) {
