@@ -2286,28 +2286,46 @@ Quick tips:
         // Try to find YUE via CHAN
         results.push(``);
         try {
-          // First get the On struct to find the Shio
+          // First get the On struct to find the Shio and more coordinates
           const onData = await lau.On();
-          if (onData && onData.Shio && onData.Shio !== ethers.ZeroAddress) {
-            results.push(`⚛️ SHIO (Reactor)`);
-            results.push(`   Address: ${onData.Shio}`);
-            addDiscoveredContract('My SHIO', onData.Shio, 'SHIO');
+          if (onData) {
+            results.push(`⚛️ ON STRUCT (Location Data)`);
+            if (onData.Shio && onData.Shio !== ethers.ZeroAddress) {
+              results.push(`   SHIO: ${onData.Shio}`);
+              addDiscoveredContract('My SHIO', onData.Shio, 'SHIO');
+            }
+            if (onData.Pi && onData.Pi !== ethers.ZeroAddress) {
+              results.push(`   Pi (QING ref): ${onData.Pi}`);
+            }
+            if (onData.Ring && onData.Ring !== ethers.ZeroAddress) {
+              results.push(`   Ring: ${onData.Ring}`);
+            }
+            if (onData.Omicron) results.push(`   Omicron: ${onData.Omicron.toString()}`);
+            if (onData.Omega) results.push(`   Omega: ${onData.Omega.toString()}`);
+            if (onData.Xi) results.push(`   Xi: ${onData.Xi.toString()}`);
+            if (onData.Mu) results.push(`   Mu: ${onData.Mu.toString()}`);
           }
-        } catch {}
+        } catch (e) {
+          log(`On struct read failed: ${e.message}`, 'warning');
+        }
         
-        // Check for YUE - need wallet address for this
+        results.push(``);
+        
+        // Check for YUE - use connected wallet or input
         const walletInput = document.getElementById('walletLookup').value.trim();
-        if (walletInput && ethers.isAddress(walletInput)) {
+        const walletToCheck = walletInput || (signer ? await signer.getAddress() : null);
+        
+        if (walletToCheck && ethers.isAddress(walletToCheck)) {
           try {
             const chan = new ethers.Contract(KNOWN_CONTRACTS['CHAN'], [
               'function Yan(address) view returns (address)',
             ], provider);
             
-            const yueAddress = await chan.Yan(walletInput);
+            const yueAddress = await chan.Yan(walletToCheck);
             
             if (yueAddress && yueAddress !== ethers.ZeroAddress) {
               userContracts.yue = yueAddress;
-              userContracts.wallet = walletInput;
+              userContracts.wallet = walletToCheck;
               
               const yue = new ethers.Contract(yueAddress, [
                 'function name() view returns (string)',
@@ -2320,18 +2338,22 @@ Quick tips:
               results.push(`🌐 YUE (IOT Bridge)`);
               results.push(`   Address: ${yueAddress}`);
               results.push(`   Name: ${yueName || 'Unknown'}`);
+              results.push(`   Wallet: ${walletToCheck.slice(0,10)}...`);
               
               addDiscoveredContract(yueName || 'My YUE', yueAddress, 'YUE');
               log(`✅ YUE found: ${yueName || yueAddress.slice(0,10)}`, 'success');
             } else {
-              results.push(`🌐 YUE: Not found for wallet ${walletInput.slice(0,10)}...`);
+              results.push(`🌐 YUE: Not found for wallet ${walletToCheck.slice(0,10)}...`);
               results.push(`   → Call SEI.Start() to create one`);
             }
           } catch (e) {
-            results.push(`🌐 YUE: Lookup failed`);
+            results.push(`🌐 YUE: Lookup failed (${e.message.slice(0,30)})`);
           }
+        } else if (signer) {
+          // Wallet connected but couldn't get address
+          results.push(`🌐 YUE: Connect wallet to find YUE`);
         } else {
-          results.push(`🌐 YUE: Enter wallet address to find YUE`);
+          results.push(`🌐 YUE: Enter wallet address or connect wallet to find YUE`);
         }
         
         // Summary
