@@ -175,7 +175,7 @@
     /* Main Layout */
     .main {
       display: grid;
-      grid-template-columns: 280px 1fr 520px;
+      grid-template-columns: 280px 1fr 700px;
       gap: 0;
       min-height: calc(100vh - 73px);
     }
@@ -550,7 +550,7 @@
     }
 
     .ai-config {
-      padding: 12px 20px;
+      padding: 8px 20px;
       border-bottom: 1px solid var(--border-color);
       background: var(--bg-tertiary);
     }
@@ -560,14 +560,16 @@
       overflow-y: auto;
       padding: 20px;
       background: var(--bg-primary);
+      display: flex;
+      flex-direction: column;
     }
 
     .ai-message {
       margin-bottom: 20px;
-      padding: 16px 20px;
+      padding: 20px 24px;
       border-radius: 12px;
-      font-size: 14px;
-      line-height: 1.7;
+      font-size: 15px;
+      line-height: 1.8;
       white-space: pre-wrap;
     }
 
@@ -587,13 +589,14 @@
 
     .ai-message pre {
       background: var(--bg-secondary);
-      padding: 14px;
+      padding: 16px;
       border-radius: 8px;
-      margin: 14px 0;
+      margin: 16px 0;
       overflow-x: auto;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 12px;
+      font-size: 13px;
       border: 1px solid var(--border-color);
+      line-height: 1.5;
     }
 
     .ai-message code {
@@ -601,22 +604,37 @@
       background: var(--bg-secondary);
       padding: 3px 8px;
       border-radius: 4px;
-      font-size: 12px;
+      font-size: 13px;
       color: var(--accent-primary);
+    }
+    
+    .ai-message h1, .ai-message h2 {
+      margin: 20px 0 12px 0;
+      color: var(--text-primary);
+      font-size: 18px;
     }
     
     .ai-message h3, .ai-message h4 {
       margin: 16px 0 8px 0;
       color: var(--accent-primary);
+      font-size: 16px;
     }
     
     .ai-message ul, .ai-message ol {
-      margin: 8px 0;
-      padding-left: 20px;
+      margin: 12px 0;
+      padding-left: 24px;
     }
     
     .ai-message li {
-      margin: 4px 0;
+      margin: 6px 0;
+    }
+    
+    .ai-message p {
+      margin: 12px 0;
+    }
+    
+    .ai-message strong {
+      color: var(--accent-primary);
     }
 
     .ai-input-container {
@@ -632,7 +650,7 @@
 
     .ai-input {
       flex: 1;
-      padding: 14px 18px;
+      padding: 12px 16px;
       background: var(--bg-primary);
       border: 2px solid var(--border-color);
       border-radius: 10px;
@@ -640,7 +658,7 @@
       font-family: inherit;
       font-size: 14px;
       resize: vertical;
-      min-height: 100px;
+      min-height: 60px;
     }
 
     .ai-input:focus {
@@ -650,7 +668,7 @@
     }
     
     .ai-input-container {
-      padding: 16px 20px;
+      padding: 12px 20px;
       border-top: 1px solid var(--border-color);
       background: var(--bg-secondary);
     }
@@ -658,7 +676,7 @@
     .ai-input-wrapper {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
     }
 
     .ai-quick-actions {
@@ -700,16 +718,15 @@
     .ai-activity-log {
       border-top: 1px solid var(--border-color);
       background: var(--bg-tertiary);
-      max-height: 200px;
     }
     
     .ai-activity-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 8px 16px;
+      padding: 6px 16px;
       cursor: pointer;
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 500;
       color: var(--text-muted);
     }
@@ -720,9 +737,9 @@
     }
     
     .ai-activity-content {
-      max-height: 120px;
+      max-height: 80px;
       overflow-y: auto;
-      padding: 0 12px 8px 12px;
+      padding: 0 12px 6px 12px;
       font-family: 'JetBrains Mono', monospace;
       font-size: 10px;
     }
@@ -1285,7 +1302,7 @@ I know the full Dysnomia architecture:
 
       <div class="ai-input-container" style="flex-shrink: 0;">
         <div class="ai-input-wrapper">
-          <textarea class="ai-input" id="aiInput" placeholder="Ask about Dysnomia, get transaction help, learn the math..." rows="6"></textarea>
+          <textarea class="ai-input" id="aiInput" placeholder="Ask about Dysnomia, get transaction help, learn the math..." rows="3"></textarea>
           <div style="display: flex; justify-content: space-between; align-items: center;">
             <div class="ai-quick-actions" style="margin: 0;">
               <button class="ai-quick-btn primary" onclick="quickAction('guide')">🧭 Next?</button>
@@ -3306,7 +3323,8 @@ Be helpful and suggest actions when appropriate. User confirms before execution.
       div.className = 'ai-message ' + role;
       div.innerHTML = content.replace(/```(\w+)?\n([\s\S]*?)```/g, '<pre>$2</pre>').replace(/`([^`]+)`/g, '<code>$1</code>');
       messages.appendChild(div);
-      messages.scrollTop = messages.scrollHeight;
+      // Scroll so the TOP of the new message is visible, not the bottom
+      div.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
     function clearAIChat() {
