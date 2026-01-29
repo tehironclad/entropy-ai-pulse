@@ -4398,7 +4398,9 @@ RULES:
             if (navAddress) {
               addAIMessage(`✅ Loading ${action}...`, 'assistant');
               await loadContract(navAddress);
-              addAIMessage(`✅ ${action} loaded at ${navAddress.slice(0,10)}...! You can now see its functions in the middle panel.`, 'assistant');
+              // Auto-switch to Funcs tab
+              showContractTab('funcs');
+              addAIMessage(`✅ **${action}** loaded! Check the **Funcs tab** in the right panel to see available functions. Click any function to open the input builder.`, 'assistant');
             } else {
               addAIMessage(`❌ Unknown contract: ${action}. Known contracts: ${Object.keys(KNOWN_CONTRACTS).slice(0,10).join(', ')}...`, 'assistant');
             }
@@ -4407,7 +4409,9 @@ RULES:
           case 'load':
             addAIMessage(`✅ Loading contract ${action.slice(0,10)}...`, 'assistant');
             await loadContract(action);
-            addAIMessage(`✅ Contract loaded!`, 'assistant');
+            // Auto-switch to Funcs tab
+            showContractTab('funcs');
+            addAIMessage(`✅ Contract loaded! Check the **Funcs tab** in the right panel. Click any function to use the input builder.`, 'assistant');
             break;
             
           case 'read':
