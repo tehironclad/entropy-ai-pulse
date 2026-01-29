@@ -39,6 +39,7 @@
       color: var(--text-primary);
       min-height: 100vh;
       line-height: 1.5;
+      overflow-x: hidden;
     }
 
     /* Header */
@@ -175,9 +176,11 @@
     /* Main Layout - AI CENTERED */
     .main {
       display: grid;
-      grid-template-columns: 260px 1fr 420px;
+      grid-template-columns: 260px minmax(400px, 1fr) 380px;
       gap: 0;
       min-height: calc(100vh - 73px);
+      max-width: 100vw;
+      overflow-x: hidden;
     }
 
     /* Right Contract Panel */
@@ -188,6 +191,7 @@
       flex-direction: column;
       height: calc(100vh - 73px);
       overflow: hidden;
+      min-width: 0;
     }
 
     .contract-panel-tabs {
@@ -730,6 +734,8 @@
       display: flex;
       flex-direction: column;
       height: calc(100vh - 73px);
+      min-width: 0;
+      overflow: hidden;
     }
 
     .ai-header {
@@ -758,10 +764,12 @@
     .ai-messages {
       flex: 1;
       overflow-y: auto;
+      overflow-x: hidden;
       padding: 20px;
       background: var(--bg-primary);
       display: flex;
       flex-direction: column;
+      min-width: 0;
     }
 
     .ai-message {
@@ -771,7 +779,12 @@
       font-size: 15px;
       line-height: 1.8;
       white-space: pre-wrap;
+      word-wrap: break-word;
+      word-break: break-word;
+      overflow-wrap: break-word;
       position: relative;
+      max-width: 100%;
+      overflow: hidden;
     }
 
     .ai-message .copy-msg-btn {
@@ -1346,12 +1359,22 @@
           <button class="btn btn-secondary btn-sm" onclick="loadQingInfo()" style="flex: 1; font-size: 10px;">Info</button>
           <button class="btn btn-secondary btn-sm" onclick="leaveQing()" style="flex: 1; font-size: 10px;">Leave</button>
         </div>
-        <div style="margin-top: 6px;">
-          <select id="knownQings" class="input" style="font-size: 10px; padding: 6px;" onchange="selectKnownQing()">
+        <div style="margin-top: 6px; display: flex; gap: 4px;">
+          <select id="knownQings" class="input" style="font-size: 10px; padding: 6px; flex: 1;" onchange="selectKnownQing()">
             <option value="">-- Known QINGs --</option>
             <option value="0xb0Ba7D36B7F0505879179ecE7401F24eB653c6E1">Zürich</option>
             <option value="0xD127839B83cBf537c29B7d268c135f745a0Da2E8">Illinois</option>
           </select>
+          <button class="btn btn-secondary btn-sm" onclick="addCustomQing()" style="font-size: 9px; padding: 4px 6px;" title="Add current QING to list">+</button>
+          <button class="btn btn-secondary btn-sm" onclick="clearCustomQings()" style="font-size: 9px; padding: 4px 6px;" title="Clear custom QINGs">🗑</button>
+        </div>
+      </div>
+
+      <!-- Recent Contracts - More Accessible -->
+      <div class="sidebar-section" style="padding-bottom: 8px; border-bottom: 1px solid var(--border-color); margin-bottom: 8px;">
+        <div class="sidebar-title" style="font-size: 11px;">📜 Recent</div>
+        <div id="recentContractsQuick" style="max-height: 80px; overflow-y: auto;">
+          <div style="color: var(--text-muted); font-size: 10px;">No recent</div>
         </div>
       </div>
 
@@ -1366,18 +1389,6 @@
       
       <div class="sidebar-tab-content" id="sidebarTabContent">
         <!-- Populated by JS -->
-      </div>
-
-      <!-- Recent - collapsible at bottom -->
-      <div class="sidebar-section" style="margin-top: auto; padding-top: 12px; border-top: 1px solid var(--border-color);">
-        <div class="sidebar-title" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;" onclick="toggleRecentContracts()">
-          Recent <span id="recentArrow">▶</span>
-        </div>
-        <div class="contract-list collapsed" id="recentContracts">
-          <div class="contract-item" style="justify-content: center; color: var(--text-muted);">
-            No recent
-          </div>
-        </div>
       </div>
     </aside>
 
@@ -2566,6 +2577,88 @@ Quick tips:
       }
     }
     
+    // Custom QING management
+    function loadCustomQings() {
+      const stored = localStorage.getItem('entropyAI_customQings');
+      return stored ? JSON.parse(stored) : [];
+    }
+    
+    function saveCustomQings(qings) {
+      localStorage.setItem('entropyAI_customQings', JSON.stringify(qings));
+    }
+    
+    function refreshQingDropdown() {
+      const select = document.getElementById('knownQings');
+      const customQings = loadCustomQings();
+      
+      // Keep default options, remove custom ones
+      while (select.options.length > 3) { // Default + Zürich + Illinois
+        select.remove(3);
+      }
+      
+      // Add custom QINGs
+      customQings.forEach(q => {
+        const option = document.createElement('option');
+        option.value = q.address;
+        option.textContent = `${q.name} (custom)`;
+        select.appendChild(option);
+      });
+    }
+    
+    async function addCustomQing() {
+      const address = document.getElementById('qingAddress').value.trim();
+      if (!address || !ethers.isAddress(address)) {
+        log('Enter a valid QING address first', 'error');
+        return;
+      }
+      
+      // Get QING name
+      let name = 'Custom QING';
+      try {
+        const qing = new ethers.Contract(address, ['function name() view returns (string)'], provider);
+        name = await qing.name();
+      } catch {}
+      
+      const customQings = loadCustomQings();
+      
+      // Check if already exists
+      if (customQings.some(q => q.address.toLowerCase() === address.toLowerCase())) {
+        log('QING already in list', 'warning');
+        return;
+      }
+      
+      customQings.push({ name, address });
+      saveCustomQings(customQings);
+      refreshQingDropdown();
+      log(`Added ${name} to custom QINGs`, 'success');
+    }
+    
+    function clearCustomQings() {
+      if (confirm('Clear all custom QINGs from the list?')) {
+        localStorage.removeItem('entropyAI_customQings');
+        refreshQingDropdown();
+        log('Custom QINGs cleared', 'info');
+      }
+    }
+    
+    // Recent contracts - quick access
+    function updateRecentQuick() {
+      const container = document.getElementById('recentContractsQuick');
+      if (!container) return;
+      
+      if (recentContracts.length === 0) {
+        container.innerHTML = '<div style="color: var(--text-muted); font-size: 10px;">No recent</div>';
+        return;
+      }
+      
+      container.innerHTML = recentContracts.slice(0, 5).map(c => `
+        <div onclick="loadContract('${c.address}')" style="cursor: pointer; padding: 3px 6px; margin: 2px 0; background: var(--bg-tertiary); border-radius: 4px; font-size: 10px; display: flex; justify-content: space-between; align-items: center;">
+          <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">${c.name || c.address.slice(0,10)}</span>
+          <span style="color: var(--text-muted); font-size: 9px;">${c.type || ''}</span>
+        </div>
+      `).join('');
+    }
+    
     // LAU-first lookup - the primary way to find your identity
     async function lookupFromLau() {
       const lauAddress = document.getElementById('myLauAddress').value.trim();
@@ -3058,6 +3151,10 @@ Read functions still work! Only write functions need a wallet.`);
 
       // Update recent
       updateRecentList();
+      updateRecentQuick();
+      
+      // Load custom QINGs
+      refreshQingDropdown();
 
       // Check API key status
       updateAIConfigStatus();
@@ -3552,34 +3649,47 @@ Or drag this file to a browser tab on a dApp site like app.pulsex.com`;
       selectedFunction = fn;
       const isRead = fn.stateMutability === 'view' || fn.stateMutability === 'pure';
       
-      document.getElementById('selectedFunction').innerHTML = `
-        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
-          <span class="function-badge ${isRead ? 'read' : 'write'}">${isRead ? 'READ' : 'WRITE'}</span>
-          <span style="font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 500;">${fn.name}</span>
+      // Build the compact builder UI
+      const builder = document.getElementById('compactBuilder');
+      let html = `
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+          <span class="fn-badge" style="background: ${isRead ? 'var(--success)' : 'var(--warning)'}; padding: 2px 6px; border-radius: 4px; font-size: 9px;">${isRead ? 'READ' : 'WRITE'}</span>
+          <span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 600;">${fn.name}</span>
         </div>
       `;
 
       // Build param inputs
-      const paramDiv = document.getElementById('paramInputs');
-      paramDiv.innerHTML = '';
-
       if (fn.inputs.length === 0) {
-        paramDiv.innerHTML = '<div style="color: var(--text-muted); font-size: 12px;">No parameters required</div>';
+        html += '<div style="color: var(--text-muted); font-size: 11px; margin-bottom: 10px;">No parameters required</div>';
       } else {
         fn.inputs.forEach((input, i) => {
-          paramDiv.innerHTML += `
-            <div class="param-input">
-              <label>${input.name || 'arg' + i}</label>
-              <input type="text" class="input" id="param_${i}" placeholder="${input.type}">
-              <span class="param-type">${input.type}</span>
+          html += `
+            <div style="margin-bottom: 8px;">
+              <label style="display: block; font-size: 10px; color: var(--text-muted); margin-bottom: 2px;">${input.name || 'arg' + i} (${input.type})</label>
+              <input type="text" class="input" id="param_${i}" placeholder="${input.type}" style="font-size: 11px; padding: 6px 8px;">
             </div>
           `;
         });
       }
 
-      // Update buttons
-      document.getElementById('readBtn').style.display = isRead ? 'flex' : 'none';
-      document.getElementById('writeBtn').style.display = isRead ? 'none' : 'flex';
+      // Add execute buttons
+      html += `
+        <div style="display: flex; gap: 6px; margin-top: 10px;">
+          ${isRead ? 
+            `<button class="btn btn-primary btn-sm" onclick="executeFunction(true)" style="flex: 1; font-size: 11px;">📖 Read</button>` : 
+            `<button class="btn btn-primary btn-sm" onclick="executeFunction(false)" style="flex: 1; font-size: 11px;">✍️ Write</button>`
+          }
+          <button class="btn btn-secondary btn-sm" onclick="clearFunctionBuilder()" style="font-size: 11px;">✕</button>
+        </div>
+      `;
+
+      builder.innerHTML = html;
+      builder.style.display = 'block';
+    }
+    
+    function clearFunctionBuilder() {
+      document.getElementById('compactBuilder').style.display = 'none';
+      selectedFunction = null;
     }
 
     async function executeFunction(isRead) {
@@ -3767,11 +3877,19 @@ Or drag this file to a browser tab on a dApp site like app.pulsex.com`;
       addAIMessage('<div class="loader"></div> Thinking...', 'assistant');
 
       try {
-        const context = buildContext();
+        let context = buildContext();
         let responseText;
+        
+        // Log and trim context if too long
+        console.log('Context length:', context.length, 'chars');
+        if (context.length > 50000) {
+          console.warn('Context too long, trimming...');
+          context = context.slice(0, 50000) + '\n\n[Context trimmed for length]';
+        }
 
         if (aiProvider === 'claude') {
           // Claude API via serverless function
+          console.log('Sending to Claude API...');
           const response = await fetch('/api/chat', {
             method: 'POST',
             headers: {
@@ -3788,12 +3906,19 @@ Or drag this file to a browser tab on a dApp site like app.pulsex.com`;
             })
           });
 
+          console.log('Response status:', response.status);
           const data = await response.json();
+          console.log('Claude API response:', data);
           
           if (data.content && data.content[0]) {
             responseText = data.content[0].text;
+          } else if (data.error) {
+            // Show the actual error from Claude API
+            const errorMsg = data.error.message || data.error.type || JSON.stringify(data.error);
+            throw new Error(`Claude API: ${errorMsg}`);
           } else {
-            throw new Error(data.error?.message || 'Unknown Claude error');
+            console.error('Unexpected response format:', data);
+            throw new Error('Unexpected response format from Claude API');
           }
         } else {
           // Gemini API (direct call)
@@ -4497,13 +4622,16 @@ RULES:
     function addToRecent(address, name, type) {
       recentContracts = recentContracts.filter(c => c.address !== address);
       recentContracts.unshift({ address, name, type });
-      recentContracts = recentContracts.slice(0, 5);
+      recentContracts = recentContracts.slice(0, 10);
       localStorage.setItem('entropyAI_recent', JSON.stringify(recentContracts));
       updateRecentList();
+      updateRecentQuick();
     }
 
     function updateRecentList() {
       const list = document.getElementById('recentContracts');
+      if (!list) return;
+      
       if (recentContracts.length === 0) {
         list.innerHTML = '<div class="contract-item" style="justify-content: center; color: var(--text-muted);">No recent contracts</div>';
         return;
