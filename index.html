@@ -673,12 +673,6 @@
       -webkit-text-fill-color: transparent;
     }
 
-    .ai-config {
-      padding: 8px 20px;
-      border-bottom: 1px solid var(--border-color);
-      background: var(--bg-tertiary);
-    }
-
     .ai-messages {
       flex: 1;
       overflow-y: auto;
@@ -1268,13 +1262,6 @@
         </div>
       </div>
       
-      <div class="ai-config" id="aiConfig">
-        <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; background: var(--bg-tertiary); border-radius: 6px;">
-          <span style="color: var(--text-muted); font-size: 11px;">API Key: Not configured</span>
-          <button class="btn btn-secondary btn-sm" onclick="openApiKeyModal()" style="padding: 4px 10px; font-size: 10px;">Set Key</button>
-        </div>
-      </div>
-
       <div class="ai-messages" id="aiMessages">
         <div class="ai-message assistant">
           🔮 Hi! I'm your Dysnomia AI Guide.
@@ -1441,6 +1428,8 @@ Quick tips:
     let currentContract = null;
     let currentAddress = null;
     let currentABI = null;
+    let currentContractName = '';
+    let currentContractType = '';
     let currentBytecode = null;
     let selectedFunction = null;
     let apiKey = localStorage.getItem('entropyAI_apiKey') || null;
@@ -2187,6 +2176,10 @@ Quick tips:
       
       log(`🔍 Loading identity from LAU: ${lauAddress.slice(0,10)}...`, 'info');
       
+      // Auto-open Output tab to show results
+      showContractTab('output');
+      setOutput('Loading Dysnomia identity...');
+      
       let results = [];
       results.push(`🔮 DYSNOMIA IDENTITY LOOKUP`);
       results.push(`${'═'.repeat(40)}`);
@@ -2278,6 +2271,50 @@ Quick tips:
           } else {
             results.push(`📍 CURRENT QING: None (not in any territory)`);
             results.push(`   → Enter a QING to start terraforming`);
+            
+            // Try to find QINGs where user is admitted
+            results.push(``);
+            results.push(`🔍 Checking known QINGs for admission...`);
+            
+            const knownQings = [
+              { name: 'QING Zürich', addr: '0xb0Ba7D36B7F0505879179ecE7401F24eB653c6E1' },
+              { name: 'QING Illinois', addr: '0xD127839B83cBf537c29B7d268c135f745a0Da2E8' },
+            ];
+            
+            let foundQing = false;
+            for (const q of knownQings) {
+              try {
+                const qingContract = new ethers.Contract(q.addr, [
+                  'function Admitted(address) view returns (bool)',
+                  'function name() view returns (string)',
+                  'function Waat() view returns (uint256)',
+                ], provider);
+                
+                const isAdmitted = await qingContract.Admitted(lauAddress);
+                if (isAdmitted) {
+                  foundQing = true;
+                  let qingName = q.name;
+                  try { qingName = await qingContract.name(); } catch {}
+                  let waat = '';
+                  try { waat = (await qingContract.Waat()).toString(); } catch {}
+                  
+                  results.push(`   ✅ ADMITTED: ${qingName}`);
+                  results.push(`      Address: ${q.addr}`);
+                  if (waat) results.push(`      Waat: ${waat}`);
+                  
+                  userContracts.qings.push(q.addr);
+                  addDiscoveredContract(qingName, q.addr, 'QING');
+                  log(`✅ Admitted to QING: ${qingName}`, 'success');
+                }
+              } catch (e) {
+                // Skip this QING if error
+              }
+            }
+            
+            if (!foundQing) {
+              results.push(`   ❌ Not admitted to any known QINGs`);
+              results.push(`   → Join a QING using QING.Join(yourLauAddress)`);
+            }
           }
         } catch (e) {
           results.push(`📍 CURRENT QING: Unable to read (${e.message.slice(0,30)})`);
@@ -2699,14 +2736,9 @@ Or drag this file to a browser tab on a dApp site like app.pulsex.com`;
       currentAddress = address;
       log('Loading ' + address.slice(0, 10) + '...', 'info');
       setOutput('Loading contract...');
-
-      // Show cards
-      document.getElementById('contractCard').style.display = 'block';
-      document.getElementById('functionsCard').style.display = 'block';
-      document.getElementById('builderCard').style.display = 'block';
-
-      // Update address display
-      document.getElementById('contractAddr').textContent = address;
+      
+      // Switch to Output tab in right panel
+      showContractTab('output');
 
       // ═══════════════════════════════════════════════════════════════════════
       // SMART ABI DETECTION
@@ -2717,6 +2749,7 @@ Or drag this file to a browser tab on a dApp site like app.pulsex.com`;
       let verified = false;
       let isDysnomia = false;
       let contractType = 'ERC20';
+      let bytecodeHtml = '';
 
       // Step 1: Check if it's a Dysnomia contract (has Xiao function)
       isDysnomia = await checkDysnomia(address);
@@ -2729,8 +2762,6 @@ Or drag this file to a browser tab on a dApp site like app.pulsex.com`;
         abi = buildDysnomiaABI(contractType);
         
         log(`Dysnomia ${contractType} detected - using built-in ABI`, 'success');
-        document.getElementById('contractVerified').innerHTML = `<span style="color: var(--accent-primary)">⚡ Dysnomia ${contractType}</span>`;
-        document.getElementById('bytecodeCard').style.display = 'none';
         verified = true; // We have full ABI
       } else {
         // Step 2: Try to fetch verified ABI from PulseScan
@@ -2738,12 +2769,8 @@ Or drag this file to a browser tab on a dApp site like app.pulsex.com`;
         
         if (abi) {
           verified = true;
-          document.getElementById('contractVerified').innerHTML = '<span style="color: var(--success)">✓ Verified</span>';
-          document.getElementById('bytecodeCard').style.display = 'none';
         } else {
           // Step 3: Unverified - analyze bytecode
-          document.getElementById('contractVerified').innerHTML = '<span style="color: var(--warning)">⚠ Unverified</span>';
-          
           currentBytecode = await provider.getCode(address);
           if (currentBytecode === '0x') {
             log('Not a contract!', 'error');
@@ -2753,10 +2780,15 @@ Or drag this file to a browser tab on a dApp site like app.pulsex.com`;
 
           const analysis = analyzesBytecode(currentBytecode);
           abi = analysis.abi;
+          bytecodeHtml = analysis.html;
           
-          document.getElementById('bytecodeCard').style.display = 'block';
-          document.getElementById('selectorList').innerHTML = analysis.html;
-          document.getElementById('bytecodeViewer').textContent = currentBytecode.slice(0, 2000) + '...';
+          // Update bytecode tab
+          document.getElementById('bytecodeTabContent').innerHTML = `
+            <div style="margin-bottom: 12px;">${analysis.html}</div>
+            <div style="font-family: monospace; font-size: 10px; word-break: break-all; color: var(--text-muted);">
+              ${currentBytecode.slice(0, 500)}...
+            </div>
+          `;
         }
       }
 
@@ -2786,12 +2818,14 @@ Or drag this file to a browser tab on a dApp site like app.pulsex.com`;
         } catch {}
       }
 
-      document.getElementById('contractName').textContent = name || Object.keys(KNOWN_CONTRACTS).find(k => KNOWN_CONTRACTS[k].toLowerCase() === address.toLowerCase()) || address.slice(0, 10);
-      document.getElementById('contractType').textContent = contractType;
-      document.getElementById('contractSupply').textContent = totalSupply;
-      document.getElementById('contractDecimals').textContent = decimals;
+      // Store for context
+      currentContractName = name;
+      currentContractType = contractType;
 
-      // Populate function list
+      // Update Info tab
+      updateContractPanel(name, address, contractType, totalSupply, decimals, verified);
+
+      // Populate function list in Functions tab
       populateFunctionList(currentABI);
 
       // Add to recent
@@ -2967,9 +3001,6 @@ Or drag this file to a browser tab on a dApp site like app.pulsex.com`;
     // ═══════════════════════════════════════════════════════════════════════════
 
     function populateFunctionList(abi) {
-      const list = document.getElementById('functionList');
-      list.innerHTML = '';
-
       // Use ethers Interface to parse both JSON and human-readable ABIs
       let iface;
       try {
@@ -2998,19 +3029,44 @@ Or drag this file to a browser tab on a dApp site like app.pulsex.com`;
         return a.name.localeCompare(b.name);
       });
 
-      functions.forEach(fn => {
-        list.innerHTML += `
-          <div class="function-item" onclick="selectFunction('${fn.name}')" data-type="${fn.isRead ? 'read' : 'write'}">
-            <span class="function-badge ${fn.isRead ? 'read' : 'write'}">${fn.isRead ? 'READ' : 'WRITE'}</span>
-            <span class="function-name">${fn.sig}</span>
+      // Build HTML for the Functions tab
+      let html = `
+        <div style="margin-bottom: 8px; display: flex; gap: 4px;">
+          <button class="btn btn-secondary btn-sm" onclick="filterFunctions('all')" style="flex:1; font-size:10px;">All</button>
+          <button class="btn btn-secondary btn-sm" onclick="filterFunctions('read')" style="flex:1; font-size:10px;">Read</button>
+          <button class="btn btn-secondary btn-sm" onclick="filterFunctions('write')" style="flex:1; font-size:10px;">Write</button>
+        </div>
+        <div class="compact-function-list" id="functionListCompact">
+      `;
+      
+      functions.forEach((fn, idx) => {
+        html += `
+          <div class="compact-function-item ${fn.isRead ? 'read' : 'write'}" onclick="selectFunction('${fn.name}')" data-type="${fn.isRead ? 'read' : 'write'}">
+            <span class="fn-badge">${fn.isRead ? 'R' : 'W'}</span>
+            <span class="fn-name">${fn.name}</span>
+            <span class="fn-params">(${fn.inputs?.length || 0})</span>
           </div>
         `;
+      });
+      
+      html += '</div><div id="compactBuilder" style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-color); display: none;"></div>';
+      
+      document.getElementById('functionTabContent').innerHTML = html;
+    }
+
+    function filterFunctions(type) {
+      document.querySelectorAll('.compact-function-item').forEach(item => {
+        if (type === 'all') {
+          item.style.display = 'flex';
+        } else {
+          item.style.display = item.dataset.type === type ? 'flex' : 'none';
+        }
       });
     }
 
     function showFunctionTab(tab) {
       document.querySelectorAll('.tabs .tab').forEach(t => t.classList.remove('active'));
-      event.target.classList.add('active');
+      if (event && event.target) event.target.classList.add('active');
 
       document.querySelectorAll('.function-item').forEach(item => {
         if (tab === 'all') {
@@ -3219,20 +3275,12 @@ Or drag this file to a browser tab on a dApp site like app.pulsex.com`;
     }
 
     function updateAIConfigStatus() {
+      // API key status is no longer shown in a banner
+      // Just log it for debugging
       const hasKey = (aiProvider === 'claude' && apiKey) || (aiProvider === 'gemini' && geminiKey);
-      const providerName = aiProvider === 'claude' ? 'Claude' : 'Gemini';
-      
-      document.getElementById('aiConfig').innerHTML = hasKey ? `
-        <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: rgba(34, 197, 94, 0.1); border: 1px solid var(--success); border-radius: 6px;">
-          <span style="color: var(--success); font-size: 11px;">✓ ${providerName} configured</span>
-          <button class="btn btn-secondary btn-sm" onclick="openApiKeyModal()" style="padding: 4px 10px; font-size: 10px;">Change</button>
-        </div>
-      ` : `
-        <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: var(--bg-tertiary); border-radius: 6px;">
-          <span style="color: var(--text-muted); font-size: 11px;">API Key: Not configured</span>
-          <button class="btn btn-secondary btn-sm" onclick="openApiKeyModal()" style="padding: 4px 10px; font-size: 10px;">Set Key</button>
-        </div>
-      `;
+      if (hasKey) {
+        log(`${aiProvider === 'claude' ? 'Claude' : 'Gemini'} API configured`, 'success');
+      }
     }
 
     async function sendToAI() {
@@ -3405,14 +3453,18 @@ Be helpful and suggest actions when appropriate. User confirms before execution.
       // Update tab buttons
       document.querySelectorAll('.contract-panel-tab').forEach(tab => {
         tab.classList.remove('active');
+        if (tab.textContent.toLowerCase().includes(tabName.toLowerCase().slice(0,4))) {
+          tab.classList.add('active');
+        }
       });
-      event.target.classList.add('active');
       
       // Update tab content
       document.querySelectorAll('.contract-panel-section').forEach(section => {
         section.classList.remove('active');
       });
-      document.getElementById('tab' + tabName.charAt(0).toUpperCase() + tabName.slice(1)).classList.add('active');
+      const tabId = 'tab' + tabName.charAt(0).toUpperCase() + tabName.slice(1);
+      const tabEl = document.getElementById(tabId);
+      if (tabEl) tabEl.classList.add('active');
     }
 
     // Update contract info in the right panel
