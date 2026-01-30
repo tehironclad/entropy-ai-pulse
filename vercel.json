@@ -14,6 +14,10 @@
       "use": "@vercel/static"
     },
     {
+      "src": "data/**/*.js",
+      "use": "@vercel/static"
+    },
+    {
       "src": "lib/**/*.js",
       "use": "@vercel/static"
     }
@@ -32,12 +36,20 @@
       "dest": "/abis/$1"
     },
     {
-      "src": "/map.html",
+      "src": "/data/(.*)",
+      "dest": "/data/$1"
+    },
+    {
+      "src": "/map",
       "dest": "/map.html"
     },
     {
-      "src": "/",
+      "src": "/v1",
       "dest": "/index.html"
+    },
+    {
+      "src": "/",
+      "dest": "/index-v2.html"
     }
   ]
 }
