@@ -625,6 +625,15 @@
       border-color: var(--accent-primary);
     }
 
+    .ai-action-btn.read {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(59, 130, 246, 0.1));
+      border-color: rgba(59, 130, 246, 0.5);
+    }
+
+    .ai-action-btn.read:hover {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(59, 130, 246, 0.2));
+    }
+
     .ai-action-btn.write {
       background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(245, 158, 11, 0.1));
       border-color: rgba(245, 158, 11, 0.5);
@@ -632,6 +641,15 @@
 
     .ai-action-btn.write:hover {
       background: linear-gradient(135deg, rgba(245, 158, 11, 0.3), rgba(245, 158, 11, 0.2));
+    }
+
+    .ai-action-btn.option {
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(139, 92, 246, 0.1));
+      border-color: rgba(139, 92, 246, 0.5);
+    }
+
+    .ai-action-btn.option:hover {
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(139, 92, 246, 0.2));
     }
 
     @keyframes fadeIn {
@@ -2424,20 +2442,36 @@ What would you like to do?`, 'assistant');
       let actions = [];
       
       if (role === 'assistant') {
-        // Extract action tags: {{ACTION:param1:param2}}
-        const actionRegex = /\{\{(LOAD|READ|WRITE|NAVIGATE):([^:}]+)(?::([^}]*))?\}\}/g;
+        // Extract action tags: {{ACTION:param1:param2}} or {{SUGGEST_ACTION:param1:param2}}
+        // Handles: LOAD, NAVIGATE, READ, WRITE (with or without SUGGEST_ prefix)
+        const actionRegex = /\{\{(?:SUGGEST_)?(LOAD|READ|WRITE|NAVIGATE):([^:}]+)(?::([^}]*))?\}\}/g;
         let match;
         
         while ((match = actionRegex.exec(content)) !== null) {
+          // Normalize LOAD and NAVIGATE to the same action
+          let actionType = match[1];
+          if (actionType === 'LOAD') actionType = 'NAVIGATE';
+          
           actions.push({
-            type: match[1],
-            param1: match[2],
+            type: actionType,
+            param1: match[2].trim(),
             param2: match[3] || ''
           });
         }
         
+        // Also extract suggestion buttons: {{OPTION:label:action}}
+        const optionRegex = /\{\{OPTION:([^:}]+):([^}]+)\}\}/g;
+        let optionMatch;
+        while ((optionMatch = optionRegex.exec(content)) !== null) {
+          actions.push({
+            type: 'OPTION',
+            param1: optionMatch[1].trim(), // label
+            param2: optionMatch[2].trim()  // what to ask AI
+          });
+        }
+        
         // Remove action tags from display
-        displayContent = content.replace(actionRegex, '').trim();
+        displayContent = content.replace(actionRegex, '').replace(optionRegex, '').trim();
       }
       
       // Simple markdown-ish parsing
@@ -2450,19 +2484,24 @@ What would you like to do?`, 'assistant');
       // Create message with copy button
       const messageId = 'msg-' + Date.now();
       
-      // Build action buttons HTML
+      // Build action buttons HTML - for WRITE and OPTION actions that need user confirmation
       let actionsHtml = '';
-      if (actions.length > 0) {
+      let writeActions = actions.filter(a => a.type === 'WRITE');
+      let optionActions = actions.filter(a => a.type === 'OPTION');
+      
+      if (writeActions.length > 0 || optionActions.length > 0) {
         actionsHtml = '<div class="ai-actions">';
-        actions.forEach((action, idx) => {
-          if (action.type === 'LOAD' || action.type === 'NAVIGATE') {
-            actionsHtml += `<button class="ai-action-btn" onclick="aiLoadContract('${action.param1}')">📂 Load ${action.param1}</button>`;
-          } else if (action.type === 'READ') {
-            actionsHtml += `<button class="ai-action-btn" onclick="aiCallRead('${action.param1}')">📖 Read ${action.param1}</button>`;
-          } else if (action.type === 'WRITE') {
-            actionsHtml += `<button class="ai-action-btn write" onclick="aiCallWrite('${action.param1}')">✍️ Write ${action.param1}</button>`;
-          }
+        
+        // Write action buttons (orange - transactions)
+        writeActions.forEach((action) => {
+          actionsHtml += `<button class="ai-action-btn write" onclick="aiCallWrite('${action.param1}')">✍️ ${action.param1}</button>`;
         });
+        
+        // Option buttons (suggestions for what to do next)
+        optionActions.forEach((action) => {
+          actionsHtml += `<button class="ai-action-btn option" onclick="askAI('${action.param2.replace(/'/g, "\\'")}')">${action.param1}</button>`;
+        });
+        
         actionsHtml += '</div>';
       }
       
@@ -2477,13 +2516,13 @@ What would you like to do?`, 'assistant');
       
       // Auto-execute LOAD and READ actions
       if (role === 'assistant') {
-        actions.forEach(action => {
-          if (action.type === 'LOAD' || action.type === 'NAVIGATE') {
-            setTimeout(() => aiLoadContract(action.param1), 500);
+        actions.forEach((action, idx) => {
+          if (action.type === 'NAVIGATE') {
+            setTimeout(() => aiLoadContract(action.param1), 300 + (idx * 500));
           } else if (action.type === 'READ') {
-            setTimeout(() => aiCallRead(action.param1), 1000);
+            setTimeout(() => aiCallRead(action.param1), 800 + (idx * 500));
           }
-          // WRITE actions require user click
+          // WRITE and OPTION actions require user click - buttons shown above
         });
       }
     }
