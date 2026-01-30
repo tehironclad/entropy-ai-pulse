@@ -374,6 +374,62 @@
       background: var(--error);
     }
     .status-dot.connected { background: var(--success); }
+
+    /* Sidebar Tabs */
+    .sidebar-tabs { display: flex; border-bottom: 1px solid var(--border-color); }
+    .sidebar-tab { flex: 1; padding: 10px 8px; text-align: center; font-size: 10px; font-weight: 500; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; }
+    .sidebar-tab:hover { color: var(--text-secondary); }
+    .sidebar-tab.active { color: var(--accent-primary); border-bottom-color: var(--accent-primary); }
+    .tab-panel { display: none; flex-direction: column; flex: 1; overflow: hidden; }
+    .tab-panel.active { display: flex; }
+
+    /* Filters */
+    .filter-group { display: flex; flex-direction: column; gap: 6px; }
+    .filter-item { display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--text-secondary); cursor: pointer; }
+    .filter-item input { accent-color: var(--accent-primary); }
+
+    /* Journey Tab */
+    .journey-item { display: flex; align-items: center; gap: 8px; padding: 8px; background: var(--bg-card); border-radius: 6px; margin-bottom: 4px; position: relative; cursor: pointer; }
+    .journey-item:hover { background: var(--bg-tertiary); }
+    .journey-num { width: 20px; height: 20px; background: var(--accent-gradient); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 600; flex-shrink: 0; }
+    .journey-connector { position: absolute; left: 17px; top: 28px; bottom: -4px; width: 2px; background: var(--border-color); }
+
+    /* Create Panel */
+    .create-panel { padding: 12px; }
+    .create-panel .input-group { margin-bottom: 10px; }
+    .create-panel .input-label { font-size: 10px; color: var(--text-muted); margin-bottom: 4px; display: block; }
+    .create-panel .input { width: 100%; padding: 8px; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-primary); font-size: 11px; }
+    .create-panel .input:focus { outline: none; border-color: var(--accent-primary); }
+    .coord-display { background: var(--bg-tertiary); padding: 10px; border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 10px; margin-bottom: 10px; }
+    .coord-label { color: var(--text-muted); }
+    .coord-value { color: var(--accent-primary); }
+
+    /* Map Controls */
+    .map-controls { position: absolute; top: 10px; right: 10px; display: flex; flex-direction: column; gap: 4px; z-index: 500; }
+    .map-control-btn { width: 32px; height: 32px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-secondary); font-size: 14px; transition: all 0.2s; }
+    .map-control-btn:hover { background: var(--bg-tertiary); color: var(--text-primary); }
+    .map-control-btn.active { background: var(--accent-primary); color: white; border-color: var(--accent-primary); }
+
+    /* Entropy Legend */
+    .entropy-legend { position: absolute; bottom: 80px; right: 10px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 6px; padding: 8px; font-size: 9px; z-index: 500; display: none; }
+    .entropy-legend.visible { display: block; }
+    .entropy-gradient { width: 80px; height: 8px; background: linear-gradient(to right, #1e40af, #3b82f6, #22c55e, #f59e0b, #ef4444); border-radius: 2px; margin: 4px 0; }
+    .entropy-labels { display: flex; justify-content: space-between; color: var(--text-muted); }
+
+    /* Hecke Overlay */
+    .hecke-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; z-index: 400; display: none; }
+    .hecke-overlay.visible { display: block; }
+
+    /* Info badges */
+    .info-badges { display: flex; gap: 4px; margin-top: 4px; }
+    .info-badge { padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: 500; }
+    .info-badge.gwat { background: var(--warning); color: black; }
+    .info-badge.member { background: var(--success); color: white; }
+    .info-badge.visited { background: #3b82f6; color: white; }
+
+    /* Entropy bar in info panel */
+    .info-entropy-bar { height: 4px; background: var(--bg-tertiary); border-radius: 2px; overflow: hidden; margin-top: 4px; }
+    .info-entropy-fill { height: 100%; border-radius: 2px; transition: width 0.3s; }
   </style>
 </head>
 <body>
@@ -392,17 +448,34 @@
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-toggle" onclick="toggleSidebar()">☰</div>
       
-      <div class="sidebar-section">
-        <div class="search-container">
-          <span class="search-icon">🔍</span>
-          <input type="text" class="search-input" id="searchInput" placeholder="Search QINGs..." oninput="handleSearch()" onfocus="showSearchResults()">
-          <div class="search-results" id="searchResults"></div>
-        </div>
+      <div class="sidebar-tabs">
+        <div class="sidebar-tab active" onclick="switchTab('explore')">Explore</div>
+        <div class="sidebar-tab" onclick="switchTab('journey')">Journey</div>
+        <div class="sidebar-tab" onclick="switchTab('create')">Create</div>
       </div>
+
+      <!-- EXPLORE TAB -->
+      <div class="tab-panel active" id="tab-explore">
+        <div class="sidebar-section">
+          <div class="search-container">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="search-input" id="searchInput" placeholder="Search QINGs..." oninput="handleSearch()" onfocus="showSearchResults()">
+            <div class="search-results" id="searchResults"></div>
+          </div>
+        </div>
 
       <div class="sidebar-section">
         <h3>Categories</h3>
         <div class="categories" id="categories"></div>
+      </div>
+
+      <div class="sidebar-section">
+        <h3>Filters</h3>
+        <div class="filter-group">
+          <label class="filter-item"><input type="checkbox" id="filterGwat" onchange="applyFilters()"> GWATs only</label>
+          <label class="filter-item"><input type="checkbox" id="filterMember" onchange="applyFilters()"> My QINGs</label>
+          <label class="filter-item"><input type="checkbox" id="filterVisited" onchange="applyFilters()"> Visited</label>
+        </div>
       </div>
 
       <div class="sidebar-section">
@@ -425,50 +498,120 @@
       <div class="sidebar-section" style="flex:1;display:flex;flex-direction:column;overflow:hidden;padding-bottom:0;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
           <h3 style="margin:0;">On Map</h3>
-          <button class="btn btn-secondary" style="padding:3px 8px;font-size:10px;" onclick="clearMap()">Clear</button>
+          <div style="display:flex;gap:4px;">
+            <button class="btn btn-secondary" style="padding:3px 8px;font-size:10px;" onclick="loadAll()">All</button>
+            <button class="btn btn-secondary" style="padding:3px 8px;font-size:10px;" onclick="clearMap()">Clear</button>
+          </div>
         </div>
         <div class="qing-list" id="qingList">
           <div class="empty-state">
             <div class="empty-state-icon">🔍</div>
-            <div class="empty-state-text">Search or select a category to add QINGs</div>
+            <div class="empty-state-text">Search or select a category</div>
           </div>
+        </div>
+      </div>
+      </div><!-- end tab-explore -->
+
+      <!-- JOURNEY TAB -->
+      <div class="tab-panel" id="tab-journey">
+        <div class="sidebar-section">
+          <h3>Your Dysnomia Journey</h3>
+          <p style="font-size:10px;color:var(--text-muted);margin-bottom:10px;">Track your path through territories</p>
+          <div id="journeyStats" style="display:none;">
+            <div class="stats-row">
+              <div class="stat-box"><div class="stat-value" id="journeyVisited">0</div><div class="stat-label">Visited</div></div>
+              <div class="stat-box"><div class="stat-value" id="journeyMember">0</div><div class="stat-label">Member</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="sidebar-section" style="flex:1;overflow-y:auto;" id="journeyList">
+          <div class="empty-state"><div class="empty-state-icon">👛</div><div class="empty-state-text">Connect wallet to track journey</div></div>
+        </div>
+      </div>
+
+      <!-- CREATE TAB -->
+      <div class="tab-panel" id="tab-create">
+        <div class="create-panel">
+          <h3 style="font-size:11px;margin-bottom:10px;">Create QING at Location</h3>
+          <p style="font-size:10px;color:var(--text-muted);margin-bottom:12px;">Click anywhere on the map to select coordinates.</p>
+          <div class="coord-display">
+            <div><span class="coord-label">Lat: </span><span class="coord-value" id="createLat">-</span></div>
+            <div><span class="coord-label">Lon: </span><span class="coord-value" id="createLon">-</span></div>
+            <div><span class="coord-label">Waat: </span><span class="coord-value" id="createWaat">(assigned by MAP)</span></div>
+          </div>
+          <div class="input-group">
+            <label class="input-label">Asset Token Address</label>
+            <input type="text" class="input" id="createAsset" placeholder="0x...">
+          </div>
+          <div class="input-group">
+            <label class="input-label">Or Select Token</label>
+            <select class="input" id="createAssetSelect" onchange="selectCreateAsset()">
+              <option value="">-- Select --</option>
+              <option value="0xCc78A0acDF847A2C1714D2A925bB4477df5d48a6">ATROPA</option>
+              <option value="0x6B175474E89094C44Da98b954EedeAC495271d0F">DAI</option>
+              <option value="0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48">USDC</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:12px;" onclick="createQing()">🌍 Create via MAP.New()</button>
+          <p style="font-size:9px;color:var(--text-muted);margin-top:10px;">Requires wallet. Waat is assigned by MAP contract.</p>
         </div>
       </div>
 
       <div class="status-bar">
         <div><span class="status-dot" id="statusDot"></span><span id="statusText">Connecting...</span></div>
-        <div>PulseChain</div>
+        <div id="walletStatus">PulseChain</div>
       </div>
     </aside>
 
     <div class="map-container">
       <div id="map"></div>
+      <div class="hecke-overlay" id="heckeOverlay"></div>
+
+      <div class="map-controls">
+        <button class="map-control-btn" id="btnHecke" onclick="toggleHeckeGrid()" title="Hecke Grid">📐</button>
+        <button class="map-control-btn" id="btnEntropy" onclick="toggleEntropyView()" title="Entropy Heatmap">🌡️</button>
+        <button class="map-control-btn active" id="btnConnections" onclick="toggleConnectionsBtn()" title="Connections">🔗</button>
+        <button class="map-control-btn" id="btnFlow" onclick="toggleFlow()" title="Asset Flow">✨</button>
+        <button class="map-control-btn" id="btnJourney" onclick="toggleJourneyPath()" title="Your Path">🛤️</button>
+      </div>
+
+      <div class="entropy-legend" id="entropyLegend">
+        <div style="font-weight:600;margin-bottom:4px;">Entropy</div>
+        <div class="entropy-gradient"></div>
+        <div class="entropy-labels"><span>Low</span><span>High</span></div>
+      </div>
 
       <div class="map-legend">
         <div class="legend-title">Markers</div>
         <div class="legend-item"><div class="legend-dot qing"></div><span>QING</span></div>
         <div class="legend-item"><div class="legend-dot gwat"></div><span>GWAT</span></div>
         <div class="legend-item"><div class="legend-dot member"></div><span>Your QING</span></div>
-        <div class="legend-title" style="margin-top:6px;">Connections</div>
+        <div class="legend-title" style="margin-top:6px;">Lines</div>
         <div class="legend-item"><div class="legend-line asset"></div><span>Same Asset</span></div>
-        <div class="toggle-group">
-          <label class="toggle-item"><input type="checkbox" id="showConnections" checked onchange="renderConnections()"> Show Links</label>
-        </div>
+        <div class="legend-item"><div class="legend-line" style="background:#3b82f6;"></div><span>Your Path</span></div>
       </div>
 
       <div class="info-panel" id="infoPanel">
         <div class="info-panel-header">
-          <span class="info-panel-title" id="infoTitle">-</span>
+          <div>
+            <div class="info-panel-title" id="infoTitle">-</div>
+            <div class="info-badges" id="infoBadges"></div>
+          </div>
           <button class="info-panel-close" onclick="closePanel()">×</button>
         </div>
         <div class="info-grid">
           <span class="info-label">Address</span><span class="info-value" id="infoAddr">-</span>
           <span class="info-label">Waat</span><span class="info-value" id="infoWaat">-</span>
           <span class="info-label">Coords</span><span class="info-value" id="infoCoords">-</span>
-          <span class="info-label">Category</span><span class="info-value" id="infoCat">-</span>
+          <span class="info-label">Entropy</span>
+          <div>
+            <span class="info-value" id="infoEntropy">-</span>
+            <div class="info-entropy-bar"><div class="info-entropy-fill" id="infoEntropyBar"></div></div>
+          </div>
         </div>
         <div class="info-actions">
-          <a class="btn btn-secondary" id="infoExplorer" href="#" target="_blank">Explorer ↗</a>
+          <a class="btn btn-secondary" id="infoExplorer" href="#" target="_blank">Explorer</a>
+          <button class="btn btn-secondary" onclick="joinSelectedQing()">Join</button>
           <a class="btn btn-primary" id="infoEntropyAI" href="#">Entropy AI</a>
         </div>
       </div>
@@ -484,12 +627,16 @@
     
     const RPC = 'https://rpc.pulsechain.com';
     const HECKE = '0x29A924D9B0233026B9844f2aFeB202F1791D7593';
+    const MAP_CONTRACT = '0xD3a7A95012Edd46Ea115c693B74c5e524b3DdA75';
     const HECKE_ABI = ['function Compliment(uint64) view returns (int64,int64)'];
+    const MAP_ABI = ['function New(address) returns (address)', 'event NewQing(address,address,uint256)'];
     const QING_ABI = [
       'function Waat() view returns (uint256)',
       'function Asset() view returns (address)',
+      'function Entropy() view returns (uint64)',
       'function GWAT() view returns (bool)',
       'function IsMember(address) view returns (bool)',
+      'function Join(address)',
     ];
 
     // Categories with their QINGs
@@ -764,13 +911,26 @@
     // STATE
     // ═══════════════════════════════════════════════════════════════════
     
-    let provider, map;
-    let activeQings = []; // QINGs currently on the map
+    let provider, signer, map;
+    let activeQings = [];
     let markers = {};
     let connectionLines = [];
+    let journeyLines = [];
     let selected = null;
     let userAddress = null;
     let activeCategory = null;
+    
+    // View toggles
+    let showHecke = false;
+    let showEntropy = false;
+    let showConnections = true;
+    let showFlow = false;
+    let showJourney = false;
+    let flowInterval = null;
+    
+    // Create mode
+    let createMode = false;
+    let createCoords = null;
 
     // ═══════════════════════════════════════════════════════════════════
     // INIT
@@ -791,6 +951,9 @@
         subdomains: 'abcd'
       }).addTo(map);
 
+      // Map click handler for create mode
+      map.on('click', onMapClick);
+
       // Connect RPC
       try {
         provider = new ethers.JsonRpcProvider(RPC);
@@ -807,6 +970,13 @@
       // Load saved QINGs from localStorage
       loadSavedQings();
       
+      // Check for URL parameter to auto-load a QING
+      const urlParams = new URLSearchParams(window.location.search);
+      const qingParam = urlParams.get('qing');
+      if (qingParam && ethers.isAddress(qingParam)) {
+        await loadQingFromUrl(qingParam);
+      }
+      
       // Update stats
       document.getElementById('statTotal').textContent = ALL_QINGS.length;
       
@@ -816,6 +986,36 @@
           document.getElementById('searchResults').classList.remove('visible');
         }
       });
+    }
+
+    // Load QING from URL parameter (cross-reference from Entropy AI)
+    async function loadQingFromUrl(address) {
+      // Check if already on map
+      if (activeQings.find(q => q.address.toLowerCase() === address.toLowerCase())) {
+        const existing = activeQings.find(q => q.address.toLowerCase() === address.toLowerCase());
+        selectQing(existing.address);
+        toast(`Focused on ${existing.name}`, 'info');
+        return;
+      }
+      
+      // Check if in our database
+      let qingInfo = ALL_QINGS.find(q => q.address.toLowerCase() === address.toLowerCase());
+      
+      if (!qingInfo) {
+        // Not in database, fetch name from chain
+        try {
+          const qing = new ethers.Contract(address, ['function name() view returns (string)'], provider);
+          const name = await qing.name();
+          qingInfo = { address, name: name || `QING ${address.slice(0,8)}...` };
+        } catch {
+          qingInfo = { address, name: `QING ${address.slice(0,8)}...` };
+        }
+      }
+      
+      toast(`Loading ${qingInfo.name} from Entropy AI...`, 'info');
+      await addToMap(qingInfo);
+      selectQing(address);
+      toast(`✅ ${qingInfo.name} loaded and selected!`, 'success');
     }
 
     // ═══════════════════════════════════════════════════════════════════
@@ -972,11 +1172,12 @@
         const qing = new ethers.Contract(addr, QING_ABI, provider);
         const hecke = new ethers.Contract(HECKE, HECKE_ABI, provider);
         
-        let waat, lat = 0, lon = 0, isGwat = false, asset = null, isMember = false;
+        let waat = 0n, lat = 0, lon = 0, isGwat = false, asset = null, entropy = 0n, isMember = false;
         
         try { waat = await qing.Waat(); } catch { waat = 0n; }
         try { asset = await qing.Asset(); } catch {}
         try { isGwat = await qing.GWAT(); } catch {}
+        try { entropy = await qing.Entropy(); } catch {}
         if (userAddress) {
           try { isMember = await qing.IsMember(userAddress); } catch {}
         }
@@ -990,9 +1191,9 @@
           lon = Number((waat / 180n) % 360n) - 180;
         }
         
-        return { waat: waat.toString(), lat, lon, isGwat, asset, isMember };
+        return { waat: waat.toString(), lat, lon, isGwat, asset, entropy: entropy.toString(), isMember, visited: false };
       } catch {
-        return { waat: '0', lat: 0, lon: 0, isGwat: false, asset: null, isMember: false };
+        return { waat: '0', lat: 0, lon: 0, isGwat: false, asset: null, entropy: '0', isMember: false, visited: false };
       }
     }
 
@@ -1030,28 +1231,31 @@
       Object.values(markers).forEach(m => map.removeLayer(m));
       markers = {};
 
-      if (!activeQings.length) return;
+      const filtered = getFilteredQings();
+      if (!filtered.length) return;
 
-      activeQings.forEach(q => {
+      filtered.forEach(q => {
         if (q.lat === undefined) return;
         
-        let bgColor = 'linear-gradient(135deg, #6366f1, #8b5cf6)';
-        if (q.isGwat) bgColor = 'linear-gradient(135deg, #f59e0b, #ef4444)';
-        else if (q.isMember) bgColor = 'linear-gradient(135deg, #22c55e, #16a34a)';
+        let bgColor;
+        if (showEntropy) {
+          bgColor = getEntropyColor(q.entropy);
+        } else if (q.isMember) {
+          bgColor = '#22c55e';
+        } else if (q.visited) {
+          bgColor = '#3b82f6';
+        } else if (q.isGwat) {
+          bgColor = '#f59e0b';
+        } else {
+          bgColor = '#6366f1';
+        }
 
+        const size = q.isMember ? 16 : 12;
         const icon = L.divIcon({
           className: '',
-          html: `<div style="
-            width: ${q.isMember ? '22px' : '18px'}; 
-            height: ${q.isMember ? '22px' : '18px'};
-            background: ${bgColor};
-            border: 2px solid white;
-            border-radius: 50%;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-            cursor: pointer;
-          "></div>`,
-          iconSize: [q.isMember ? 22 : 18, q.isMember ? 22 : 18],
-          iconAnchor: [q.isMember ? 11 : 9, q.isMember ? 11 : 9]
+          html: `<div style="width:${size}px;height:${size}px;background:${bgColor};border:2px solid white;border-radius:50%;box-shadow:0 2px 4px rgba(0,0,0,0.3);cursor:pointer;"></div>`,
+          iconSize: [size, size],
+          iconAnchor: [size/2, size/2]
         });
 
         const marker = L.marker([q.lat, q.lon], {icon})
@@ -1061,35 +1265,37 @@
         marker.bindTooltip(q.name, {
           permanent: false,
           direction: 'top',
-          offset: [0, -8]
+          offset: [0, -6]
         });
 
         markers[q.address] = marker;
       });
 
       // Fit bounds if we have markers
-      if (activeQings.length > 0) {
-        const validQings = activeQings.filter(q => q.lat !== undefined);
+      if (filtered.length > 0) {
+        const validQings = filtered.filter(q => q.lat !== undefined);
         if (validQings.length > 0) {
           const bounds = validQings.map(q => [q.lat, q.lon]);
           map.fitBounds(bounds, { padding: [50, 50], maxZoom: 6 });
         }
       }
 
-      renderConnections();
+      if (showConnections) renderConnections();
+      if (showJourney) renderJourneyPath();
     }
 
     function renderConnections() {
       connectionLines.forEach(line => map.removeLayer(line));
       connectionLines = [];
 
-      if (!document.getElementById('showConnections')?.checked) return;
+      if (!showConnections) return;
 
+      const filtered = getFilteredQings();
       // Draw lines between QINGs with same asset
-      for (let i = 0; i < activeQings.length; i++) {
-        for (let j = i + 1; j < activeQings.length; j++) {
-          const q1 = activeQings[i];
-          const q2 = activeQings[j];
+      for (let i = 0; i < filtered.length; i++) {
+        for (let j = i + 1; j < filtered.length; j++) {
+          const q1 = filtered[i];
+          const q2 = filtered[j];
 
           if (q1.asset && q2.asset &&
               q1.asset !== ethers.ZeroAddress &&
@@ -1116,10 +1322,24 @@
       selected = q;
       
       document.getElementById('infoTitle').textContent = q.name;
+      
+      // Badges
+      let badges = '';
+      if (q.isGwat) badges += '<span class="info-badge gwat">GWAT</span>';
+      if (q.isMember) badges += '<span class="info-badge member">Member</span>';
+      if (q.visited) badges += '<span class="info-badge visited">Visited</span>';
+      document.getElementById('infoBadges').innerHTML = badges;
+      
       document.getElementById('infoAddr').textContent = q.address.slice(0,10) + '...' + q.address.slice(-6);
       document.getElementById('infoWaat').textContent = q.waat?.slice(0, 16) + (q.waat?.length > 16 ? '...' : '');
       document.getElementById('infoCoords').textContent = `${q.lat?.toFixed(4)}°, ${q.lon?.toFixed(4)}°`;
-      document.getElementById('infoCat').textContent = getCategoryForQing(q.address) || 'Community';
+      
+      // Entropy
+      const ePct = Math.min(100, Number(BigInt(q.entropy || 0) % 100n));
+      document.getElementById('infoEntropy').textContent = ePct + '%';
+      document.getElementById('infoEntropyBar').style.width = ePct + '%';
+      document.getElementById('infoEntropyBar').style.background = getEntropyColor(q.entropy);
+      
       document.getElementById('infoExplorer').href = 'https://scan.pulsechain.com/address/' + q.address;
       document.getElementById('infoEntropyAI').href = 'index.html?contract=' + q.address;
       
@@ -1147,7 +1367,9 @@
       try {
         const accts = await window.ethereum.request({method: 'eth_requestAccounts'});
         userAddress = accts[0];
+        signer = new ethers.BrowserProvider(window.ethereum).getSigner();
         document.getElementById('connectBtn').textContent = userAddress.slice(0,6) + '...' + userAddress.slice(-4);
+        document.getElementById('walletStatus').textContent = userAddress.slice(0,6) + '...' + userAddress.slice(-4);
         toast('Connected!', 'success');
         
         // Re-check memberships
@@ -1160,6 +1382,7 @@
         updateStats();
         renderList();
         renderMarkers();
+        updateJourneyTab();
       } catch { toast('Connection failed', 'error'); }
     }
 
@@ -1205,6 +1428,223 @@
         document.getElementById('searchResults').classList.remove('visible');
       }
     });
+
+    // ═══════════════════════════════════════════════════════════════════
+    // TABS
+    // ═══════════════════════════════════════════════════════════════════
+    
+    function switchTab(tab) {
+      document.querySelectorAll('.sidebar-tab').forEach((t, i) => {
+        t.classList.toggle('active', (tab === 'explore' && i === 0) || (tab === 'journey' && i === 1) || (tab === 'create' && i === 2));
+      });
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      document.getElementById('tab-' + tab).classList.add('active');
+      createMode = tab === 'create';
+      if (tab === 'journey') updateJourneyTab();
+    }
+
+    // ═══════════════════════════════════════════════════════════════════
+    // FILTERS
+    // ═══════════════════════════════════════════════════════════════════
+    
+    function applyFilters() { renderList(); renderMarkers(); }
+    
+    function getFilteredQings() {
+      let f = [...activeQings];
+      if (document.getElementById('filterGwat')?.checked) f = f.filter(q => q.isGwat);
+      if (document.getElementById('filterMember')?.checked) f = f.filter(q => q.isMember);
+      if (document.getElementById('filterVisited')?.checked) f = f.filter(q => q.visited);
+      return f;
+    }
+
+    async function loadAll() {
+      toast('Loading all QINGs...', 'info');
+      for (const q of ALL_QINGS) {
+        if (!activeQings.find(x => x.address.toLowerCase() === q.address.toLowerCase())) {
+          await addToMap(q);
+        }
+      }
+      toast('Loaded ' + activeQings.length + ' QINGs', 'success');
+    }
+
+    // ═══════════════════════════════════════════════════════════════════
+    // MAP CONTROL TOGGLES
+    // ═══════════════════════════════════════════════════════════════════
+    
+    function toggleHeckeGrid() {
+      showHecke = !showHecke;
+      document.getElementById('btnHecke').classList.toggle('active', showHecke);
+      document.getElementById('heckeOverlay').classList.toggle('visible', showHecke);
+      if (showHecke) drawHeckeGrid();
+    }
+
+    function toggleEntropyView() {
+      showEntropy = !showEntropy;
+      document.getElementById('btnEntropy').classList.toggle('active', showEntropy);
+      document.getElementById('entropyLegend').classList.toggle('visible', showEntropy);
+      renderMarkers();
+    }
+
+    function toggleConnectionsBtn() {
+      showConnections = !showConnections;
+      document.getElementById('btnConnections').classList.toggle('active', showConnections);
+      if (showConnections) renderConnections();
+      else { connectionLines.forEach(l => map.removeLayer(l)); connectionLines = []; }
+    }
+
+    function toggleFlow() {
+      showFlow = !showFlow;
+      document.getElementById('btnFlow').classList.toggle('active', showFlow);
+      if (showFlow) startFlowAnimation();
+      else stopFlowAnimation();
+    }
+
+    function toggleJourneyPath() {
+      showJourney = !showJourney;
+      document.getElementById('btnJourney').classList.toggle('active', showJourney);
+      if (showJourney) renderJourneyPath();
+      else { journeyLines.forEach(l => map.removeLayer(l)); journeyLines = []; }
+    }
+
+    // ═══════════════════════════════════════════════════════════════════
+    // HECKE GRID
+    // ═══════════════════════════════════════════════════════════════════
+    
+    function drawHeckeGrid() {
+      const overlay = document.getElementById('heckeOverlay');
+      let svg = '<svg width="100%" height="100%" style="position:absolute;top:0;left:0;">';
+      for (let i = -180; i <= 180; i += 30) {
+        const x = ((i + 180) / 360) * 100;
+        svg += `<line x1="${x}%" y1="0" x2="${x}%" y2="100%" stroke="rgba(99,102,241,0.2)" stroke-width="1"/>`;
+      }
+      for (let i = -90; i <= 90; i += 30) {
+        const y = ((90 - i) / 180) * 100;
+        svg += `<line x1="0" y1="${y}%" x2="100%" y2="${y}%" stroke="rgba(99,102,241,0.2)" stroke-width="1"/>`;
+      }
+      svg += '</svg>';
+      overlay.innerHTML = svg;
+    }
+
+    // ═══════════════════════════════════════════════════════════════════
+    // ENTROPY COLORING
+    // ═══════════════════════════════════════════════════════════════════
+    
+    function getEntropyColor(entropy) {
+      const e = Number(BigInt(entropy || 0) % 100n) / 100;
+      if (e < 0.25) return '#1e40af';
+      if (e < 0.5) return '#22c55e';
+      if (e < 0.75) return '#f59e0b';
+      return '#ef4444';
+    }
+
+    // ═══════════════════════════════════════════════════════════════════
+    // FLOW ANIMATION
+    // ═══════════════════════════════════════════════════════════════════
+    
+    function startFlowAnimation() {
+      if (flowInterval) return;
+      flowInterval = setInterval(() => {
+        connectionLines.forEach(line => {
+          const op = line.options.opacity || 0.5;
+          line.setStyle({ opacity: op === 0.5 ? 0.8 : 0.5 });
+        });
+      }, 500);
+    }
+
+    function stopFlowAnimation() {
+      if (flowInterval) { clearInterval(flowInterval); flowInterval = null; }
+      connectionLines.forEach(line => line.setStyle({ opacity: 0.5 }));
+    }
+
+    // ═══════════════════════════════════════════════════════════════════
+    // JOURNEY PATH
+    // ═══════════════════════════════════════════════════════════════════
+    
+    function renderJourneyPath() {
+      journeyLines.forEach(l => map.removeLayer(l));
+      journeyLines = [];
+      if (!showJourney || !userAddress) return;
+      const visited = activeQings.filter(q => q.visited || q.isMember);
+      for (let i = 0; i < visited.length - 1; i++) {
+        const a = visited[i], b = visited[i + 1];
+        if (a.lat !== undefined && b.lat !== undefined) {
+          const line = L.polyline([[a.lat, a.lon], [b.lat, b.lon]], { color: '#3b82f6', weight: 2, opacity: 0.7, dashArray: '5,5' }).addTo(map);
+          journeyLines.push(line);
+        }
+      }
+    }
+
+    function updateJourneyTab() {
+      if (!userAddress) {
+        document.getElementById('journeyStats').style.display = 'none';
+        document.getElementById('journeyList').innerHTML = '<div class="empty-state"><div class="empty-state-icon">👛</div><div class="empty-state-text">Connect wallet to track journey</div></div>';
+        return;
+      }
+      const memberQings = activeQings.filter(q => q.isMember);
+      const visitedQings = activeQings.filter(q => q.visited);
+      document.getElementById('journeyStats').style.display = 'block';
+      document.getElementById('journeyVisited').textContent = visitedQings.length;
+      document.getElementById('journeyMember').textContent = memberQings.length;
+      
+      const all = [...memberQings, ...visitedQings.filter(v => !memberQings.find(m => m.address === v.address))];
+      if (!all.length) {
+        document.getElementById('journeyList').innerHTML = '<div class="empty-state"><div class="empty-state-icon">🗺️</div><div class="empty-state-text">Join QINGs to start journey</div></div>';
+        return;
+      }
+      document.getElementById('journeyList').innerHTML = all.map((q, i) => `
+        <div class="journey-item" onclick="selectQing('${q.address}')">
+          ${i < all.length - 1 ? '<div class="journey-connector"></div>' : ''}
+          <div class="journey-num">${i + 1}</div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:11px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${q.name}</div>
+            <div style="font-size:9px;color:var(--text-muted);">${q.isMember ? '⭐ Member' : '👁️ Visited'}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // ═══════════════════════════════════════════════════════════════════
+    // CREATE QING
+    // ═══════════════════════════════════════════════════════════════════
+    
+    function onMapClick(e) {
+      if (!createMode) return;
+      createCoords = { lat: e.latlng.lat, lon: e.latlng.lng };
+      document.getElementById('createLat').textContent = createCoords.lat.toFixed(6);
+      document.getElementById('createLon').textContent = createCoords.lon.toFixed(6);
+    }
+
+    function selectCreateAsset() {
+      const val = document.getElementById('createAssetSelect').value;
+      if (val) document.getElementById('createAsset').value = val;
+    }
+
+    async function createQing() {
+      const asset = document.getElementById('createAsset').value.trim();
+      if (!asset || !ethers.isAddress(asset)) { toast('Enter valid asset address', 'error'); return; }
+      if (!signer) { toast('Connect wallet first', 'error'); return; }
+      try {
+        toast('Creating QING...', 'info');
+        const mapContract = new ethers.Contract(MAP_CONTRACT, MAP_ABI, await signer);
+        const tx = await mapContract.New(asset);
+        toast('Tx sent: ' + tx.hash.slice(0, 10) + '...', 'info');
+        await tx.wait();
+        toast('QING created!', 'success');
+      } catch (e) { toast('Error: ' + (e.message || e).toString().slice(0, 50), 'error'); }
+    }
+
+    async function joinSelectedQing() {
+      if (!selected || !signer) { toast('Connect wallet first', 'error'); return; }
+      try {
+        toast('Joining...', 'info');
+        const q = new ethers.Contract(selected.address, QING_ABI, await signer);
+        const tx = await q.Join(userAddress);
+        await tx.wait();
+        selected.isMember = true;
+        toast('Joined ' + selected.name, 'success');
+        renderList(); renderMarkers(); updateJourneyTab();
+      } catch (e) { toast('Error: ' + (e.message || e).toString().slice(0, 40), 'error'); }
+    }
 
     // Start
     init();
