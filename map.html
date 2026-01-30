@@ -7,22 +7,14 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.9.0/ethers.umd.min.js"></script>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
       --bg-primary: #0a0a0f;
       --bg-secondary: #12121a;
       --bg-tertiary: #1a1a25;
       --bg-card: #16161f;
       --border-color: rgba(255, 255, 255, 0.08);
-      --border-hover: rgba(255, 255, 255, 0.15);
       --text-primary: #f0f0f5;
       --text-secondary: #a0a0b0;
       --text-muted: #606070;
@@ -32,19 +24,13 @@
       --success: #22c55e;
       --warning: #f59e0b;
       --error: #ef4444;
-      --info: #3b82f6;
     }
-
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: 'Inter', sans-serif;
       background: var(--bg-primary);
       color: var(--text-primary);
       min-height: 100vh;
-      line-height: 1.5;
-      overflow-x: hidden;
     }
-
-    /* Header */
     .header {
       background: var(--bg-secondary);
       border-bottom: 1px solid var(--border-color);
@@ -53,31 +39,24 @@
       justify-content: space-between;
       align-items: center;
       position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
+      top: 0; left: 0; right: 0;
       z-index: 1000;
       height: 60px;
     }
-
     .logo {
       display: flex;
       align-items: center;
       gap: 12px;
     }
-
     .logo-icon {
-      width: 36px;
-      height: 36px;
+      width: 36px; height: 36px;
       background: var(--accent-gradient);
       border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 18px;
-      font-weight: 700;
     }
-
     .logo-text {
       font-size: 20px;
       font-weight: 700;
@@ -85,83 +64,53 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
-
-    .header-actions {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-    }
-
+    .header-actions { display: flex; gap: 12px; align-items: center; }
     .btn {
       padding: 8px 16px;
       border-radius: 8px;
       font-size: 13px;
       font-weight: 500;
       cursor: pointer;
-      transition: all 0.2s;
       border: none;
       display: flex;
       align-items: center;
       gap: 6px;
+      text-decoration: none;
+      transition: all 0.2s;
     }
-
-    .btn-primary {
-      background: var(--accent-gradient);
-      color: white;
-    }
-
-    .btn-primary:hover {
-      opacity: 0.9;
-      transform: translateY(-1px);
-    }
-
+    .btn-primary { background: var(--accent-gradient); color: white; }
+    .btn-primary:hover { opacity: 0.9; }
     .btn-secondary {
       background: var(--bg-tertiary);
       color: var(--text-primary);
       border: 1px solid var(--border-color);
     }
-
-    .btn-secondary:hover {
-      border-color: var(--border-hover);
-      background: var(--bg-card);
-    }
-
-    /* Main Layout */
+    .btn-secondary:hover { border-color: var(--accent-primary); }
     .main-container {
       display: flex;
       height: calc(100vh - 60px);
       margin-top: 60px;
     }
-
-    /* Sidebar */
     .sidebar {
-      width: 380px;
+      width: 340px;
       background: var(--bg-secondary);
       border-right: 1px solid var(--border-color);
       display: flex;
       flex-direction: column;
-      overflow: hidden;
     }
-
     .sidebar-section {
       padding: 16px;
       border-bottom: 1px solid var(--border-color);
     }
-
     .sidebar-section h3 {
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 600;
       color: var(--text-muted);
       text-transform: uppercase;
       letter-spacing: 0.5px;
       margin-bottom: 12px;
     }
-
-    .input-group {
-      display: flex;
-      gap: 8px;
-    }
-
+    .input-group { display: flex; gap: 8px; }
     .input {
       flex: 1;
       padding: 10px 12px;
@@ -169,26 +118,11 @@
       border: 1px solid var(--border-color);
       border-radius: 8px;
       color: var(--text-primary);
-      font-size: 13px;
+      font-size: 12px;
       font-family: 'JetBrains Mono', monospace;
     }
-
-    .input:focus {
-      outline: none;
-      border-color: var(--accent-primary);
-    }
-
-    .input::placeholder {
-      color: var(--text-muted);
-    }
-
-    /* QING List */
-    .qing-list {
-      flex: 1;
-      overflow-y: auto;
-      padding: 8px;
-    }
-
+    .input:focus { outline: none; border-color: var(--accent-primary); }
+    .qing-list { flex: 1; overflow-y: auto; padding: 8px; }
     .qing-item {
       background: var(--bg-card);
       border: 1px solid var(--border-color);
@@ -198,143 +132,40 @@
       cursor: pointer;
       transition: all 0.2s;
     }
-
-    .qing-item:hover {
-      border-color: var(--accent-primary);
-      transform: translateX(2px);
+    .qing-item:hover { border-color: var(--accent-primary); }
+    .qing-item.selected { border-color: var(--accent-primary); background: rgba(99,102,241,0.1); }
+    .qing-header { display: flex; justify-content: space-between; margin-bottom: 6px; }
+    .qing-name { font-weight: 600; font-size: 14px; }
+    .qing-badge {
+      font-size: 9px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: var(--warning);
+      color: #000;
+      margin-left: 6px;
     }
-
-    .qing-item.selected {
-      border-color: var(--accent-primary);
-      background: rgba(99, 102, 241, 0.1);
-    }
-
-    .qing-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 8px;
-    }
-
-    .qing-name {
-      font-weight: 600;
-      font-size: 14px;
-      color: var(--text-primary);
-    }
-
     .qing-remove {
       background: none;
       border: none;
       color: var(--text-muted);
       cursor: pointer;
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-size: 12px;
+      font-size: 14px;
     }
-
-    .qing-remove:hover {
-      background: var(--error);
-      color: white;
-    }
-
+    .qing-remove:hover { color: var(--error); }
     .qing-details {
       font-size: 11px;
       color: var(--text-secondary);
       font-family: 'JetBrains Mono', monospace;
     }
-
-    .qing-details div {
-      margin-bottom: 2px;
-    }
-
     .qing-coords {
-      display: flex;
-      gap: 12px;
+      display: inline-block;
       margin-top: 6px;
-      padding-top: 6px;
-      border-top: 1px solid var(--border-color);
-    }
-
-    .qing-coord {
-      font-size: 12px;
+      padding: 3px 8px;
+      background: var(--bg-tertiary);
+      border-radius: 4px;
+      font-size: 11px;
       color: var(--accent-primary);
     }
-
-    .qing-actions {
-      display: flex;
-      gap: 6px;
-      margin-top: 8px;
-    }
-
-    .qing-actions .btn {
-      flex: 1;
-      padding: 6px 10px;
-      font-size: 11px;
-    }
-
-    /* Map Container */
-    .map-container {
-      flex: 1;
-      position: relative;
-    }
-
-    #map {
-      width: 100%;
-      height: 100%;
-      background: var(--bg-primary);
-    }
-
-    /* Leaflet customization */
-    .leaflet-container {
-      background: var(--bg-primary);
-      font-family: 'Inter', sans-serif;
-    }
-
-    .leaflet-popup-content-wrapper {
-      background: var(--bg-card);
-      color: var(--text-primary);
-      border-radius: 10px;
-      border: 1px solid var(--border-color);
-    }
-
-    .leaflet-popup-tip {
-      background: var(--bg-card);
-    }
-
-    .leaflet-popup-content {
-      margin: 12px;
-    }
-
-    .popup-title {
-      font-weight: 600;
-      font-size: 14px;
-      margin-bottom: 8px;
-      color: var(--accent-primary);
-    }
-
-    .popup-info {
-      font-size: 11px;
-      font-family: 'JetBrains Mono', monospace;
-      color: var(--text-secondary);
-    }
-
-    .popup-info div {
-      margin-bottom: 4px;
-    }
-
-    /* Custom marker */
-    .qing-marker {
-      background: var(--accent-gradient);
-      border: 2px solid white;
-      border-radius: 50%;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-    }
-
-    .qing-marker.gwat {
-      background: linear-gradient(135deg, #f59e0b, #ef4444);
-    }
-
-    /* Status bar */
     .status-bar {
       padding: 8px 16px;
       background: var(--bg-tertiary);
@@ -343,99 +174,70 @@
       color: var(--text-muted);
       display: flex;
       justify-content: space-between;
-      align-items: center;
     }
-
     .status-dot {
-      width: 8px;
-      height: 8px;
+      width: 8px; height: 8px;
       border-radius: 50%;
       display: inline-block;
       margin-right: 6px;
-    }
-
-    .status-dot.connected {
-      background: var(--success);
-    }
-
-    .status-dot.disconnected {
       background: var(--error);
     }
-
-    /* Loading state */
-    .loading {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: var(--text-muted);
-      font-size: 12px;
-      padding: 12px;
+    .status-dot.connected { background: var(--success); }
+    .map-container {
+      flex: 1;
+      position: relative;
+      background: var(--bg-primary);
+      background-image: 
+        radial-gradient(circle at 50% 50%, rgba(99,102,241,0.05) 0%, transparent 70%),
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 100% 100%, 60px 60px, 60px 60px;
     }
-
-    .spinner {
-      width: 16px;
-      height: 16px;
-      border: 2px solid var(--border-color);
-      border-top-color: var(--accent-primary);
+    .qing-marker {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      cursor: pointer;
+      z-index: 10;
+      transition: all 0.2s;
+    }
+    .qing-marker:hover { z-index: 20; }
+    .marker-dot {
+      width: 24px; height: 24px;
+      background: var(--accent-gradient);
+      border: 3px solid white;
       border-radius: 50%;
-      animation: spin 1s linear infinite;
+      box-shadow: 0 2px 12px rgba(99,102,241,0.5);
+      transition: transform 0.2s;
     }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
+    .marker-dot.gwat {
+      background: linear-gradient(135deg, var(--warning), var(--error));
+      box-shadow: 0 2px 12px rgba(245,158,11,0.5);
     }
-
-    /* Empty state */
-    .empty-state {
-      text-align: center;
-      padding: 40px 20px;
-      color: var(--text-muted);
+    .qing-marker:hover .marker-dot { transform: scale(1.2); }
+    .qing-marker.selected .marker-dot {
+      transform: scale(1.3);
+      box-shadow: 0 0 0 6px rgba(99,102,241,0.3);
     }
-
-    .empty-state-icon {
-      font-size: 48px;
-      margin-bottom: 12px;
-    }
-
-    .empty-state-text {
-      font-size: 13px;
-    }
-
-    /* Toast notifications */
-    .toast-container {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      z-index: 2000;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .toast {
+    .marker-label {
+      position: absolute;
+      top: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      white-space: nowrap;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-primary);
       background: var(--bg-card);
+      padding: 4px 10px;
+      border-radius: 6px;
       border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 12px 16px;
-      font-size: 13px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      animation: slideIn 0.3s ease;
-      max-width: 300px;
+      opacity: 0;
+      transition: opacity 0.2s;
+      pointer-events: none;
     }
-
-    .toast.success { border-left: 3px solid var(--success); }
-    .toast.error { border-left: 3px solid var(--error); }
-    .toast.info { border-left: 3px solid var(--info); }
-
-    @keyframes slideIn {
-      from { transform: translateX(100%); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
-    }
-
-    /* Selected QING Panel */
-    .selected-panel {
+    .qing-marker:hover .marker-label,
+    .qing-marker.selected .marker-label { opacity: 1; }
+    .info-panel {
       position: absolute;
       bottom: 20px;
       left: 50%;
@@ -444,55 +246,169 @@
       border: 1px solid var(--border-color);
       border-radius: 12px;
       padding: 16px 20px;
-      min-width: 300px;
-      z-index: 1000;
+      min-width: 320px;
+      z-index: 100;
       display: none;
     }
-
-    .selected-panel.visible {
-      display: block;
-    }
-
-    .selected-panel-header {
+    .info-panel.visible { display: block; }
+    .info-panel-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 12px;
     }
-
-    .selected-panel-title {
+    .info-panel-title {
       font-weight: 600;
       font-size: 16px;
       color: var(--accent-primary);
     }
-
-    .selected-panel-close {
+    .info-panel-close {
       background: none;
       border: none;
       color: var(--text-muted);
       cursor: pointer;
-      font-size: 18px;
+      font-size: 20px;
     }
-
-    .selected-panel-info {
+    .info-grid {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 6px 12px;
       font-size: 12px;
+      margin-bottom: 12px;
+    }
+    .info-label { color: var(--text-muted); }
+    .info-value {
+      color: var(--text-primary);
       font-family: 'JetBrains Mono', monospace;
-      color: var(--text-secondary);
+      word-break: break-all;
     }
-
-    .selected-panel-info div {
-      margin-bottom: 4px;
+    .info-actions { display: flex; gap: 8px; }
+    .info-actions .btn { flex: 1; justify-content: center; }
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-muted);
     }
-
-    .selected-panel-actions {
+    .empty-state-icon { font-size: 48px; margin-bottom: 12px; }
+    .map-legend {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 11px;
+    }
+    .legend-title { font-weight: 600; margin-bottom: 8px; color: var(--text-secondary); }
+    .legend-item { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+    .legend-dot {
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      border: 2px solid white;
+    }
+    .legend-dot.qing { background: var(--accent-primary); }
+    .legend-dot.gwat { background: var(--warning); }
+    .toast-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 2000;
+    }
+    .toast {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-top: 8px;
+      font-size: 13px;
+    }
+    .toast.success { border-left: 3px solid var(--success); }
+    .toast.error { border-left: 3px solid var(--error); }
+    .toast.info { border-left: 3px solid var(--accent-primary); }
+    
+    /* Connection lines */
+    .connection-line {
+      position: absolute;
+      pointer-events: none;
+      z-index: 5;
+      transform-origin: 0 50%;
+    }
+    .connection-line .line {
+      height: 2px;
+      background: var(--accent-primary);
+      opacity: 0.4;
+      transition: opacity 0.2s;
+    }
+    .connection-line.same-asset .line {
+      background: linear-gradient(90deg, var(--success), var(--success));
+      height: 3px;
+    }
+    .connection-line.shared-member .line {
+      background: linear-gradient(90deg, var(--warning), var(--warning));
+      height: 2px;
+      opacity: 0.6;
+    }
+    .connection-line.proximity .line {
+      background: linear-gradient(90deg, var(--accent-secondary), var(--accent-secondary));
+      height: 1px;
+      opacity: 0.3;
+      stroke-dasharray: 5,5;
+    }
+    .connection-line:hover .line {
+      opacity: 1;
+    }
+    .connection-label {
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 9px;
+      background: var(--bg-card);
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid var(--border-color);
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.2s;
+      pointer-events: none;
+    }
+    .connection-line:hover .connection-label {
+      opacity: 1;
+    }
+    
+    /* Legend updates */
+    .legend-line {
+      width: 20px;
+      height: 3px;
+      border-radius: 2px;
+    }
+    .legend-line.asset { background: var(--success); }
+    .legend-line.member { background: var(--warning); }
+    .legend-line.proximity { background: var(--accent-secondary); opacity: 0.5; }
+    
+    /* Connection toggle */
+    .toggle-group {
       display: flex;
-      gap: 8px;
+      flex-direction: column;
+      gap: 6px;
       margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border-color);
+    }
+    .toggle-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      cursor: pointer;
+    }
+    .toggle-item input {
+      accent-color: var(--accent-primary);
     }
   </style>
 </head>
 <body>
-  <!-- Header -->
   <header class="header">
     <div class="logo">
       <div class="logo-icon">🗺️</div>
@@ -500,537 +416,359 @@
     </div>
     <div class="header-actions">
       <a href="index.html" class="btn btn-secondary">⚡ Entropy AI</a>
-      <button class="btn btn-primary" id="connectBtn" onclick="connectWallet()">
-        Connect Wallet
-      </button>
+      <button class="btn btn-primary" id="connectBtn" onclick="connectWallet()">Connect Wallet</button>
     </div>
   </header>
 
-  <!-- Main Container -->
   <div class="main-container">
-    <!-- Sidebar -->
     <aside class="sidebar">
-      <!-- Add QING Section -->
       <div class="sidebar-section">
-        <h3>Add QING to Map</h3>
+        <h3>Add QING</h3>
         <div class="input-group">
-          <input type="text" class="input" id="qingInput" placeholder="0x... QING address">
+          <input type="text" class="input" id="qingInput" placeholder="0x... address">
           <button class="btn btn-primary" onclick="addQing()">Add</button>
         </div>
       </div>
-
-      <!-- QING List -->
-      <div class="sidebar-section" style="flex: 1; display: flex; flex-direction: column; overflow: hidden; padding-bottom: 0;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-          <h3 style="margin: 0;">Cached QINGs (<span id="qingCount">0</span>)</h3>
-          <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 11px;" onclick="clearAllQings()">Clear All</button>
+      <div class="sidebar-section" style="flex:1;display:flex;flex-direction:column;overflow:hidden;padding-bottom:0;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <h3 style="margin:0;">QINGs (<span id="qingCount">0</span>)</h3>
+          <button class="btn btn-secondary" style="padding:4px 8px;font-size:10px;" onclick="clearAll()">Clear</button>
         </div>
         <div class="qing-list" id="qingList">
           <div class="empty-state">
             <div class="empty-state-icon">📍</div>
-            <div class="empty-state-text">No QINGs added yet.<br>Enter an address above to start mapping!</div>
+            <div>No QINGs added</div>
           </div>
         </div>
       </div>
-
-      <!-- Status Bar -->
       <div class="status-bar">
-        <div>
-          <span class="status-dot" id="statusDot"></span>
-          <span id="statusText">Connecting...</span>
-        </div>
-        <div id="networkInfo">-</div>
+        <div><span class="status-dot" id="statusDot"></span><span id="statusText">Connecting...</span></div>
+        <div>PulseChain</div>
       </div>
     </aside>
 
-    <!-- Map -->
-    <div class="map-container">
-      <div id="map"></div>
-      
-      <!-- Selected QING Panel -->
-      <div class="selected-panel" id="selectedPanel">
-        <div class="selected-panel-header">
-          <span class="selected-panel-title" id="selectedName">-</span>
-          <button class="selected-panel-close" onclick="closeSelectedPanel()">×</button>
+    <div class="map-container" id="mapContainer">
+      <div class="map-legend">
+        <div class="legend-title">Markers</div>
+        <div class="legend-item"><div class="legend-dot qing"></div><span>QING</span></div>
+        <div class="legend-item"><div class="legend-dot gwat"></div><span>GWAT</span></div>
+        <div class="legend-title" style="margin-top:10px;">Connections</div>
+        <div class="legend-item"><div class="legend-line asset"></div><span>Same Asset</span></div>
+        <div class="legend-item"><div class="legend-line member"></div><span>Shared Member</span></div>
+        <div class="legend-item"><div class="legend-line proximity"></div><span>Nearby</span></div>
+        <div class="toggle-group">
+          <label class="toggle-item"><input type="checkbox" id="showAsset" checked onchange="render()"> Show Asset Links</label>
+          <label class="toggle-item"><input type="checkbox" id="showProximity" checked onchange="render()"> Show Proximity</label>
         </div>
-        <div class="selected-panel-info">
-          <div>Address: <span id="selectedAddress">-</span></div>
-          <div>Waat: <span id="selectedWaat">-</span></div>
-          <div>Coordinates: <span id="selectedCoords">-</span></div>
-          <div>Asset: <span id="selectedAsset">-</span></div>
-          <div>Entropy: <span id="selectedEntropy">-</span></div>
+      </div>
+      <div class="info-panel" id="infoPanel">
+        <div class="info-panel-header">
+          <span class="info-panel-title" id="infoTitle">-</span>
+          <button class="info-panel-close" onclick="closePanel()">×</button>
         </div>
-        <div class="selected-panel-actions">
-          <a class="btn btn-secondary" id="selectedExplorer" href="#" target="_blank" style="flex: 1; text-decoration: none; justify-content: center;">View on Explorer</a>
-          <a class="btn btn-primary" id="selectedEntropyAI" href="#" style="flex: 1; text-decoration: none; justify-content: center;">Open in Entropy AI</a>
+        <div class="info-grid">
+          <span class="info-label">Address</span><span class="info-value" id="infoAddr">-</span>
+          <span class="info-label">Waat</span><span class="info-value" id="infoWaat">-</span>
+          <span class="info-label">Coords</span><span class="info-value" id="infoCoords">-</span>
+          <span class="info-label">Asset</span><span class="info-value" id="infoAsset">-</span>
+          <span class="info-label">Entropy</span><span class="info-value" id="infoEntropy">-</span>
+          <span class="info-label">Connections</span><span class="info-value" id="infoConnections">-</span>
+        </div>
+        <div class="info-actions">
+          <a class="btn btn-secondary" id="infoExplorer" href="#" target="_blank">Explorer</a>
+          <a class="btn btn-primary" id="infoEntropy" href="#">Entropy AI</a>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Toast Container -->
-  <div class="toast-container" id="toastContainer"></div>
+  <div class="toast-container" id="toasts"></div>
 
   <script>
-    // ═══════════════════════════════════════════════════════════════════════════
-    // CONFIGURATION
-    // ═══════════════════════════════════════════════════════════════════════════
-    
-    const RPC_URL = 'https://rpc.pulsechain.com';
-    const EXPLORER_URL = 'https://scan.pulsechain.com';
-    
-    // Known contract addresses
-    const CONTRACTS = {
-      MAP: '0xD3a7A95012Edd46Ea115c693B74c5e524b3DdA75',
-      HECKE: '0x29A924D9B0233026B9844f2aFeB202F1791D7593',
-      CHO: '0xB6be11F0A788014C1F68C92F8D6CcC1AbF78F2aB',
-    };
-    
-    // Default QINGs to show
-    const DEFAULT_QINGS = [
-      { address: '0xb0Ba7D36B7F0505879179ecE7401F24eB653c6E1', name: 'Zürich' },
-      { address: '0xD127839B83cBf537c29B7d268c135f745a0Da2E8', name: 'Illinois' },
+    const RPC = 'https://rpc.pulsechain.com';
+    const HECKE = '0x29A924D9B0233026B9844f2aFeB202F1791D7593';
+    const DEFAULTS = [
+      {address:'0xb0Ba7D36B7F0505879179ecE7401F24eB653c6E1',name:'Zürich'},
+      {address:'0xD127839B83cBf537c29B7d268c135f745a0Da2E8',name:'Illinois'},
     ];
-    
-    // ABIs
     const QING_ABI = [
       'function Waat() view returns (uint256)',
       'function Asset() view returns (address)',
       'function Entropy() view returns (uint64)',
       'function GWAT() view returns (bool)',
-      'function Cho() view returns (address)',
-      'function GetMembers() view returns (address[])',
-      'function IsMember(address) view returns (bool)',
       'function name() view returns (string)',
-      'function symbol() view returns (string)',
     ];
-    
-    const HECKE_ABI = [
-      'function Compliment(uint64) view returns (int64, int64)',
-      'function GetMeridian(uint64) view returns (uint64)',
-    ];
-    
-    const MAP_ABI = [
-      'function GetQing(uint256) view returns (address)',
-      'function GetMapQing(int256,int256) view returns (address)',
-      'function Offset() view returns (uint256)',
-    ];
+    const HECKE_ABI = ['function Compliment(uint64) view returns (int64,int64)'];
 
-    // ═══════════════════════════════════════════════════════════════════════════
-    // STATE
-    // ═══════════════════════════════════════════════════════════════════════════
-    
-    let provider = null;
-    let signer = null;
-    let userAddress = null;
-    let map = null;
-    let markers = {};
-    let qingCache = [];
-    let selectedQing = null;
+    let provider, cache = [], selected = null;
 
-    // ═══════════════════════════════════════════════════════════════════════════
-    // INITIALIZATION
-    // ═══════════════════════════════════════════════════════════════════════════
-    
     async function init() {
-      // Initialize map
-      initMap();
-      
-      // Connect to RPC
       try {
-        provider = new ethers.JsonRpcProvider(RPC_URL);
-        const network = await provider.getNetwork();
-        document.getElementById('networkInfo').textContent = `PulseChain (${network.chainId})`;
+        provider = new ethers.JsonRpcProvider(RPC);
+        await provider.getNetwork();
         document.getElementById('statusDot').classList.add('connected');
-        document.getElementById('statusText').textContent = 'Connected to PulseChain';
-      } catch (e) {
-        document.getElementById('statusDot').classList.add('disconnected');
-        document.getElementById('statusText').textContent = 'RPC Error';
-        showToast('Failed to connect to PulseChain RPC', 'error');
+        document.getElementById('statusText').textContent = 'Connected';
+      } catch {
+        document.getElementById('statusText').textContent = 'Error';
       }
-      
-      // Load cached QINGs
       loadCache();
-      
-      // Add default QINGs if cache is empty
-      if (qingCache.length === 0) {
-        for (const q of DEFAULT_QINGS) {
-          await addQingByAddress(q.address, q.name);
-        }
+      if (!cache.length) {
+        for (const d of DEFAULTS) await addByAddr(d.address, d.name);
       } else {
-        renderQingList();
-        plotAllQings();
+        render();
       }
     }
 
-    function initMap() {
-      map = L.map('map', {
-        center: [30, 0],
-        zoom: 2,
-        minZoom: 2,
-        maxZoom: 18,
-        worldCopyJump: true,
-      });
-      
-      // Dark tile layer
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-        subdomains: 'abcd',
-        maxZoom: 20
-      }).addTo(map);
-    }
-
-    // ═══════════════════════════════════════════════════════════════════════════
-    // WALLET CONNECTION
-    // ═══════════════════════════════════════════════════════════════════════════
-    
     async function connectWallet() {
-      if (typeof window.ethereum === 'undefined') {
-        showToast('Please install MetaMask', 'error');
-        return;
-      }
-      
+      if (!window.ethereum) return toast('Install MetaMask','error');
       try {
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-        userAddress = accounts[0];
-        signer = new ethers.BrowserProvider(window.ethereum).getSigner();
-        
-        document.getElementById('connectBtn').innerHTML = `${userAddress.slice(0,6)}...${userAddress.slice(-4)}`;
-        showToast('Wallet connected', 'success');
-        
-        // Check membership for all QINGs
-        checkMemberships();
-      } catch (e) {
-        showToast('Failed to connect wallet', 'error');
-      }
+        const accts = await window.ethereum.request({method:'eth_requestAccounts'});
+        document.getElementById('connectBtn').textContent = accts[0].slice(0,6)+'...'+accts[0].slice(-4);
+        toast('Connected','success');
+      } catch { toast('Failed','error'); }
     }
 
-    // ═══════════════════════════════════════════════════════════════════════════
-    // QING MANAGEMENT
-    // ═══════════════════════════════════════════════════════════════════════════
-    
     async function addQing() {
-      const input = document.getElementById('qingInput').value.trim();
-      if (!input) {
-        showToast('Please enter a QING address', 'error');
-        return;
-      }
-      
-      if (!ethers.isAddress(input)) {
-        showToast('Invalid address format', 'error');
-        return;
-      }
-      
-      // Check if already cached
-      if (qingCache.find(q => q.address.toLowerCase() === input.toLowerCase())) {
-        showToast('QING already added', 'info');
-        return;
-      }
-      
-      await addQingByAddress(input);
+      const val = document.getElementById('qingInput').value.trim();
+      if (!val || !ethers.isAddress(val)) return toast('Invalid address','error');
+      if (cache.find(q=>q.address.toLowerCase()===val.toLowerCase())) return toast('Already added','info');
+      await addByAddr(val);
       document.getElementById('qingInput').value = '';
     }
-    
-    async function addQingByAddress(address, knownName = null) {
-      showToast('Fetching QING data...', 'info');
-      
+
+    async function addByAddr(addr, name = null) {
+      toast('Loading...','info');
       try {
-        const qingContract = new ethers.Contract(address, QING_ABI, provider);
-        const heckeContract = new ethers.Contract(CONTRACTS.HECKE, HECKE_ABI, provider);
-        
-        // Fetch QING data
-        let name, waat, asset, entropy, isGwat;
-        
+        const q = new ethers.Contract(addr, QING_ABI, provider);
+        const h = new ethers.Contract(HECKE, HECKE_ABI, provider);
+        let waat, asset, entropy, gwat;
+        try { name = name || await q.name(); } catch { name = 'QING '+addr.slice(0,8); }
+        try { waat = await q.Waat(); } catch { return toast('Not a QING','error'); }
+        try { asset = await q.Asset(); } catch { asset = ethers.ZeroAddress; }
+        try { entropy = await q.Entropy(); } catch { entropy = 0n; }
+        try { gwat = await q.GWAT(); } catch { gwat = false; }
+        let lat=0, lon=0;
         try {
-          name = knownName || await qingContract.name();
+          const c = await h.Compliment(waat);
+          lat = Number(c[1])/1e6;
+          lon = Number(c[0])/1e6;
         } catch {
-          name = `QING ${address.slice(0,8)}`;
+          lat = Number(waat % 180n) - 90;
+          lon = Number((waat/180n) % 360n) - 180;
         }
-        
-        try {
-          waat = await qingContract.Waat();
-        } catch (e) {
-          showToast('Failed to get Waat - may not be a QING contract', 'error');
-          return;
-        }
-        
-        try {
-          asset = await qingContract.Asset();
-        } catch {
-          asset = '0x0000000000000000000000000000000000000000';
-        }
-        
-        try {
-          entropy = await qingContract.Entropy();
-        } catch {
-          entropy = 0n;
-        }
-        
-        try {
-          isGwat = await qingContract.GWAT();
-        } catch {
-          isGwat = false;
-        }
-        
-        // Get coordinates from Hecke
-        let lat = 0, lon = 0;
-        try {
-          const coords = await heckeContract.Compliment(waat);
-          // Hecke returns scaled integers, convert to degrees
-          lat = Number(coords[1]) / 1000000;
-          lon = Number(coords[0]) / 1000000;
-        } catch (e) {
-          console.log('Hecke lookup failed, using fallback coords', e);
-          // Fallback: derive rough coords from waat
-          lat = (Number(waat % 180n) - 90);
-          lon = (Number((waat / 180n) % 360n) - 180);
-        }
-        
-        const qingData = {
-          address: address,
-          name: name,
-          waat: waat.toString(),
-          lat: lat,
-          lon: lon,
-          asset: asset,
-          entropy: entropy.toString(),
-          isGwat: isGwat,
-          addedAt: Date.now(),
-        };
-        
-        qingCache.push(qingData);
+        cache.push({address:addr,name,waat:waat.toString(),lat,lon,asset,entropy:entropy.toString(),gwat});
         saveCache();
-        renderQingList();
-        plotQing(qingData);
-        
-        // Center map on new QING
-        map.flyTo([lat, lon], 6, { duration: 1 });
-        
-        showToast(`Added ${name} to map`, 'success');
-      } catch (e) {
-        console.error(e);
-        showToast('Failed to fetch QING data: ' + e.message, 'error');
-      }
-    }
-    
-    function removeQing(address) {
-      qingCache = qingCache.filter(q => q.address.toLowerCase() !== address.toLowerCase());
-      saveCache();
-      renderQingList();
-      
-      // Remove marker
-      if (markers[address]) {
-        map.removeLayer(markers[address]);
-        delete markers[address];
-      }
-      
-      // Close panel if this QING was selected
-      if (selectedQing && selectedQing.address.toLowerCase() === address.toLowerCase()) {
-        closeSelectedPanel();
-      }
-      
-      showToast('QING removed', 'info');
-    }
-    
-    function clearAllQings() {
-      if (!confirm('Remove all QINGs from the map?')) return;
-      
-      qingCache = [];
-      saveCache();
-      renderQingList();
-      
-      // Remove all markers
-      Object.values(markers).forEach(m => map.removeLayer(m));
-      markers = {};
-      
-      closeSelectedPanel();
-      showToast('All QINGs cleared', 'info');
+        render();
+        toast('Added '+name,'success');
+      } catch(e) { toast(e.message,'error'); }
     }
 
-    // ═══════════════════════════════════════════════════════════════════════════
-    // MAP PLOTTING
-    // ═══════════════════════════════════════════════════════════════════════════
-    
-    function plotAllQings() {
-      qingCache.forEach(q => plotQing(q));
-      
-      // Fit bounds if we have QINGs
-      if (qingCache.length > 0) {
-        const bounds = qingCache.map(q => [q.lat, q.lon]);
-        map.fitBounds(bounds, { padding: [50, 50], maxZoom: 6 });
-      }
-    }
-    
-    function plotQing(qing) {
-      // Remove existing marker if any
-      if (markers[qing.address]) {
-        map.removeLayer(markers[qing.address]);
-      }
-      
-      // Create custom icon
-      const iconHtml = `<div class="qing-marker ${qing.isGwat ? 'gwat' : ''}" style="width: 20px; height: 20px;"></div>`;
-      const icon = L.divIcon({
-        html: iconHtml,
-        className: '',
-        iconSize: [20, 20],
-        iconAnchor: [10, 10],
-      });
-      
-      // Create marker
-      const marker = L.marker([qing.lat, qing.lon], { icon: icon })
-        .addTo(map)
-        .on('click', () => selectQing(qing));
-      
-      // Add tooltip
-      marker.bindTooltip(qing.name, {
-        permanent: false,
-        direction: 'top',
-        offset: [0, -10],
-      });
-      
-      markers[qing.address] = marker;
-    }
-    
-    function selectQing(qing) {
-      selectedQing = qing;
-      
-      // Update panel
-      document.getElementById('selectedName').textContent = qing.name + (qing.isGwat ? ' (GWAT)' : '');
-      document.getElementById('selectedAddress').textContent = qing.address.slice(0,10) + '...' + qing.address.slice(-8);
-      document.getElementById('selectedWaat').textContent = qing.waat;
-      document.getElementById('selectedCoords').textContent = `${qing.lat.toFixed(4)}°, ${qing.lon.toFixed(4)}°`;
-      document.getElementById('selectedAsset').textContent = qing.asset.slice(0,10) + '...' + qing.asset.slice(-8);
-      document.getElementById('selectedEntropy').textContent = qing.entropy;
-      
-      document.getElementById('selectedExplorer').href = `${EXPLORER_URL}/address/${qing.address}`;
-      document.getElementById('selectedEntropyAI').href = `index.html?contract=${qing.address}`;
-      
-      document.getElementById('selectedPanel').classList.add('visible');
-      
-      // Highlight in list
-      document.querySelectorAll('.qing-item').forEach(el => {
-        el.classList.toggle('selected', el.dataset.address.toLowerCase() === qing.address.toLowerCase());
-      });
-    }
-    
-    function closeSelectedPanel() {
-      selectedQing = null;
-      document.getElementById('selectedPanel').classList.remove('visible');
-      document.querySelectorAll('.qing-item').forEach(el => el.classList.remove('selected'));
+    function remove(addr) {
+      cache = cache.filter(q=>q.address.toLowerCase()!==addr.toLowerCase());
+      saveCache();
+      if (selected?.address.toLowerCase()===addr.toLowerCase()) closePanel();
+      render();
     }
 
-    // ═══════════════════════════════════════════════════════════════════════════
-    // UI RENDERING
-    // ═══════════════════════════════════════════════════════════════════════════
-    
-    function renderQingList() {
-      const container = document.getElementById('qingList');
-      document.getElementById('qingCount').textContent = qingCache.length;
-      
-      if (qingCache.length === 0) {
-        container.innerHTML = `
-          <div class="empty-state">
-            <div class="empty-state-icon">📍</div>
-            <div class="empty-state-text">No QINGs added yet.<br>Enter an address above to start mapping!</div>
+    function clearAll() {
+      if (!confirm('Clear all?')) return;
+      cache = [];
+      saveCache();
+      closePanel();
+      render();
+    }
+
+    function render() {
+      // List
+      const list = document.getElementById('qingList');
+      document.getElementById('qingCount').textContent = cache.length;
+      if (!cache.length) {
+        list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📍</div><div>No QINGs</div></div>';
+      } else {
+        list.innerHTML = cache.map(q=>`
+          <div class="qing-item ${selected?.address===q.address?'selected':''}" onclick="select('${q.address}')">
+            <div class="qing-header">
+              <span class="qing-name">${q.name}${q.gwat?'<span class="qing-badge">GWAT</span>':''}</span>
+              <button class="qing-remove" onclick="event.stopPropagation();remove('${q.address}')">×</button>
+            </div>
+            <div class="qing-details">${q.address.slice(0,14)}...${q.address.slice(-6)}</div>
+            <span class="qing-coords">📍 ${q.lat.toFixed(2)}°, ${q.lon.toFixed(2)}°</span>
           </div>
+        `).join('');
+      }
+      // Clear map
+      const map = document.getElementById('mapContainer');
+      map.querySelectorAll('.qing-marker, .connection-line').forEach(m=>m.remove());
+      if (!cache.length) return;
+      
+      // Calculate bounds
+      const lats = cache.map(q=>q.lat), lons = cache.map(q=>q.lon);
+      const pad = 15;
+      const minLat = Math.min(...lats)-pad, maxLat = Math.max(...lats)+pad;
+      const minLon = Math.min(...lons)-pad, maxLon = Math.max(...lons)+pad;
+      const w = map.offsetWidth, h = map.offsetHeight;
+      
+      // Helper to get screen position
+      const getPos = (q) => ({
+        x: ((q.lon-minLon)/(maxLon-minLon))*w,
+        y: h - ((q.lat-minLat)/(maxLat-minLat))*h
+      });
+      
+      // Draw connection lines first (so markers are on top)
+      const connections = findConnections();
+      const showAsset = document.getElementById('showAsset')?.checked ?? true;
+      const showProximity = document.getElementById('showProximity')?.checked ?? true;
+      
+      connections.forEach(conn => {
+        if (conn.type === 'same-asset' && !showAsset) return;
+        if (conn.type === 'proximity' && !showProximity) return;
+        
+        const pos1 = getPos(conn.q1);
+        const pos2 = getPos(conn.q2);
+        
+        // Calculate line angle and length
+        const dx = pos2.x - pos1.x;
+        const dy = pos2.y - pos1.y;
+        const length = Math.sqrt(dx*dx + dy*dy);
+        const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+        
+        const line = document.createElement('div');
+        line.className = 'connection-line ' + conn.type;
+        line.style.left = pos1.x + 'px';
+        line.style.top = pos1.y + 'px';
+        line.style.width = length + 'px';
+        line.style.transform = `rotate(${angle}deg)`;
+        line.innerHTML = `
+          <div class="line"></div>
+          <div class="connection-label">${conn.label}</div>
         `;
-        return;
-      }
+        map.appendChild(line);
+      });
       
-      container.innerHTML = qingCache.map(q => `
-        <div class="qing-item" data-address="${q.address}" onclick="selectQing(qingCache.find(x => x.address === '${q.address}'))">
-          <div class="qing-header">
-            <span class="qing-name">${q.name} ${q.isGwat ? '🏠' : ''}</span>
-            <button class="qing-remove" onclick="event.stopPropagation(); removeQing('${q.address}')">✕</button>
-          </div>
-          <div class="qing-details">
-            <div>${q.address.slice(0,10)}...${q.address.slice(-8)}</div>
-            <div>Waat: ${q.waat.slice(0,12)}${q.waat.length > 12 ? '...' : ''}</div>
-          </div>
-          <div class="qing-coords">
-            <span class="qing-coord">📍 ${q.lat.toFixed(2)}°, ${q.lon.toFixed(2)}°</span>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    // ═══════════════════════════════════════════════════════════════════════════
-    // CACHE MANAGEMENT
-    // ═══════════════════════════════════════════════════════════════════════════
-    
-    function saveCache() {
-      localStorage.setItem('qingMapCache', JSON.stringify(qingCache));
+      // Draw markers
+      cache.forEach(q=>{
+        const pos = getPos(q);
+        const m = document.createElement('div');
+        m.className = 'qing-marker'+(selected?.address===q.address?' selected':'');
+        m.style.left = pos.x+'px';
+        m.style.top = pos.y+'px';
+        m.innerHTML = `<div class="marker-dot ${q.gwat?'gwat':''}"></div><div class="marker-label">${q.name}</div>`;
+        m.onclick = () => select(q.address);
+        map.appendChild(m);
+      });
     }
     
-    function loadCache() {
-      try {
-        const cached = localStorage.getItem('qingMapCache');
-        if (cached) {
-          qingCache = JSON.parse(cached);
-        }
-      } catch (e) {
-        console.error('Failed to load cache', e);
-        qingCache = [];
-      }
-    }
-
-    // ═══════════════════════════════════════════════════════════════════════════
-    // MEMBERSHIP CHECK
-    // ═══════════════════════════════════════════════════════════════════════════
-    
-    async function checkMemberships() {
-      if (!userAddress) return;
+    function findConnections() {
+      const connections = [];
       
-      for (const qing of qingCache) {
-        try {
-          const contract = new ethers.Contract(qing.address, QING_ABI, provider);
-          const isMember = await contract.IsMember(userAddress);
-          qing.isMember = isMember;
-        } catch {
-          qing.isMember = false;
+      for (let i = 0; i < cache.length; i++) {
+        for (let j = i + 1; j < cache.length; j++) {
+          const q1 = cache[i];
+          const q2 = cache[j];
+          
+          // Check same asset
+          if (q1.asset && q2.asset && 
+              q1.asset !== ethers.ZeroAddress && 
+              q1.asset.toLowerCase() === q2.asset.toLowerCase()) {
+            connections.push({
+              q1, q2,
+              type: 'same-asset',
+              label: 'Same Asset'
+            });
+          }
+          
+          // Check proximity (within ~20 degrees)
+          const latDiff = Math.abs(q1.lat - q2.lat);
+          const lonDiff = Math.abs(q1.lon - q2.lon);
+          const distance = Math.sqrt(latDiff*latDiff + lonDiff*lonDiff);
+          
+          if (distance < 30 && distance > 0) {
+            connections.push({
+              q1, q2,
+              type: 'proximity',
+              label: `${distance.toFixed(1)}° apart`
+            });
+          }
         }
       }
       
-      renderQingList();
+      return connections;
     }
 
-    // ═══════════════════════════════════════════════════════════════════════════
-    // TOAST NOTIFICATIONS
-    // ═══════════════════════════════════════════════════════════════════════════
-    
-    function showToast(message, type = 'info') {
-      const container = document.getElementById('toastContainer');
-      const toast = document.createElement('div');
-      toast.className = `toast ${type}`;
-      toast.innerHTML = `
-        <span>${type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ'}</span>
-        <span>${message}</span>
-      `;
-      container.appendChild(toast);
+    function select(addr) {
+      const q = cache.find(x=>x.address===addr);
+      if (!q) return;
+      selected = q;
+      document.getElementById('infoTitle').innerHTML = q.name+(q.gwat?' <span class="qing-badge">GWAT</span>':'');
+      document.getElementById('infoAddr').textContent = q.address.slice(0,12)+'...'+q.address.slice(-6);
+      document.getElementById('infoWaat').textContent = q.waat.length>16?q.waat.slice(0,16)+'...':q.waat;
+      document.getElementById('infoCoords').textContent = q.lat.toFixed(4)+'°, '+q.lon.toFixed(4)+'°';
+      document.getElementById('infoAsset').textContent = q.asset.slice(0,12)+'...'+q.asset.slice(-6);
+      document.getElementById('infoEntropy').textContent = q.entropy;
       
-      setTimeout(() => {
-        toast.style.opacity = '0';
-        setTimeout(() => toast.remove(), 300);
-      }, 3000);
+      // Find connections for this QING
+      const conns = findConnectionsFor(q);
+      if (conns.length > 0) {
+        document.getElementById('infoConnections').innerHTML = conns.map(c => 
+          `<span style="display:block;font-size:10px;">${c.type}: ${c.other.name}</span>`
+        ).join('');
+      } else {
+        document.getElementById('infoConnections').textContent = 'None';
+      }
+      
+      document.getElementById('infoExplorer').href = 'https://scan.pulsechain.com/address/'+q.address;
+      document.getElementById('infoEntropy').href = 'index.html?contract='+q.address;
+      document.getElementById('infoPanel').classList.add('visible');
+      render();
+    }
+    
+    function findConnectionsFor(q) {
+      const conns = [];
+      cache.forEach(other => {
+        if (other.address === q.address) return;
+        
+        // Same asset
+        if (q.asset && other.asset && 
+            q.asset !== ethers.ZeroAddress && 
+            q.asset.toLowerCase() === other.asset.toLowerCase()) {
+          conns.push({ type: '🔗 Same Asset', other });
+        }
+        
+        // Proximity
+        const dist = Math.sqrt(
+          Math.pow(q.lat - other.lat, 2) + 
+          Math.pow(q.lon - other.lon, 2)
+        );
+        if (dist < 30) {
+          conns.push({ type: `📍 ${dist.toFixed(1)}° away`, other });
+        }
+      });
+      return conns;
     }
 
-    // ═══════════════════════════════════════════════════════════════════════════
-    // KEYBOARD SHORTCUTS
-    // ═══════════════════════════════════════════════════════════════════════════
-    
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        closeSelectedPanel();
-      }
-      if (e.key === 'Enter' && document.activeElement.id === 'qingInput') {
-        addQing();
-      }
+    function closePanel() {
+      selected = null;
+      document.getElementById('infoPanel').classList.remove('visible');
+      render();
+    }
+
+    function saveCache() { localStorage.setItem('qingMap', JSON.stringify(cache)); }
+    function loadCache() { try { cache = JSON.parse(localStorage.getItem('qingMap'))||[]; } catch { cache=[]; } }
+
+    function toast(msg, type='info') {
+      const t = document.createElement('div');
+      t.className = 'toast '+type;
+      t.textContent = msg;
+      document.getElementById('toasts').appendChild(t);
+      setTimeout(()=>t.remove(), 3000);
+    }
+
+    document.addEventListener('keydown', e => {
+      if (e.key==='Escape') closePanel();
+      if (e.key==='Enter' && document.activeElement.id==='qingInput') addQing();
     });
 
-    // ═══════════════════════════════════════════════════════════════════════════
-    // INIT
-    // ═══════════════════════════════════════════════════════════════════════════
-    
+    window.addEventListener('resize', render);
     init();
   </script>
 </body>
