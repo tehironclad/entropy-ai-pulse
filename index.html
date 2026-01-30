@@ -2974,6 +2974,15 @@ Quick tips:
             
             addDiscoveredContract(qingName || 'My QING', currentArea, 'QING');
             log(`✅ QING found: ${qingName || currentArea.slice(0,10)}`, 'success');
+            
+            // Auto-load the QING into the contract field so user can interact with it
+            document.getElementById('contractAddress').value = currentArea;
+            log(`📋 QING address loaded - click "Load" to interact`, 'info');
+            
+            // Also try to auto-load the contract
+            setTimeout(() => {
+              loadContract(currentArea).catch(() => {});
+            }, 500);
           } else {
             results.push(`📍 CURRENT QING: None (not in any territory)`);
             results.push(`   → Enter a QING to start terraforming`);
