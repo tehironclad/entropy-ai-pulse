@@ -2577,21 +2577,43 @@ What would you like to do?`, 'assistant');
         return;
       }
       
-      // Parse function call
-      const match = functionCall.match(/^(\w+)\((.*)\)$/);
+      // Parse function call - handle quoted strings properly
+      const match = functionCall.match(/^(\w+)\((.*)\)$/s);
       if (!match) {
         log(`Invalid function format: ${functionCall}`, 'error');
+        addAIMessage(`⚠️ Invalid function format: ${functionCall}`, 'assistant');
         return;
       }
       
       const fnName = match[1];
       const argsStr = match[2].trim();
-      const args = argsStr ? argsStr.split(',').map(a => a.trim()) : [];
       
-      log(`AI executing ${fnName}...`, 'info');
+      // Parse args properly - handle quoted strings and addresses
+      let args = [];
+      if (argsStr) {
+        // Match: quoted strings, addresses, or numbers
+        const argRegex = /"([^"]*)"|'([^']*)'|(0x[a-fA-F0-9]+)|([^,]+)/g;
+        let argMatch;
+        while ((argMatch = argRegex.exec(argsStr)) !== null) {
+          // Get the matched value (quoted string content or raw value)
+          let val = argMatch[1] || argMatch[2] || argMatch[3] || argMatch[4];
+          if (val) {
+            val = val.trim();
+            // Remove surrounding quotes if present
+            if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+              val = val.slice(1, -1);
+            }
+            args.push(val);
+          }
+        }
+      }
+      
+      log(`AI executing ${fnName}(${args.join(', ')})...`, 'info');
+      console.log('Function:', fnName, 'Args:', args);
       
       try {
         const contractWithSigner = currentContract.connect(signer);
+        addAIMessage(`🔄 Calling ${fnName}()... Check your wallet to confirm.`, 'assistant');
         const tx = await contractWithSigner[fnName](...args);
         setOutput(`Transaction sent!\nHash: ${tx.hash}\n\nWaiting for confirmation...`);
         addAIMessage(`📤 Transaction sent! Hash: \`${tx.hash.slice(0,20)}...\`\n\nWaiting for confirmation...`, 'assistant');
@@ -2601,6 +2623,7 @@ What would you like to do?`, 'assistant');
         addAIMessage(`✅ **${fnName}()** confirmed in block ${receipt.blockNumber}`, 'assistant');
         log(`${fnName} confirmed`, 'success');
       } catch (e) {
+        console.error('Write error:', e);
         addAIMessage(`⚠️ Error: ${e.message}`, 'assistant');
         log(`Error: ${e.message.slice(0, 50)}`, 'error');
       }
@@ -2673,16 +2696,21 @@ What would you like to do?`, 'assistant');
     
     // Call Claude via serverless API (uses the rich system prompt in api/chat.js)
     async function callClaudeServerless(apiKey, context, history) {
-      // Build messages with context prefix
-      const contextMsg = `[CONTEXT] LAU: ${context.lau?.name || 'None'}, QING: ${context.qing?.name || 'None'}, Wallet: ${context.walletConnected ? 'Connected' : 'Not connected'}, Current Contract: ${context.currentContract?.name || 'None'}`;
+      // Build rich context that AI will always have
+      const contextMsg = `[USER CONTEXT]
+LAU: ${context.lau?.name || 'Not loaded'}${context.lau?.address ? ' (' + context.lau.address + ')' : ''}
+QING: ${context.qing?.name || 'None'}${context.qing?.address ? ' (' + context.qing.address + ')' : ''}
+Wallet: ${context.walletConnected ? 'Connected' : 'Not connected'}
+Current Contract Loaded: ${context.currentContract?.name || 'None'}
+
+The user's LAU and QING are shown in the left panel. Always reference them by name when relevant.`;
       
-      const messages = history.map((m, i) => {
-        // Add context to first user message
-        if (i === 0 && m.role === 'user') {
-          return { role: m.role, content: contextMsg + '\n\n' + m.content };
-        }
-        return { role: m.role, content: m.content };
-      });
+      // Add context as the first message in every request
+      const messages = [
+        { role: 'user', content: contextMsg },
+        { role: 'assistant', content: 'Understood. I can see your identity and will help you navigate Dysnomia.' },
+        ...history
+      ];
       
       const response = await fetch('/api/chat', {
         method: 'POST',
