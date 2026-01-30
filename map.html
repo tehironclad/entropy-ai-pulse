@@ -416,10 +416,6 @@
     .entropy-gradient { width: 80px; height: 8px; background: linear-gradient(to right, #1e40af, #3b82f6, #22c55e, #f59e0b, #ef4444); border-radius: 2px; margin: 4px 0; }
     .entropy-labels { display: flex; justify-content: space-between; color: var(--text-muted); }
 
-    /* Hecke Overlay */
-    .hecke-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; z-index: 400; display: none; }
-    .hecke-overlay.visible { display: block; }
-
     /* Info badges */
     .info-badges { display: flex; gap: 4px; margin-top: 4px; }
     .info-badge { padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: 500; }
@@ -565,10 +561,9 @@
 
     <div class="map-container">
       <div id="map"></div>
-      <div class="hecke-overlay" id="heckeOverlay"></div>
 
       <div class="map-controls">
-        <button class="map-control-btn" id="btnHecke" onclick="toggleHeckeGrid()" title="Hecke Grid">📐</button>
+        <button class="map-control-btn" id="btnHecke" onclick="toggleMeridians()" title="Meridians">📐</button>
         <button class="map-control-btn" id="btnEntropy" onclick="toggleEntropyView()" title="Entropy Heatmap">🌡️</button>
         <button class="map-control-btn active" id="btnConnections" onclick="toggleConnectionsBtn()" title="Connections">🔗</button>
         <button class="map-control-btn" id="btnFlow" onclick="toggleFlow()" title="Asset Flow">✨</button>
@@ -579,6 +574,18 @@
         <div style="font-weight:600;margin-bottom:4px;">Entropy</div>
         <div class="entropy-gradient"></div>
         <div class="entropy-labels"><span>Low</span><span>High</span></div>
+      </div>
+
+      <div class="entropy-legend" id="meridianLegend" style="display:none;bottom:130px;">
+        <div style="font-weight:600;margin-bottom:4px;">Meridians (90)</div>
+        <div style="display:flex;height:8px;border-radius:2px;overflow:hidden;">
+          <div style="flex:1;background:#ef4444;"></div>
+          <div style="flex:1;background:#f59e0b;"></div>
+          <div style="flex:1;background:#22c55e;"></div>
+          <div style="flex:1;background:#3b82f6;"></div>
+          <div style="flex:1;background:#8b5cf6;"></div>
+        </div>
+        <div class="entropy-labels"><span>M0</span><span>M45</span><span>M89</span></div>
       </div>
 
       <div class="map-legend">
@@ -603,6 +610,7 @@
           <span class="info-label">Address</span><span class="info-value" id="infoAddr">-</span>
           <span class="info-label">Waat</span><span class="info-value" id="infoWaat">-</span>
           <span class="info-label">Coords</span><span class="info-value" id="infoCoords">-</span>
+          <span class="info-label">Meridian</span><span class="info-value" id="infoMeridian">-</span>
           <span class="info-label">Entropy</span>
           <div>
             <span class="info-value" id="infoEntropy">-</span>
@@ -628,7 +636,11 @@
     const RPC = 'https://rpc.pulsechain.com';
     const HECKE = '0x29A924D9B0233026B9844f2aFeB202F1791D7593';
     const MAP_CONTRACT = '0xD3a7A95012Edd46Ea115c693B74c5e524b3DdA75';
-    const HECKE_ABI = ['function Compliment(uint64) view returns (int64,int64)'];
+    const HECKE_ABI = [
+      'function Compliment(uint64) view returns (int64,int64)',
+      'function Meridians(uint256) view returns (uint256)',
+      'function GetMeridian(uint256) view returns (uint256)',
+    ];
     const MAP_ABI = ['function New(address) returns (address)', 'event NewQing(address,address,uint256)'];
     const QING_ABI = [
       'function Waat() view returns (uint256)',
@@ -916,6 +928,8 @@
     let markers = {};
     let connectionLines = [];
     let journeyLines = [];
+    let meridianLines = [];
+    let meridianData = null; // Cache fetched meridian boundaries
     let selected = null;
     let userAddress = null;
     let activeCategory = null;
@@ -1172,7 +1186,7 @@
         const qing = new ethers.Contract(addr, QING_ABI, provider);
         const hecke = new ethers.Contract(HECKE, HECKE_ABI, provider);
         
-        let waat = 0n, lat = 0, lon = 0, isGwat = false, asset = null, entropy = 0n, isMember = false;
+        let waat = 0n, lat = 0, lon = 0, isGwat = false, asset = null, entropy = 0n, isMember = false, meridian = 0;
         
         try { waat = await qing.Waat(); } catch { waat = 0n; }
         try { asset = await qing.Asset(); } catch {}
@@ -1191,9 +1205,16 @@
           lon = Number((waat / 180n) % 360n) - 180;
         }
         
-        return { waat: waat.toString(), lat, lon, isGwat, asset, entropy: entropy.toString(), isMember, visited: false };
+        // Try to get meridian from contract, fallback to calculated
+        try {
+          meridian = Number(await hecke.GetMeridian(waat));
+        } catch {
+          meridian = getMeridianForLon(lon);
+        }
+        
+        return { waat: waat.toString(), lat, lon, isGwat, asset, entropy: entropy.toString(), isMember, visited: false, meridian };
       } catch {
-        return { waat: '0', lat: 0, lon: 0, isGwat: false, asset: null, entropy: '0', isMember: false, visited: false };
+        return { waat: '0', lat: 0, lon: 0, isGwat: false, asset: null, entropy: '0', isMember: false, visited: false, meridian: 0 };
       }
     }
 
@@ -1334,6 +1355,11 @@
       document.getElementById('infoWaat').textContent = q.waat?.slice(0, 16) + (q.waat?.length > 16 ? '...' : '');
       document.getElementById('infoCoords').textContent = `${q.lat?.toFixed(4)}°, ${q.lon?.toFixed(4)}°`;
       
+      // Meridian
+      const meridian = q.meridian !== undefined ? q.meridian : getMeridianForLon(q.lon || 0);
+      const meridianColor = getMeridianColor(q.lon || 0);
+      document.getElementById('infoMeridian').innerHTML = `<span style="color:${meridianColor};font-weight:600;">M${meridian}</span> <span style="opacity:0.6;">(${((meridian/90)*100).toFixed(0)}%)</span>`;
+      
       // Entropy
       const ePct = Math.min(100, Number(BigInt(q.entropy || 0) % 100n));
       document.getElementById('infoEntropy').textContent = ePct + '%';
@@ -1471,11 +1497,16 @@
     // MAP CONTROL TOGGLES
     // ═══════════════════════════════════════════════════════════════════
     
-    function toggleHeckeGrid() {
+    function toggleMeridians() {
       showHecke = !showHecke;
       document.getElementById('btnHecke').classList.toggle('active', showHecke);
-      document.getElementById('heckeOverlay').classList.toggle('visible', showHecke);
-      if (showHecke) drawHeckeGrid();
+      document.getElementById('meridianLegend').style.display = showHecke ? 'block' : 'none';
+      
+      if (showHecke) {
+        drawMeridianGrid();
+      } else {
+        clearMeridianGrid();
+      }
     }
 
     function toggleEntropyView() {
@@ -1507,22 +1538,111 @@
     }
 
     // ═══════════════════════════════════════════════════════════════════
-    // HECKE GRID
+    // MERIDIAN GRID
     // ═══════════════════════════════════════════════════════════════════
     
-    function drawHeckeGrid() {
-      const overlay = document.getElementById('heckeOverlay');
-      let svg = '<svg width="100%" height="100%" style="position:absolute;top:0;left:0;">';
-      for (let i = -180; i <= 180; i += 30) {
-        const x = ((i + 180) / 360) * 100;
-        svg += `<line x1="${x}%" y1="0" x2="${x}%" y2="100%" stroke="rgba(99,102,241,0.2)" stroke-width="1"/>`;
+    async function fetchMeridianData() {
+      if (meridianData) return meridianData;
+      
+      try {
+        const hecke = new ethers.Contract(HECKE, HECKE_ABI, provider);
+        const boundaries = [];
+        
+        // Fetch meridian boundaries (0-89)
+        // Each meridian defines a Waat range boundary
+        toast('Loading meridian data...', 'info');
+        
+        // Fetch a sample of meridians to understand the scale
+        for (let i = 0; i <= 89; i += 10) {
+          try {
+            const val = await hecke.Meridians(i);
+            boundaries.push({ idx: i, value: val.toString() });
+          } catch {}
+        }
+        
+        meridianData = boundaries;
+        toast(`Loaded ${boundaries.length} meridian boundaries`, 'success');
+        return boundaries;
+      } catch (e) {
+        toast('Failed to load meridian data', 'error');
+        return [];
       }
-      for (let i = -90; i <= 90; i += 30) {
-        const y = ((90 - i) / 180) * 100;
-        svg += `<line x1="0" y1="${y}%" x2="100%" y2="${y}%" stroke="rgba(99,102,241,0.2)" stroke-width="1"/>`;
+    }
+    
+    function drawMeridianGrid() {
+      // Clear existing meridian lines
+      meridianLines.forEach(l => map.removeLayer(l));
+      meridianLines = [];
+      
+      // Draw 90 vertical meridian lines across the map
+      // The Hecke system divides the coordinate space into 90 meridians
+      const meridianColors = [
+        '#ef4444', '#f97316', '#f59e0b', '#eab308', '#84cc16',
+        '#22c55e', '#14b8a6', '#06b6d4', '#0ea5e9', '#3b82f6',
+        '#6366f1', '#8b5cf6', '#a855f7', '#d946ef', '#ec4899'
+      ];
+      
+      for (let i = 0; i < 90; i++) {
+        // Map 90 meridians across -180 to +180 longitude
+        const lon = -180 + (i * 4); // 360 / 90 = 4 degrees per meridian
+        const color = meridianColors[i % meridianColors.length];
+        const opacity = (i % 10 === 0) ? 0.5 : 0.15; // Every 10th is brighter
+        const weight = (i % 10 === 0) ? 2 : 1;
+        
+        const line = L.polyline(
+          [[-85, lon], [85, lon]], 
+          { color, weight, opacity, dashArray: (i % 10 === 0) ? null : '2,4' }
+        ).addTo(map);
+        
+        // Add label for every 10th meridian
+        if (i % 10 === 0) {
+          const label = L.marker([80, lon], {
+            icon: L.divIcon({
+              className: '',
+              html: `<div style="color:${color};font-size:10px;font-weight:600;text-shadow:0 0 3px black;">M${i}</div>`,
+              iconSize: [30, 15],
+              iconAnchor: [15, 7]
+            })
+          }).addTo(map);
+          meridianLines.push(label);
+        }
+        
+        meridianLines.push(line);
       }
-      svg += '</svg>';
-      overlay.innerHTML = svg;
+      
+      // Add latitude bands too (every 20 degrees)
+      for (let lat = -80; lat <= 80; lat += 20) {
+        const line = L.polyline(
+          [[-180, lat], [180, lat]].map(([lon, lt]) => [lt, lon]), 
+          { color: '#6366f1', weight: 1, opacity: 0.1, dashArray: '4,4' }
+        ).addTo(map);
+        meridianLines.push(line);
+      }
+      
+      // Try to fetch actual meridian data from contract
+      fetchMeridianData();
+    }
+    
+    function clearMeridianGrid() {
+      meridianLines.forEach(l => map.removeLayer(l));
+      meridianLines = [];
+    }
+    
+    // Get which meridian a QING is in based on its longitude
+    function getMeridianForLon(lon) {
+      // Map -180 to 180 → 0 to 89
+      return Math.floor(((lon + 180) / 360) * 90) % 90;
+    }
+    
+    // Get meridian color for a longitude
+    function getMeridianColor(lon) {
+      const meridianColors = [
+        '#ef4444', '#f97316', '#f59e0b', '#eab308', '#84cc16',
+        '#22c55e', '#14b8a6', '#06b6d4', '#0ea5e9', '#3b82f6',
+        '#6366f1', '#8b5cf6', '#a855f7', '#d946ef', '#ec4899'
+      ];
+      const idx = getMeridianForLon(lon);
+      return meridianColors[idx % meridianColors.length];
     }
 
     // ═══════════════════════════════════════════════════════════════════
