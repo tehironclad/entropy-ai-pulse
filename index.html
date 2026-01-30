@@ -7,6 +7,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.9.0/ethers.umd.min.js"></script>
+  <!-- Dysnomia ABIs - Single file with all 52 contracts -->
+  <script src="abis/all.js"></script>
   <style>
     * {
       margin: 0;
@@ -2167,7 +2169,14 @@ Quick tips:
     // Helper: Build full ABI for a contract
     function buildDysnomiaABI(type) {
       let abi = [...ERC20_ABI, ...DYSNOMIA_BASE];
-      if (TYPE_ABI[type]) {
+      
+      // Check external DYSNOMIA_ABIS first (from abis/*.js files)
+      if (window.DYSNOMIA_ABIS && window.DYSNOMIA_ABIS[type]) {
+        abi = [...abi, ...window.DYSNOMIA_ABIS[type]];
+        log(`Built ABI for ${type}: ${abi.length} functions (external)`, 'success');
+      }
+      // Fall back to inline TYPE_ABI
+      else if (TYPE_ABI[type]) {
         abi = [...abi, ...TYPE_ABI[type]];
         log(`Built ABI for ${type}: ${abi.length} functions`, 'success');
       } else {
