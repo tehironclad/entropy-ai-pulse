@@ -358,24 +358,36 @@ DYSNOMIA_ABIS.SHIOFactory = [
 // ═══════════════════════════════════════════════════════════════════════════
 
 DYSNOMIA_ABIS.AFFECTION = [
-  'function BuyWithDAI(uint256)',
-  'function BuyWithUSDC(uint256)',
-  'function BuyWithUSDT(uint256)',
+  // View function - returns full FAUNG struct
+  'function View() view returns (tuple(tuple(uint64 Base, uint64 Secret, uint64 Signal, uint64 Channel, uint64 Pole, uint64 Identity, uint64 Foundation, uint64 Element, uint64 Dynamo, uint64 Manifold, uint64 Ring, uint64 Barn, uint64 Coordinate, uint64 Tau, uint64 Eta, uint64 Kappa, uint64 Alpha, uint8 Nu) Rod, tuple(uint64 Base, uint64 Secret, uint64 Signal, uint64 Channel, uint64 Pole, uint64 Identity, uint64 Foundation, uint64 Element, uint64 Dynamo, uint64 Manifold, uint64 Ring, uint64 Barn, uint64 Coordinate, uint64 Tau, uint64 Eta, uint64 Kappa, uint64 Alpha, uint8 Nu) Cone, uint64 Phi, uint64 Eta, uint64 Mu, uint64 Xi, uint64 Sigma, uint64 Rho, uint64 Upsilon, uint64 Ohm, uint64 Pi, uint64 Omicron, uint64 Omega, uint8 Chi))',
+  // Terraforming functions
+  'function Alpha(uint64)',
+  'function Beta(uint64)',
+  'function Pi()',
+  'function Rho()',
+  'function Upsilon(uint64, bool)',
+  'function Generate() returns (uint64)',
+  // Buy functions
+  'function BuyWithFa(uint256)',
+  'function BuyWithFaung(uint256)',
   'function BuyWithG5(uint256)',
   'function BuyWithPI(uint256)',
   'function BuyWithMATH(uint256)',
-  'function BuyWithFa(uint256)',
-  'function BuyWithFaung(uint256)',
-  'function BuyWith(address,uint256)',
-  'function GetBuyPrice(address) view returns (uint64)',
-  'function SetBuyPrice(address,uint64)',
-  'function Alpha(uint64)',
-  'function Beta(uint64)',
-  'function Pi(uint64)',
-  'function Rho(uint64)',
-  'function Generate()',
-  'function React(address,uint256)',
-  'function Issuance() view returns (uint256)',
+  // Constants
+  'function MotzkinPrime() view returns (uint64)',
+  // ERC20 standard
+  'function name() view returns (string)',
+  'function symbol() view returns (string)',
+  'function decimals() view returns (uint8)',
+  'function totalSupply() view returns (uint256)',
+  'function balanceOf(address) view returns (uint256)',
+  'function transfer(address, uint256) returns (bool)',
+  'function approve(address, uint256) returns (bool)',
+  'function allowance(address, address) view returns (uint256)',
+  'function transferFrom(address, address, uint256) returns (bool)',
+  'function burn(uint256)',
+  'function burnFrom(address, uint256)',
+  'function owner() view returns (address)',
 ];
 
 DYSNOMIA_ABIS.BLOTTER = [
