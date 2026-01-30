@@ -2696,6 +2696,19 @@ What would you like to do?`, 'assistant');
     
     // Call Claude via serverless API (uses the rich system prompt in api/chat.js)
     async function callClaudeServerless(apiKey, context, history) {
+      // Get available functions on currently loaded contract
+      let availableFunctions = 'None loaded';
+      if (currentABI && currentABI.length > 0) {
+        const fnNames = currentABI
+          .filter(item => item.type === 'function')
+          .map(fn => {
+            const inputs = fn.inputs?.map(i => i.type).join(', ') || '';
+            const viewMark = fn.stateMutability === 'view' ? ' (view)' : '';
+            return `${fn.name}(${inputs})${viewMark}`;
+          });
+        availableFunctions = fnNames.join(', ');
+      }
+      
       // Build rich context that AI will always have
       const contextMsg = `[USER CONTEXT]
 LAU: ${context.lau?.name || 'Not loaded'}${context.lau?.address ? ' (' + context.lau.address + ')' : ''}
@@ -2703,12 +2716,20 @@ QING: ${context.qing?.name || 'None'}${context.qing?.address ? ' (' + context.qi
 Wallet: ${context.walletConnected ? 'Connected' : 'Not connected'}
 Current Contract Loaded: ${context.currentContract?.name || 'None'}
 
-The user's LAU and QING are shown in the left panel. Always reference them by name when relevant.`;
+AVAILABLE FUNCTIONS ON LOADED CONTRACT:
+${availableFunctions}
+
+IMPORTANT: Only call functions that are listed above. Do NOT make up function names. If you need a function that's not available, tell the user to load the correct contract first.
+
+Common contracts:
+- AFFECTION: Alpha(uint64), Beta(uint64), Pi(uint64), Rho(uint64), Generate() - for terraforming
+- LAU: Soul() (view), Aura() (view), Username() (view), CurrentArea() (view) - user identity
+- QING: Entropy() (view), Waat() (view), Join(address), Leave(address) - territories`;
       
       // Add context as the first message in every request
       const messages = [
         { role: 'user', content: contextMsg },
-        { role: 'assistant', content: 'Understood. I can see your identity and will help you navigate Dysnomia.' },
+        { role: 'assistant', content: 'Understood. I can see your identity and the available functions. I will only suggest functions that exist on the loaded contract.' },
         ...history
       ];
       
