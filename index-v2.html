@@ -2193,6 +2193,7 @@ What would you like to do?`, 'assistant');
       
       let address = addressOrName;
       let name = addressOrName;
+      let knownType = null;
       
       // If it's a name, look up the address
       if (!addressOrName.startsWith('0x')) {
@@ -2202,12 +2203,17 @@ What would you like to do?`, 'assistant');
           return;
         }
         name = addressOrName;
+        // Use the name as the type for known contracts
+        knownType = addressOrName.toUpperCase();
       } else {
         // Reverse lookup for known contracts
         const found = Object.entries(KNOWN_CONTRACTS).find(([n, a]) => 
           a.toLowerCase() === addressOrName.toLowerCase()
         );
-        if (found) name = found[0];
+        if (found) {
+          name = found[0];
+          knownType = found[0].toUpperCase();
+        }
       }
       
       log(`Loading ${name}...`, 'info');
@@ -2219,7 +2225,12 @@ What would you like to do?`, 'assistant');
         let abi, type = 'ERC20';
         
         if (isDysnomia) {
-          type = await getDysnomiaType(address) || 'DYSNOMIA';
+          // Use known type first, otherwise query the contract
+          if (knownType && window.DYSNOMIA_ABIS && window.DYSNOMIA_ABIS[knownType]) {
+            type = knownType;
+          } else {
+            type = await getDysnomiaType(address) || 'DYSNOMIA';
+          }
           abi = buildDysnomiaABI(type);
         } else {
           // Use basic ERC20 ABI
