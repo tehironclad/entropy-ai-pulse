@@ -1861,6 +1861,74 @@ Quick tips:
       'pUSDC': '0x15D38573d2feeb82e7ad5187aB8c1D52810B1f07',
     };
     
+    // QING Database for cross-referencing with map.html
+    // This allows auto-linking LAU's current QING to the map
+    const QING_DATABASE = [
+      {address:'0xD127839B83cBf537c29B7d268c135f745a0Da2E8',name:'Illinois QING'},
+      {address:'0xb0Ba7D36B7F0505879179ecE7401F24eB653c6E1',name:'Zürich QING'},
+      {address:'0x644aAbeAcd96938a7ea5910f0C5240d289B64cd1',name:'DAI QING'},
+      {address:'0xa1ddBBcAB4f62E7968Cc4Adbe8Ca0634EE509956',name:'USDC QING'},
+      {address:'0x4C74302e0C64d2F03CF93135ae1D70F3487Cd7ee',name:'USDT QING'},
+      {address:'0x85E14Bb47B22cF82a805B424ce605eA025ca751e',name:'WBTC QING'},
+      {address:'0x8157A5AC755d70218683232b06d6062253104918',name:'WPLS QING'},
+      {address:'0x875360521d23456af5CF561BD0B1C1FdBf47C4cB',name:'WETH QING'},
+      {address:'0x900AE7e39d13F8D0dBC9bd6F2F117C144Efb489A',name:'HEX QING'},
+      {address:'0xFB1D79843B4be8c9fc244F54ee965d051261bb4B',name:'AFFECTION QING'},
+      {address:'0x012b805D8FB0bb53c4E9189328006B9c6D56a44c',name:'Cho QING'},
+      {address:'0x58065d1351972D9358665602c967EA58c13DC744',name:'MAP QING'},
+      {address:'0x0A2f46d1D07EA169ACea81bdc6d73Ed0f5812634',name:'mariarahel QING'},
+      {address:'0x872739Df73Cad8eC87418Bc0B00Eb9925BbF6971',name:'libAtropaMath QING'},
+      {address:'0x83Ec6aCdfD04C7Fdc98403937f8a18f7A8cd8399',name:'LEGAL QING'},
+      {address:'0x015A15727d5B21F58B5aB56a86959A3B32849BA9',name:'TREASURY BILL QING'},
+      {address:'0x1cE307593CbE3C13B2624Bc95Aa7D10C9FB335b1',name:'Teddy Bear QING'},
+      {address:'0x829f778b5857eCa60C4c44f187A92395f453b4Da',name:'POPPY QING'},
+      {address:'0x4c6fc9EF5f930B7B0a23978ec73f13d44CfdE82e',name:'Zagreb QING'},
+      {address:'0x8985267Bbfe0E8c4Da9F6eABbD3341dcD88E975d',name:'Vatican QING'},
+      {address:'0x7F326F7fD8E308337b9c94f198DC6742d5958752',name:'Greenland QING'},
+      {address:'0xA65aC1bF7e70f8545575C50F40c43f3c898389b4',name:'Cherokee QING'},
+      {address:'0xA67EFFBfA307C6C9c6EA63E39654b97a6D8a334B',name:'Kremlin QING'},
+      {address:'0xC5b901C1Fad5ef392E8812ab134B46D3BC1acf31',name:'Aave QING'},
+      {address:'0xCCd1fED551Fe2C34E0876509e323a4F430922B6D',name:'Balancer QING'},
+      {address:'0xe0E3928c901491339BFF312224D172AAaFe3D6d4',name:'Compound QING'},
+      {address:'0xea530865dbca4fa985a9881E746C3D3e84DbE745',name:'Curve QING'},
+      {address:'0x5949C6d1b226ad35b4E040a43E6d36ad4d3C99d5',name:'Lido QING'},
+      {address:'0xA3263C6d3F76979F7078345ae528Dce928Bdfd38',name:'ChainLink QING'},
+      {address:'0x2fDa4e4e39B2366b8505E6d5490Fb0feFb7e9AB1',name:'Sushi QING'},
+      {address:'0x4b3E90c711C4a6cB98BC742A9acd7f75793A02d6',name:'Uniswap QING'},
+      {address:'0xe83852e0574765f5d4D1d314c1c63e98A8EfA2c0',name:'Dogecoin QING'},
+      {address:'0xF2C4087a18781D5347d4905E86b087B1b9D6ba51',name:'SHIBA QING'},
+      {address:'0x3eA1B5181543B8F793943e9503091D463c6b18C7',name:'BitTorrent QING'},
+      {address:'0xF2Efa194B5571e407790998b14ED82BceD2Be3B1',name:'🦝 QING'},
+      {address:'0xE4169cF239e2FDc6E6e4a3a6fA0a703058ce400b',name:'RatKing QING'},
+      {address:'0x81b74e9a2eaf3c024EcBB19Ee6d592363F206A1b',name:'Fatoshi QING'},
+      {address:'0xd898C85C071128396Fb6082221d545cA01803ED5',name:'NotsDotQ QING'},
+      {address:'0xf628ddF33e97cfE53826E839241200E148394B16',name:'Reserve Teh QING'},
+      {address:'0xCbFcA49631570387CB04577b82D55bE67b316c74',name:'Teh QING'},
+      {address:'0x5ae65A18c06011daab861106983CF72c153aD1fe',name:'IronChad QING'},
+      {address:'0xA43F71ac277022A547c56706fbBc5d93f88C3467',name:'enter teh QING'},
+      {address:'0xC56a3E96CB971be4119CDF3094ECD6B8bBb4f622',name:'Koan QING'},
+      {address:'0xa846857caD1153BC9cE3AD7391Dc7f1D060d2d75',name:'GOD QING'},
+    ];
+
+    // Helper to find QING in database by address or name
+    function findQingInDatabase(addressOrName) {
+      const searchLower = addressOrName.toLowerCase();
+      return QING_DATABASE.find(q => 
+        q.address.toLowerCase() === searchLower || 
+        q.name.toLowerCase().includes(searchLower) ||
+        searchLower.includes(q.name.toLowerCase().replace(' qing', ''))
+      );
+    }
+
+    // Generate map link for a QING
+    function getMapLinkForQing(qingAddress) {
+      const qing = QING_DATABASE.find(q => q.address.toLowerCase() === qingAddress.toLowerCase());
+      if (qing) {
+        return `map.html?qing=${qingAddress}`;
+      }
+      return null;
+    }
+    
     // Contract categories for sidebar
     const CONTRACT_CATEGORIES = {
       'Core Chain': ['VOID', 'SIU', 'YANG', 'YAU', 'ZHOU', 'ZHENG', 'YI'],
@@ -2896,6 +2964,13 @@ Quick tips:
             results.push(`   Name: ${qingName || 'Unknown'}`);
             if (waat) results.push(`   Waat: ${waat}`);
             if (entropy) results.push(`   Entropy: ${entropy}`);
+            
+            // Check if QING is in our database and offer map link
+            const qingInDb = findQingInDatabase(currentArea);
+            if (qingInDb) {
+              results.push(`   🗺️ View on Map: <a href="map.html?qing=${currentArea}" target="_blank" style="color:#6366f1;">${qingInDb.name}</a>`);
+              log(`🗺️ QING "${qingInDb.name}" available on map!`, 'success');
+            }
             
             addDiscoveredContract(qingName || 'My QING', currentArea, 'QING');
             log(`✅ QING found: ${qingName || currentArea.slice(0,10)}`, 'success');
@@ -4425,6 +4500,12 @@ Be helpful and suggest actions when appropriate. User confirms before execution.
 
     // Update contract info in the right panel
     function updateContractPanel(name, address, type, supply, decimals, verified) {
+      // Check if this is a QING that's in our database
+      const qingInDb = findQingInDatabase(address);
+      const mapButton = qingInDb || type === 'QING' 
+        ? `<button class="btn btn-secondary btn-sm" onclick="viewOnMap('${address}')" style="flex: 1;">🗺️ Map</button>` 
+        : '';
+      
       document.getElementById('contractInfoContent').innerHTML = `
         <div style="margin-bottom: 16px;">
           <div style="font-size: 16px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">${name}</div>
@@ -4451,8 +4532,14 @@ Be helpful and suggest actions when appropriate. User confirms before execution.
         <div style="margin-top: 16px; display: flex; gap: 8px;">
           <button class="btn btn-secondary btn-sm" onclick="copyAddress()" style="flex: 1;">📋</button>
           <button class="btn btn-secondary btn-sm" onclick="viewOnScan()" style="flex: 1;">🔗 Scan</button>
+          ${mapButton}
         </div>
       `;
+    }
+
+    // Open QING on map
+    function viewOnMap(address) {
+      window.open(`map.html?qing=${address}`, '_blank');
     }
 
     // Update functions list in right panel
@@ -4935,7 +5022,13 @@ RULES:
     }
 
     function setOutput(text) {
-      document.getElementById('outputContent').textContent = text;
+      const el = document.getElementById('outputContent');
+      // Check if text contains HTML links
+      if (text.includes('<a href=')) {
+        el.innerHTML = text.replace(/\n/g, '<br>');
+      } else {
+        el.textContent = text;
+      }
     }
 
     function copyOutput() {
