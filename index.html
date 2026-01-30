@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -16,1299 +17,1303 @@
       box-sizing: border-box;
     }
 
-    :root {
-      --bg-primary: #0a0a0f;
-      --bg-secondary: #12121a;
-      --bg-tertiary: #1a1a25;
-      --bg-card: #16161f;
-      --border-color: rgba(255, 255, 255, 0.08);
-      --border-hover: rgba(255, 255, 255, 0.15);
-      --text-primary: #f0f0f5;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent-primary: #6366f1;
-      --accent-secondary: #8b5cf6;
-      --accent-gradient: linear-gradient(135deg, #6366f1, #8b5cf6);
-      --success: #22c55e;
-      --warning: #f59e0b;
-      --error: #ef4444;
-      --info: #3b82f6;
-    }
-
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: var(--bg-primary);
-      color: var(--text-primary);
-      min-height: 100vh;
-      line-height: 1.5;
-      overflow-x: hidden;
-    }
-
-    /* Header */
-    .header {
-      background: var(--bg-secondary);
-      border-bottom: 1px solid var(--border-color);
-      padding: 16px 24px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .logo-icon {
-      width: 40px;
-      height: 40px;
-      background: var(--accent-gradient);
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      font-weight: 700;
-    }
-
-    .logo-text {
-      font-size: 22px;
-      font-weight: 700;
-      background: var(--accent-gradient);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .logo-subtitle {
-      font-size: 11px;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    .header-status {
-      display: flex;
-      gap: 16px;
-      align-items: center;
-    }
-
-    .status-badge {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 16px;
-      background: var(--bg-tertiary);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      font-size: 13px;
-      color: var(--text-secondary);
-    }
-
-    .status-badge.connected {
-      border-color: var(--success);
-      color: var(--success);
-    }
-
-    .status-badge.error {
-      border-color: var(--error);
-      color: var(--error);
-    }
-
-    .status-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: currentColor;
-    }
-
-    .btn {
-      padding: 10px 20px;
-      border: none;
-      border-radius: 8px;
-      font-family: inherit;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .btn-primary {
-      background: var(--accent-gradient);
-      color: white;
-    }
-
-    .btn-primary:hover {
-      opacity: 0.9;
-      transform: translateY(-1px);
-    }
-
-    .btn-secondary {
-      background: var(--bg-tertiary);
-      border: 1px solid var(--border-color);
-      color: var(--text-secondary);
-    }
-
-    .btn-secondary:hover {
-      border-color: var(--border-hover);
-      color: var(--text-primary);
-    }
-
-    .btn-success {
-      background: linear-gradient(135deg, var(--success), #16a34a);
-      color: white;
-    }
-
-    .btn-warning {
-      background: linear-gradient(135deg, var(--warning), #d97706);
-      color: white;
-    }
-
-    .btn-sm {
-      padding: 8px 14px;
-      font-size: 12px;
-    }
-
-    /* Main Layout - AI CENTERED */
-    .main {
-      display: grid;
-      grid-template-columns: 260px minmax(400px, 1fr) 380px;
-      gap: 0;
-      min-height: calc(100vh - 73px);
-      max-width: 100vw;
-      overflow-x: hidden;
-    }
-
-    /* Right Contract Panel */
-    .contract-panel {
-      background: var(--bg-secondary);
-      border-left: 1px solid var(--border-color);
-      display: flex;
-      flex-direction: column;
-      height: calc(100vh - 73px);
-      overflow: hidden;
-      min-width: 0;
-    }
-
-    .contract-panel-tabs {
-      display: flex;
-      border-bottom: 1px solid var(--border-color);
-      background: var(--bg-tertiary);
-      flex-shrink: 0;
-    }
-
-    .contract-panel-tab {
-      flex: 1;
-      padding: 12px 8px;
-      text-align: center;
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--text-muted);
-      cursor: pointer;
-      border-bottom: 2px solid transparent;
-      transition: all 0.2s;
-    }
-
-    .contract-panel-tab:hover {
-      color: var(--text-secondary);
-      background: rgba(99, 102, 241, 0.05);
-    }
-
-    .contract-panel-tab.active {
-      color: var(--accent-primary);
-      border-bottom-color: var(--accent-primary);
-      background: rgba(99, 102, 241, 0.1);
-    }
-
-    .contract-panel-content {
-      flex: 1;
-      overflow-y: auto;
-      padding: 12px;
-    }
-
-    .contract-panel-section {
-      display: none;
-    }
-
-    .contract-panel-section.active {
-      display: block;
-    }
-
-    /* Compact function list for right panel */
-    .compact-function-list {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      max-height: calc(100vh - 300px);
-      overflow-y: auto;
-    }
-
-    .compact-function-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 10px;
-      background: var(--bg-tertiary);
-      border-radius: 6px;
-      cursor: pointer;
-      transition: all 0.15s;
-      font-size: 12px;
-    }
-
-    .compact-function-item:hover {
-      background: var(--bg-card);
-      border-color: var(--accent-primary);
-    }
-
-    .compact-function-item.read .fn-badge {
-      background: var(--success);
-    }
-
-    .compact-function-item.write .fn-badge {
-      background: var(--warning);
-    }
-
-    .fn-badge {
-      width: 18px;
-      height: 18px;
-      border-radius: 4px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 10px;
-      font-weight: 700;
-      color: white;
-    }
-
-    .fn-name {
-      flex: 1;
-      font-weight: 500;
-      color: var(--text-primary);
-    }
-
-    .fn-params {
-      color: var(--text-muted);
-      font-size: 10px;
-    }
-
-    .output-panel-compact {
-      background: var(--bg-primary);
-      border-radius: 8px;
-      padding: 12px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
-      white-space: pre-wrap;
-      word-break: break-all;
-      max-height: calc(100vh - 200px);
-      overflow-y: auto;
-    }
-
-    /* Sidebar */
-    .sidebar {
-      background: var(--bg-secondary);
-      border-right: 1px solid var(--border-color);
-      padding: 12px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .sidebar-section {
-      margin-bottom: 12px;
-    }
-
-    .sidebar-title {
-      font-size: 10px;
-      font-weight: 600;
-      color: var(--accent-primary);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .sidebar-title::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: linear-gradient(90deg, var(--border-color), transparent);
-    }
-
-    /* Sidebar Tabs */
-    .sidebar-tabs {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 2px;
-      margin-bottom: 8px;
-      background: var(--bg-tertiary);
-      border-radius: 6px;
-      padding: 3px;
-    }
-
-    .sidebar-tab {
-      flex: 1;
-      min-width: 45px;
-      padding: 6px 4px;
-      text-align: center;
-      font-size: 9px;
-      font-weight: 600;
-      color: var(--text-muted);
-      cursor: pointer;
-      border-radius: 4px;
-      transition: all 0.2s;
-    }
-
-    .sidebar-tab:hover {
-      color: var(--text-secondary);
-      background: rgba(99, 102, 241, 0.1);
-    }
-
-    .sidebar-tab.active {
-      color: var(--accent-primary);
-      background: var(--bg-card);
-    }
-
-    .sidebar-tab-content {
-      flex: 1;
-      overflow-y: auto;
-      max-height: calc(100vh - 420px);
-    }
-
-    .sidebar-contract-list {
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-    }
-
-    .sidebar-contract-item {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 8px;
-      background: var(--bg-tertiary);
-      border-radius: 4px;
-      cursor: pointer;
-      transition: all 0.15s;
-      font-size: 11px;
-    }
-
-    .sidebar-contract-item:hover {
-      background: var(--bg-card);
-      border-left: 2px solid var(--accent-primary);
-    }
-
-    .sidebar-contract-item .icon {
-      font-size: 12px;
-    }
-
-    .sidebar-contract-item .name {
-      flex: 1;
-      font-weight: 500;
-      color: var(--text-primary);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .contract-list.collapsed {
-      display: none;
-    }
-
-    /* Input styles */
-    .input-group {
-      margin-bottom: 12px;
-    }
-
-    .input-label {
-      display: block;
-      font-size: 12px;
-      color: var(--text-secondary);
-      margin-bottom: 6px;
-    }
-
-    .input {
-      width: 100%;
-      padding: 12px 14px;
-      background: var(--bg-primary);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      color: var(--text-primary);
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 13px;
-      transition: all 0.2s;
-    }
-
-    .input:focus {
-      outline: none;
-      border-color: var(--accent-primary);
-      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-    }
-
-    .input::placeholder {
-      color: var(--text-muted);
-    }
-
-    .input-with-btn {
-      display: flex;
-      gap: 8px;
-    }
-
-    .input-with-btn .input {
-      flex: 1;
-    }
-
-    /* Contract List */
-    .contract-list {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .contract-item {
-      padding: 10px 12px;
-      background: var(--bg-primary);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .contract-item:hover {
-      border-color: var(--accent-primary);
-      background: var(--bg-tertiary);
-    }
-
-    .contract-item-name {
-      font-size: 13px;
-      font-weight: 500;
-    }
-
-    .contract-item-addr {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 10px;
-      color: var(--text-muted);
-    }
-
-    .contract-item-type {
-      font-size: 10px;
-      padding: 2px 8px;
-      background: var(--accent-gradient);
-      border-radius: 4px;
-      color: white;
-    }
-    
-    /* Ecosystem Category Styles */
-    .ecosystem-category {
-      margin-bottom: 4px;
-    }
-    
-    .category-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 8px 12px;
-      background: var(--bg-tertiary);
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text-secondary);
-      transition: all 0.2s;
-    }
-    
-    .category-header:hover {
-      background: var(--bg-card);
-      color: var(--text-primary);
-    }
-    
-    .category-arrow {
-      font-size: 10px;
-      color: var(--text-muted);
-    }
-    
-    .category-contracts {
-      padding-left: 8px;
-      margin-top: 4px;
-    }
-    
-    .category-contracts .contract-item {
-      padding: 8px 10px;
-      font-size: 12px;
-    }
-    
-    .category-contracts .contract-item-name {
-      font-size: 12px;
-    }
-    
-    .category-contracts .contract-item-addr {
-      font-size: 9px;
-    }
-
-    /* Main Content */
-    .content {
-      padding: 24px;
-      overflow-y: auto;
-    }
-
-    .card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      margin-bottom: 20px;
-      overflow: hidden;
-    }
-
-    .card-header {
-      padding: 16px 20px;
-      background: var(--bg-tertiary);
-      border-bottom: 1px solid var(--border-color);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .card-title {
-      font-size: 14px;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .card-body {
-      padding: 20px;
-    }
-
-    /* Contract Info */
-    .contract-info {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 16px;
-    }
-
-    .info-item {
-      background: var(--bg-primary);
-      padding: 14px 16px;
-      border-radius: 8px;
-      border: 1px solid var(--border-color);
-    }
-
-    .info-label {
-      font-size: 11px;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 4px;
-    }
-
-    .info-value {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 13px;
-      color: var(--text-primary);
-      word-break: break-all;
-    }
-
-    .info-value.large {
-      font-size: 18px;
-      font-weight: 600;
-    }
-
-    /* Function Builder */
-    .function-builder {
-      background: var(--bg-primary);
-      border-radius: 8px;
-      padding: 16px;
-      border: 1px solid var(--border-color);
-    }
-
-    .function-select {
-      width: 100%;
-      padding: 12px 14px;
-      background: var(--bg-secondary);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      color: var(--text-primary);
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 13px;
-      cursor: pointer;
-      margin-bottom: 16px;
-    }
-
-    .function-select:focus {
-      outline: none;
-      border-color: var(--accent-primary);
-    }
-
-    .function-select option {
-      background: var(--bg-secondary);
-      color: var(--text-primary);
-    }
-
-    .param-inputs {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      margin-bottom: 16px;
-    }
-
-    .param-input {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-    }
-
-    .param-input label {
-      min-width: 120px;
-      font-size: 12px;
-      color: var(--text-secondary);
-    }
-
-    .param-input .input {
-      flex: 1;
-    }
-
-    .param-type {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
-      color: var(--accent-primary);
-      padding: 4px 8px;
-      background: rgba(99, 102, 241, 0.1);
-      border-radius: 4px;
-    }
-
-    .function-actions {
-      display: flex;
-      gap: 12px;
-    }
-
-    .function-actions .btn {
-      flex: 1;
-    }
-
-    /* Output */
-    .output-panel {
-      background: var(--bg-primary);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 12px;
-      max-height: 300px;
-      overflow-y: auto;
-    }
-
-    .output-panel::-webkit-scrollbar {
-      width: 8px;
-    }
-
-    .output-panel::-webkit-scrollbar-thumb {
-      background: var(--border-color);
-      border-radius: 4px;
-    }
-
-    .output-content {
-      padding: 16px;
-      white-space: pre-wrap;
-      word-break: break-all;
-      line-height: 1.6;
-      color: var(--text-secondary);
-    }
-
-    .output-success { color: var(--success); }
-    .output-error { color: var(--error); }
-    .output-info { color: var(--info); }
-
-    /* AI Panel - NOW IN CENTER */
-    .ai-panel {
-      background: var(--bg-primary);
-      border-left: 1px solid var(--border-color);
-      border-right: 1px solid var(--border-color);
-      display: flex;
-      flex-direction: column;
-      height: calc(100vh - 73px);
-      min-width: 0;
-      overflow: hidden;
-    }
-
-    .ai-header {
-      padding: 16px 20px;
-      border-bottom: 1px solid var(--border-color);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
-    }
-
-    .ai-title {
-      font-size: 16px;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .ai-title span {
-      background: var(--accent-gradient);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .ai-messages {
-      flex: 1;
-      overflow-y: auto;
-      overflow-x: hidden;
-      padding: 20px;
-      background: var(--bg-primary);
-      display: flex;
-      flex-direction: column;
-      min-width: 0;
-    }
-
-    .ai-message {
-      margin-bottom: 20px;
-      padding: 20px 24px;
-      border-radius: 12px;
-      font-size: 14px;
-      line-height: 1.7;
-      white-space: pre-wrap;
-      word-wrap: break-word;
-      word-break: break-word;
-      overflow-wrap: break-word;
-      position: relative;
-      max-width: 100%;
-      overflow: visible;
-    }
-
-    .ai-message .copy-msg-btn {
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      padding: 4px 10px;
-      font-size: 10px;
-      background: transparent;
-      border: 1px solid transparent;
-      border-radius: 4px;
-      cursor: pointer;
-      color: var(--text-muted);
-      opacity: 0.3;
-      z-index: 10;
-      transition: all 0.2s ease;
-    }
-
-    .ai-message:hover .copy-msg-btn {
-      opacity: 0.7;
-      background: var(--bg-tertiary);
-      border-color: var(--border-color);
-    }
-
-    .ai-message .copy-msg-btn:hover {
-      opacity: 1;
-      background: var(--accent-primary);
-      color: white;
-      border-color: var(--accent-primary);
-    }
-
-    .ai-message.user {
-      background: var(--accent-gradient);
-      color: white;
-      margin-left: 40px;
-      border-bottom-right-radius: 4px;
-    }
-
-    .ai-message.user .copy-msg-btn {
-      color: rgba(255,255,255,0.5);
-    }
-    
-    .ai-message.user:hover .copy-msg-btn {
-      background: rgba(255,255,255,0.2);
-      border-color: rgba(255,255,255,0.3);
-      color: white;
-    }
-
-    .ai-message.user .copy-msg-btn:hover {
-      background: rgba(255,255,255,0.4);
-      opacity: 1;
-    }
-
-    .ai-message.assistant {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      margin-right: 20px;
-      border-bottom-left-radius: 4px;
-    }
-
-    .ai-message pre {
-      background: var(--bg-secondary);
-      padding: 12px;
-      border-radius: 8px;
-      margin: 12px 0;
-      overflow: auto;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
-      border: 1px solid var(--border-color);
-      line-height: 1.4;
-      max-width: 100%;
-      max-height: 400px;
-      white-space: pre-wrap;
-      word-break: break-all;
-    }
-
-    .ai-message code {
-      font-family: 'JetBrains Mono', monospace;
-      background: var(--bg-secondary);
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-size: 11px;
-      color: var(--accent-primary);
-      word-break: break-all;
-    }
-    
-    .ai-message h1, .ai-message h2 {
-      margin: 20px 0 12px 0;
-      color: var(--text-primary);
-      font-size: 18px;
-    }
-    
-    .ai-message h3, .ai-message h4 {
-      margin: 16px 0 8px 0;
-      color: var(--accent-primary);
-      font-size: 16px;
-    }
-    
-    .ai-message ul, .ai-message ol {
-      margin: 12px 0;
-      padding-left: 24px;
-    }
-    
-    .ai-message li {
-      margin: 6px 0;
-    }
-    
-    .ai-message p {
-      margin: 12px 0;
-    }
-    
-    .ai-message strong {
-      color: var(--accent-primary);
-    }
-
-    .ai-input-container {
-      padding: 10px 16px;
-      border-top: 1px solid var(--border-color);
-      background: var(--bg-secondary);
-    }
-
-    .ai-input-wrapper {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .ai-input {
-      flex: 1;
-      padding: 10px 14px;
-      background: var(--bg-primary);
-      border: 2px solid var(--border-color);
-      border-radius: 8px;
-      color: var(--text-primary);
-      font-family: inherit;
-      font-size: 14px;
-      resize: vertical;
-      min-height: 50px;
-    }
-
-    .ai-input:focus {
-      outline: none;
-      border-color: var(--accent-primary);
-      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
-    }
-
-    .ai-quick-actions {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .ai-quick-btn {
-      padding: 8px 14px;
-      background: var(--bg-tertiary);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      color: var(--text-secondary);
-      font-size: 12px;
-      cursor: pointer;
-      transition: all 0.2s;
-      font-weight: 500;
-    }
-
-    .ai-quick-btn:hover {
-      border-color: var(--accent-primary);
-      color: var(--accent-primary);
-      background: rgba(99, 102, 241, 0.1);
-    }
-    
-    .ai-quick-btn.primary {
-      background: var(--accent-gradient);
-      color: white;
-      border: none;
-    }
-    
-    .ai-quick-btn.primary:hover {
-      opacity: 0.9;
-      color: white;
-    }
-    
-    /* AI Activity Log - minimal */
-    .ai-activity-log {
-      border-top: 1px solid var(--border-color);
-      background: var(--bg-tertiary);
-    }
-    
-    .ai-activity-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 4px 12px;
-      cursor: pointer;
-      font-size: 9px;
-      font-weight: 500;
-      color: var(--text-muted);
-    }
-    
-    .ai-activity-header:hover {
-      background: var(--bg-card);
-      color: var(--text-secondary);
-    }
-    
-    .ai-activity-content {
-      max-height: 60px;
-      overflow-y: auto;
-      padding: 0 12px 4px 12px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 9px;
-    }
-    
-    .ai-activity-content.collapsed {
-      display: none;
-    }
-    
-    .log-entry {
-      padding: 2px 0;
-      border-bottom: 1px solid var(--border-color);
-      color: var(--text-muted);
-      font-size: 9px;
-    }
-    
-    .log-entry.success { color: var(--success); }
-    .log-entry.error { color: var(--error); }
-    .log-entry.warning { color: var(--warning); }
-    .log-entry.info { color: var(--info); }
-    
-    /* Provider Toggle */
-    .provider-toggle {
-      display: flex;
-      gap: 8px;
-    }
-    
-    .provider-btn {
-      flex: 1;
-      padding: 10px 16px;
-      background: var(--bg-tertiary);
-      border: 2px solid var(--border-color);
-      border-radius: 8px;
-      color: var(--text-secondary);
-      font-size: 13px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    
-    .provider-btn:hover {
-      border-color: var(--accent-primary);
-    }
-    
-    .provider-btn.active {
-      background: var(--accent-gradient);
-      border-color: transparent;
-      color: white;
-    }
-    
-    /* AI Action Buttons */
-    .ai-action-buttons {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 12px;
-      padding: 12px;
-      background: var(--bg-tertiary);
-      border-radius: 8px;
-      border: 1px solid var(--border-color);
-      position: relative;
-      z-index: 100;
-    }
-    
-    .action-btn {
-      padding: 10px 18px;
-      background: var(--bg-card);
-      border: 2px solid var(--accent-primary);
-      border-radius: 6px;
-      color: var(--accent-primary);
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      pointer-events: auto;
-    }
-    
-    .action-btn:hover {
-      background: var(--accent-primary);
-      color: white;
-      transform: translateY(-1px);
-    }
-    
-    .action-btn.write {
-      border-color: var(--warning);
-      color: var(--warning);
-    }
-    
-    .action-btn.write:hover {
-      background: var(--warning);
-      color: white;
-    }
-    
-    .action-btn.decline {
-      border-color: var(--text-muted);
-      color: var(--text-muted);
-    }
-    
-    .action-btn.decline:hover {
-      background: var(--text-muted);
-      color: white;
-    }
-
-    /* Function List */
-    .function-list {
-      max-height: 300px;
-      overflow-y: auto;
-    }
-
-    .function-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 12px;
-      border-bottom: 1px solid var(--border-color);
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .function-item:hover {
-      background: var(--bg-tertiary);
-    }
-
-    .function-item:last-child {
-      border-bottom: none;
-    }
-
-    .function-badge {
-      font-size: 10px;
-      padding: 3px 8px;
-      border-radius: 4px;
-      font-weight: 600;
-    }
-
-    .function-badge.read {
-      background: rgba(34, 197, 94, 0.15);
-      color: var(--success);
-    }
-
-    .function-badge.write {
-      background: rgba(245, 158, 11, 0.15);
-      color: var(--warning);
-    }
-
-    .function-name {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 12px;
-      flex: 1;
-    }
-
-    /* Tabs */
-    .tabs {
-      display: flex;
-      border-bottom: 1px solid var(--border-color);
-    }
-
-    .tab {
-      padding: 12px 20px;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text-secondary);
-      cursor: pointer;
-      border-bottom: 2px solid transparent;
-      transition: all 0.2s;
-    }
-
-    .tab:hover {
-      color: var(--text-primary);
-    }
-
-    .tab.active {
-      color: var(--accent-primary);
-      border-bottom-color: var(--accent-primary);
-    }
-
-    .tab-content {
-      display: none;
-    }
-
-    .tab-content.active {
-      display: block;
-    }
-
-    /* Bytecode viewer */
-    .bytecode-viewer {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
-      background: var(--bg-primary);
-      padding: 16px;
-      border-radius: 8px;
-      max-height: 200px;
-      overflow-y: auto;
-      word-break: break-all;
-      color: var(--text-muted);
-    }
-
-    .selector-highlight {
-      background: rgba(99, 102, 241, 0.3);
-      padding: 1px 2px;
-      border-radius: 2px;
-    }
-
-    /* Log panel */
-    .log-panel {
-      max-height: 150px;
-      overflow-y: auto;
-    }
-
-    .log-entry {
-      display: flex;
-      gap: 12px;
-      padding: 8px 12px;
-      border-bottom: 1px solid var(--border-color);
-      font-size: 12px;
-    }
-
-    .log-time {
-      font-family: 'JetBrains Mono', monospace;
-      color: var(--text-muted);
-      font-size: 11px;
-    }
-
-    .log-msg { color: var(--text-secondary); }
-    .log-entry.success .log-msg { color: var(--success); }
-    .log-entry.error .log-msg { color: var(--error); }
-    .log-entry.info .log-msg { color: var(--info); }
-
-    /* Modal */
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.7);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-      display: none;
-    }
-
-    .modal-overlay.active {
-      display: flex;
-    }
-
-    .modal {
-      background: var(--bg-secondary);
-      border: 1px solid var(--border-color);
-      border-radius: 16px;
-      width: 500px;
-      max-width: 90vw;
-    }
-
-    .modal-header {
-      padding: 20px 24px;
-      border-bottom: 1px solid var(--border-color);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .modal-title {
-      font-size: 16px;
-      font-weight: 600;
-    }
-
-    .modal-close {
-      background: none;
-      border: none;
-      color: var(--text-muted);
-      font-size: 24px;
-      cursor: pointer;
-    }
-
-    .modal-body {
-      padding: 24px;
-    }
-
-    /* Loader */
-    .loader {
-      width: 20px;
-      height: 20px;
-      border: 2px solid var(--border-color);
-      border-top-color: var(--accent-primary);
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    /* Responsive */
-    @media (max-width: 1400px) {
-      .main {
-        grid-template-columns: 300px 1fr 350px;
-      }
-    }
-
-    @media (max-width: 1100px) {
-      .main {
-        grid-template-columns: 1fr;
-      }
-      
-      .sidebar, .ai-panel {
-        display: none;
-      }
-    }
+```
+:root {
+  --bg-primary: #0a0a0f;
+  --bg-secondary: #12121a;
+  --bg-tertiary: #1a1a25;
+  --bg-card: #16161f;
+  --border-color: rgba(255, 255, 255, 0.08);
+  --border-hover: rgba(255, 255, 255, 0.15);
+  --text-primary: #f0f0f5;
+  --text-secondary: #a0a0b0;
+  --text-muted: #606070;
+  --accent-primary: #6366f1;
+  --accent-secondary: #8b5cf6;
+  --accent-gradient: linear-gradient(135deg, #6366f1, #8b5cf6);
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --error: #ef4444;
+  --info: #3b82f6;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  line-height: 1.5;
+  overflow-x: hidden;
+}
+
+/* Header */
+.header {
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+  padding: 16px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-icon {
+  width: 40px;
+  height: 40px;
+  background: var(--accent-gradient);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.logo-text {
+  font-size: 22px;
+  font-weight: 700;
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.logo-subtitle {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.header-status {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.status-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.status-badge.connected {
+  border-color: var(--success);
+  color: var(--success);
+}
+
+.status-badge.error {
+  border-color: var(--error);
+  color: var(--error);
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-primary {
+  background: var(--accent-gradient);
+  color: white;
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+}
+
+.btn-secondary:hover {
+  border-color: var(--border-hover);
+  color: var(--text-primary);
+}
+
+.btn-success {
+  background: linear-gradient(135deg, var(--success), #16a34a);
+  color: white;
+}
+
+.btn-warning {
+  background: linear-gradient(135deg, var(--warning), #d97706);
+  color: white;
+}
+
+.btn-sm {
+  padding: 8px 14px;
+  font-size: 12px;
+}
+
+/* Main Layout - AI CENTERED */
+.main {
+  display: grid;
+  grid-template-columns: 260px minmax(400px, 1fr) 380px;
+  gap: 0;
+  min-height: calc(100vh - 73px);
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+/* Right Contract Panel */
+.contract-panel {
+  background: var(--bg-secondary);
+  border-left: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 73px);
+  overflow: hidden;
+  min-width: 0;
+}
+
+.contract-panel-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-tertiary);
+  flex-shrink: 0;
+}
+
+.contract-panel-tab {
+  flex: 1;
+  padding: 12px 8px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+}
+
+.contract-panel-tab:hover {
+  color: var(--text-secondary);
+  background: rgba(99, 102, 241, 0.05);
+}
+
+.contract-panel-tab.active {
+  color: var(--accent-primary);
+  border-bottom-color: var(--accent-primary);
+  background: rgba(99, 102, 241, 0.1);
+}
+
+.contract-panel-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+}
+
+.contract-panel-section {
+  display: none;
+}
+
+.contract-panel-section.active {
+  display: block;
+}
+
+/* Compact function list for right panel */
+.compact-function-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: calc(100vh - 300px);
+  overflow-y: auto;
+}
+
+.compact-function-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: var(--bg-tertiary);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-size: 12px;
+}
+
+.compact-function-item:hover {
+  background: var(--bg-card);
+  border-color: var(--accent-primary);
+}
+
+.compact-function-item.read .fn-badge {
+  background: var(--success);
+}
+
+.compact-function-item.write .fn-badge {
+  background: var(--warning);
+}
+
+.fn-badge {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  color: white;
+}
+
+.fn-name {
+  flex: 1;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.fn-params {
+  color: var(--text-muted);
+  font-size: 10px;
+}
+
+.output-panel-compact {
+  background: var(--bg-primary);
+  border-radius: 8px;
+  padding: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  white-space: pre-wrap;
+  word-break: break-all;
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+}
+
+/* Sidebar */
+.sidebar {
+  background: var(--bg-secondary);
+  border-right: 1px solid var(--border-color);
+  padding: 12px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-section {
+  margin-bottom: 12px;
+}
+
+.sidebar-title {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--accent-primary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sidebar-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--border-color), transparent);
+}
+
+/* Sidebar Tabs */
+.sidebar-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  margin-bottom: 8px;
+  background: var(--bg-tertiary);
+  border-radius: 6px;
+  padding: 3px;
+}
+
+.sidebar-tab {
+  flex: 1;
+  min-width: 45px;
+  padding: 6px 4px;
+  text-align: center;
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.sidebar-tab:hover {
+  color: var(--text-secondary);
+  background: rgba(99, 102, 241, 0.1);
+}
+
+.sidebar-tab.active {
+  color: var(--accent-primary);
+  background: var(--bg-card);
+}
+
+.sidebar-tab-content {
+  flex: 1;
+  overflow-y: auto;
+  max-height: calc(100vh - 420px);
+}
+
+.sidebar-contract-list {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.sidebar-contract-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  background: var(--bg-tertiary);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-size: 11px;
+}
+
+.sidebar-contract-item:hover {
+  background: var(--bg-card);
+  border-left: 2px solid var(--accent-primary);
+}
+
+.sidebar-contract-item .icon {
+  font-size: 12px;
+}
+
+.sidebar-contract-item .name {
+  flex: 1;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.contract-list.collapsed {
+  display: none;
+}
+
+/* Input styles */
+.input-group {
+  margin-bottom: 12px;
+}
+
+.input-label {
+  display: block;
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+
+.input {
+  width: 100%;
+  padding: 12px 14px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  transition: all 0.2s;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.input::placeholder {
+  color: var(--text-muted);
+}
+
+.input-with-btn {
+  display: flex;
+  gap: 8px;
+}
+
+.input-with-btn .input {
+  flex: 1;
+}
+
+/* Contract List */
+.contract-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.contract-item {
+  padding: 10px 12px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.contract-item:hover {
+  border-color: var(--accent-primary);
+  background: var(--bg-tertiary);
+}
+
+.contract-item-name {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.contract-item-addr {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.contract-item-type {
+  font-size: 10px;
+  padding: 2px 8px;
+  background: var(--accent-gradient);
+  border-radius: 4px;
+  color: white;
+}
+
+/* Ecosystem Category Styles */
+.ecosystem-category {
+  margin-bottom: 4px;
+}
+
+.category-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: var(--bg-tertiary);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  transition: all 0.2s;
+}
+
+.category-header:hover {
+  background: var(--bg-card);
+  color: var(--text-primary);
+}
+
+.category-arrow {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.category-contracts {
+  padding-left: 8px;
+  margin-top: 4px;
+}
+
+.category-contracts .contract-item {
+  padding: 8px 10px;
+  font-size: 12px;
+}
+
+.category-contracts .contract-item-name {
+  font-size: 12px;
+}
+
+.category-contracts .contract-item-addr {
+  font-size: 9px;
+}
+
+/* Main Content */
+.content {
+  padding: 24px;
+  overflow-y: auto;
+}
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+
+.card-header {
+  padding: 16px 20px;
+  background: var(--bg-tertiary);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-title {
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.card-body {
+  padding: 20px;
+}
+
+/* Contract Info */
+.contract-info {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.info-item {
+  background: var(--bg-primary);
+  padding: 14px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.info-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.info-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: var(--text-primary);
+  word-break: break-all;
+}
+
+.info-value.large {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* Function Builder */
+.function-builder {
+  background: var(--bg-primary);
+  border-radius: 8px;
+  padding: 16px;
+  border: 1px solid var(--border-color);
+}
+
+.function-select {
+  width: 100%;
+  padding: 12px 14px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  cursor: pointer;
+  margin-bottom: 16px;
+}
+
+.function-select:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+}
+
+.function-select option {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.param-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.param-input {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.param-input label {
+  min-width: 120px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.param-input .input {
+  flex: 1;
+}
+
+.param-type {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--accent-primary);
+  padding: 4px 8px;
+  background: rgba(99, 102, 241, 0.1);
+  border-radius: 4px;
+}
+
+.function-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.function-actions .btn {
+  flex: 1;
+}
+
+/* Output */
+.output-panel {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.output-panel::-webkit-scrollbar {
+  width: 8px;
+}
+
+.output-panel::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+.output-content {
+  padding: 16px;
+  white-space: pre-wrap;
+  word-break: break-all;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.output-success { color: var(--success); }
+.output-error { color: var(--error); }
+.output-info { color: var(--info); }
+
+/* AI Panel - NOW IN CENTER */
+.ai-panel {
+  background: var(--bg-primary);
+  border-left: 1px solid var(--border-color);
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 73px);
+  min-width: 0;
+  overflow: hidden;
+}
+
+.ai-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+}
+
+.ai-title {
+  font-size: 16px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ai-title span {
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.ai-messages {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 20px;
+  background: var(--bg-primary);
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.ai-message {
+  margin-bottom: 20px;
+  padding: 20px 24px;
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  position: relative;
+  max-width: 100%;
+  overflow: visible;
+}
+
+.ai-message .copy-msg-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 4px 10px;
+  font-size: 10px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  color: var(--text-muted);
+  opacity: 0.3;
+  z-index: 10;
+  transition: all 0.2s ease;
+}
+
+.ai-message:hover .copy-msg-btn {
+  opacity: 0.7;
+  background: var(--bg-tertiary);
+  border-color: var(--border-color);
+}
+
+.ai-message .copy-msg-btn:hover {
+  opacity: 1;
+  background: var(--accent-primary);
+  color: white;
+  border-color: var(--accent-primary);
+}
+
+.ai-message.user {
+  background: var(--accent-gradient);
+  color: white;
+  margin-left: 40px;
+  border-bottom-right-radius: 4px;
+}
+
+.ai-message.user .copy-msg-btn {
+  color: rgba(255,255,255,0.5);
+}
+
+.ai-message.user:hover .copy-msg-btn {
+  background: rgba(255,255,255,0.2);
+  border-color: rgba(255,255,255,0.3);
+  color: white;
+}
+
+.ai-message.user .copy-msg-btn:hover {
+  background: rgba(255,255,255,0.4);
+  opacity: 1;
+}
+
+.ai-message.assistant {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  margin-right: 20px;
+  border-bottom-left-radius: 4px;
+}
+
+.ai-message pre {
+  background: var(--bg-secondary);
+  padding: 12px;
+  border-radius: 8px;
+  margin: 12px 0;
+  overflow: auto;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  border: 1px solid var(--border-color);
+  line-height: 1.4;
+  max-width: 100%;
+  max-height: 400px;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.ai-message code {
+  font-family: 'JetBrains Mono', monospace;
+  background: var(--bg-secondary);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  color: var(--accent-primary);
+  word-break: break-all;
+}
+
+.ai-message h1, .ai-message h2 {
+  margin: 20px 0 12px 0;
+  color: var(--text-primary);
+  font-size: 18px;
+}
+
+.ai-message h3, .ai-message h4 {
+  margin: 16px 0 8px 0;
+  color: var(--accent-primary);
+  font-size: 16px;
+}
+
+.ai-message ul, .ai-message ol {
+  margin: 12px 0;
+  padding-left: 24px;
+}
+
+.ai-message li {
+  margin: 6px 0;
+}
+
+.ai-message p {
+  margin: 12px 0;
+}
+
+.ai-message strong {
+  color: var(--accent-primary);
+}
+
+.ai-input-container {
+  padding: 10px 16px;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+}
+
+.ai-input-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ai-input {
+  flex: 1;
+  padding: 10px 14px;
+  background: var(--bg-primary);
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 14px;
+  resize: vertical;
+  min-height: 50px;
+}
+
+.ai-input:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+
+.ai-quick-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ai-quick-btn {
+  padding: 8px 14px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-secondary);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.ai-quick-btn:hover {
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+  background: rgba(99, 102, 241, 0.1);
+}
+
+.ai-quick-btn.primary {
+  background: var(--accent-gradient);
+  color: white;
+  border: none;
+}
+
+.ai-quick-btn.primary:hover {
+  opacity: 0.9;
+  color: white;
+}
+
+/* AI Activity Log - minimal */
+.ai-activity-log {
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-tertiary);
+}
+
+.ai-activity-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 12px;
+  cursor: pointer;
+  font-size: 9px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.ai-activity-header:hover {
+  background: var(--bg-card);
+  color: var(--text-secondary);
+}
+
+.ai-activity-content {
+  max-height: 60px;
+  overflow-y: auto;
+  padding: 0 12px 4px 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+}
+
+.ai-activity-content.collapsed {
+  display: none;
+}
+
+.log-entry {
+  padding: 2px 0;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-muted);
+  font-size: 9px;
+}
+
+.log-entry.success { color: var(--success); }
+.log-entry.error { color: var(--error); }
+.log-entry.warning { color: var(--warning); }
+.log-entry.info { color: var(--info); }
+
+/* Provider Toggle */
+.provider-toggle {
+  display: flex;
+  gap: 8px;
+}
+
+.provider-btn {
+  flex: 1;
+  padding: 10px 16px;
+  background: var(--bg-tertiary);
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.provider-btn:hover {
+  border-color: var(--accent-primary);
+}
+
+.provider-btn.active {
+  background: var(--accent-gradient);
+  border-color: transparent;
+  color: white;
+}
+
+/* AI Action Buttons */
+.ai-action-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 12px;
+  background: var(--bg-tertiary);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  position: relative;
+  z-index: 100;
+}
+
+.action-btn {
+  padding: 10px 18px;
+  background: var(--bg-card);
+  border: 2px solid var(--accent-primary);
+  border-radius: 6px;
+  color: var(--accent-primary);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  pointer-events: auto;
+}
+
+.action-btn:hover {
+  background: var(--accent-primary);
+  color: white;
+  transform: translateY(-1px);
+}
+
+.action-btn.write {
+  border-color: var(--warning);
+  color: var(--warning);
+}
+
+.action-btn.write:hover {
+  background: var(--warning);
+  color: white;
+}
+
+.action-btn.decline {
+  border-color: var(--text-muted);
+  color: var(--text-muted);
+}
+
+.action-btn.decline:hover {
+  background: var(--text-muted);
+  color: white;
+}
+
+/* Function List */
+.function-list {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.function-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border-color);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.function-item:hover {
+  background: var(--bg-tertiary);
+}
+
+.function-item:last-child {
+  border-bottom: none;
+}
+
+.function-badge {
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.function-badge.read {
+  background: rgba(34, 197, 94, 0.15);
+  color: var(--success);
+}
+
+.function-badge.write {
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--warning);
+}
+
+.function-name {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  flex: 1;
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.tab {
+  padding: 12px 20px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+}
+
+.tab:hover {
+  color: var(--text-primary);
+}
+
+.tab.active {
+  color: var(--accent-primary);
+  border-bottom-color: var(--accent-primary);
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* Bytecode viewer */
+.bytecode-viewer {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  background: var(--bg-primary);
+  padding: 16px;
+  border-radius: 8px;
+  max-height: 200px;
+  overflow-y: auto;
+  word-break: break-all;
+  color: var(--text-muted);
+}
+
+.selector-highlight {
+  background: rgba(99, 102, 241, 0.3);
+  padding: 1px 2px;
+  border-radius: 2px;
+}
+
+/* Log panel */
+.log-panel {
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.log-entry {
+  display: flex;
+  gap: 12px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 12px;
+}
+
+.log-time {
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+.log-msg { color: var(--text-secondary); }
+.log-entry.success .log-msg { color: var(--success); }
+.log-entry.error .log-msg { color: var(--error); }
+.log-entry.info .log-msg { color: var(--info); }
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  display: none;
+}
+
+.modal-overlay.active {
+  display: flex;
+}
+
+.modal {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  width: 500px;
+  max-width: 90vw;
+}
+
+.modal-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-title {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.modal-body {
+  padding: 24px;
+}
+
+/* Loader */
+.loader {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border-color);
+  border-top-color: var(--accent-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Responsive */
+@media (max-width: 1400px) {
+  .main {
+    grid-template-columns: 300px 1fr 350px;
+  }
+}
+
+@media (max-width: 1100px) {
+  .main {
+    grid-template-columns: 1fr;
+  }
+  
+  .sidebar, .ai-panel {
+    display: none;
+  }
+}
+```
+
   </style>
 </head>
 <body>
 
   <!-- Header -->
+
   <header class="header">
     <div class="logo">
       <div class="logo-icon" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); position: relative; overflow: hidden;">
@@ -1325,6 +1330,7 @@
       </div>
     </div>
     <div class="header-status">
+      <a href="map.html" class="btn btn-secondary" style="padding: 8px 12px; text-decoration: none;">🗺️ QING Map</a>
       <div class="status-badge" id="chainStatus">
         <span class="status-dot"></span>
         <span>Connecting...</span>
@@ -1340,6 +1346,7 @@
   </header>
 
   <!-- Main -->
+
   <main class="main">
     <!-- Left Sidebar - TABBED -->
     <aside class="sidebar">
@@ -1353,90 +1360,93 @@
           </div>
         </div>
       </div>
-      
-      <!-- My Identity - Always visible -->
-      <div class="sidebar-section" style="padding-bottom: 12px; border-bottom: 1px solid var(--border-color); margin-bottom: 12px;">
-        <div class="sidebar-title">🔮 My Identity</div>
-        <div class="input-group" style="margin-bottom: 6px;">
-          <input type="text" class="input" id="myLauAddress" placeholder="Your LAU address (0x...)" style="font-size: 11px;">
-        </div>
-        <button class="btn btn-primary btn-sm" onclick="lookupFromLau()" style="width: 100%; font-size: 11px;">🔍 Load Identity</button>
-        <div style="margin-top: 8px;">
-          <input type="text" class="input" id="walletLookup" placeholder="Wallet (0x...)" style="font-size: 10px; padding: 6px;">
-        </div>
-      </div>
 
-      <!-- QING / Territory Section -->
-      <div class="sidebar-section" style="padding-bottom: 12px; border-bottom: 1px solid var(--border-color); margin-bottom: 12px;">
-        <div class="sidebar-title">📍 Territory (QING)</div>
-        <div id="currentQingStatus" style="font-size: 10px; color: var(--text-muted); margin-bottom: 6px;">
-          Not in a QING
-        </div>
-        <div class="input-group" style="margin-bottom: 6px;">
-          <input type="text" class="input" id="qingAddress" placeholder="QING address (0x...)" style="font-size: 11px;">
-        </div>
-        <div style="display: flex; gap: 4px;">
-          <button class="btn btn-primary btn-sm" onclick="joinQing()" style="flex: 1; font-size: 10px;">Join</button>
-          <button class="btn btn-secondary btn-sm" onclick="loadQingInfo()" style="flex: 1; font-size: 10px;">Info</button>
-          <button class="btn btn-secondary btn-sm" onclick="leaveQing()" style="flex: 1; font-size: 10px;">Leave</button>
-        </div>
-        <div style="margin-top: 6px; display: flex; gap: 4px;">
-          <select id="knownQings" class="input" style="font-size: 10px; padding: 6px; flex: 1;" onchange="selectKnownQing()">
-            <option value="">-- Known QINGs --</option>
-            <option value="0xb0Ba7D36B7F0505879179ecE7401F24eB653c6E1">Zürich</option>
-            <option value="0xD127839B83cBf537c29B7d268c135f745a0Da2E8">Illinois</option>
-          </select>
-          <button class="btn btn-secondary btn-sm" onclick="addCustomQing()" style="font-size: 9px; padding: 4px 6px;" title="Add current QING to list">+</button>
-          <button class="btn btn-secondary btn-sm" onclick="clearCustomQings()" style="font-size: 9px; padding: 4px 6px;" title="Clear custom QINGs">🗑</button>
-        </div>
-      </div>
+```
+  <!-- My Identity - Always visible -->
+  <div class="sidebar-section" style="padding-bottom: 12px; border-bottom: 1px solid var(--border-color); margin-bottom: 12px;">
+    <div class="sidebar-title">🔮 My Identity</div>
+    <div class="input-group" style="margin-bottom: 6px;">
+      <input type="text" class="input" id="myLauAddress" placeholder="Your LAU address (0x...)" style="font-size: 11px;">
+    </div>
+    <button class="btn btn-primary btn-sm" onclick="lookupFromLau()" style="width: 100%; font-size: 11px;">🔍 Load Identity</button>
+    <div style="margin-top: 8px;">
+      <input type="text" class="input" id="walletLookup" placeholder="Wallet (0x...)" style="font-size: 10px; padding: 6px;">
+    </div>
+  </div>
 
-      <!-- Recent Contracts - More Accessible -->
-      <div class="sidebar-section" style="padding-bottom: 8px; border-bottom: 1px solid var(--border-color); margin-bottom: 8px;">
-        <div class="sidebar-title" style="font-size: 11px; display: flex; justify-content: space-between; align-items: center;">
-          📜 Recent
-          <button class="btn btn-secondary btn-sm" onclick="clearRecentContracts()" style="font-size: 8px; padding: 2px 5px;" title="Clear recent contracts">🗑</button>
-        </div>
-        <div id="recentContractsQuick" style="max-height: 80px; overflow-y: auto;">
-          <div style="color: var(--text-muted); font-size: 10px;">No recent</div>
-        </div>
-      </div>
+  <!-- QING / Territory Section -->
+  <div class="sidebar-section" style="padding-bottom: 12px; border-bottom: 1px solid var(--border-color); margin-bottom: 12px;">
+    <div class="sidebar-title">📍 Territory (QING)</div>
+    <div id="currentQingStatus" style="font-size: 10px; color: var(--text-muted); margin-bottom: 6px;">
+      Not in a QING
+    </div>
+    <div class="input-group" style="margin-bottom: 6px;">
+      <input type="text" class="input" id="qingAddress" placeholder="QING address (0x...)" style="font-size: 11px;">
+    </div>
+    <div style="display: flex; gap: 4px;">
+      <button class="btn btn-primary btn-sm" onclick="joinQing()" style="flex: 1; font-size: 10px;">Join</button>
+      <button class="btn btn-secondary btn-sm" onclick="loadQingInfo()" style="flex: 1; font-size: 10px;">Info</button>
+      <button class="btn btn-secondary btn-sm" onclick="leaveQing()" style="flex: 1; font-size: 10px;">Leave</button>
+    </div>
+    <div style="margin-top: 6px; display: flex; gap: 4px;">
+      <select id="knownQings" class="input" style="font-size: 10px; padding: 6px; flex: 1;" onchange="selectKnownQing()">
+        <option value="">-- Known QINGs --</option>
+        <option value="0xb0Ba7D36B7F0505879179ecE7401F24eB653c6E1">Zürich</option>
+        <option value="0xD127839B83cBf537c29B7d268c135f745a0Da2E8">Illinois</option>
+      </select>
+      <button class="btn btn-secondary btn-sm" onclick="addCustomQing()" style="font-size: 9px; padding: 4px 6px;" title="Add current QING to list">+</button>
+      <button class="btn btn-secondary btn-sm" onclick="clearCustomQings()" style="font-size: 9px; padding: 4px 6px;" title="Clear custom QINGs">🗑</button>
+    </div>
+  </div>
 
-      <!-- Tabbed Contract Browser -->
-      <div class="sidebar-tabs">
-        <div class="sidebar-tab active" onclick="showSidebarTab('core')">Core</div>
-        <div class="sidebar-tab" onclick="showSidebarTab('soeng')">Soeng</div>
-        <div class="sidebar-tab" onclick="showSidebarTab('spatial')">Spatial</div>
-        <div class="sidebar-tab" onclick="showSidebarTab('users')">Users</div>
-        <div class="sidebar-tab" onclick="showSidebarTab('tokens')">Tokens</div>
-      </div>
-      
-      <div class="sidebar-tab-content" id="sidebarTabContent">
-        <!-- Populated by JS -->
-      </div>
-    </aside>
+  <!-- Recent Contracts - More Accessible -->
+  <div class="sidebar-section" style="padding-bottom: 8px; border-bottom: 1px solid var(--border-color); margin-bottom: 8px;">
+    <div class="sidebar-title" style="font-size: 11px; display: flex; justify-content: space-between; align-items: center;">
+      📜 Recent
+      <button class="btn btn-secondary btn-sm" onclick="clearRecentContracts()" style="font-size: 8px; padding: 2px 5px;" title="Clear recent contracts">🗑</button>
+    </div>
+    <div id="recentContractsQuick" style="max-height: 80px; overflow-y: auto;">
+      <div style="color: var(--text-muted); font-size: 10px;">No recent</div>
+    </div>
+  </div>
 
-    <!-- AI Panel - NOW IN CENTER -->
-    <section class="ai-panel">
-      <div class="ai-header">
-        <div class="ai-title">
-          🧠 <span>Dysnomia AI Guide</span>
-        </div>
-        <div style="display: flex; gap: 6px;">
-          <button class="btn btn-secondary btn-sm" onclick="clearAIChat()" title="Clear chat">🗑️</button>
-          <button class="btn btn-secondary btn-sm" onclick="openApiKeyModal()" title="API Settings">⚙️</button>
-        </div>
-      </div>
-      
-      <div class="ai-messages" id="aiMessages">
-        <div class="ai-message assistant">
-          <button class="copy-msg-btn" onclick="copyInitialMsg(this)">📋</button>
-          <div>🔮 Hi! I'm your Dysnomia AI Guide.
+  <!-- Tabbed Contract Browser -->
+  <div class="sidebar-tabs">
+    <div class="sidebar-tab active" onclick="showSidebarTab('core')">Core</div>
+    <div class="sidebar-tab" onclick="showSidebarTab('soeng')">Soeng</div>
+    <div class="sidebar-tab" onclick="showSidebarTab('spatial')">Spatial</div>
+    <div class="sidebar-tab" onclick="showSidebarTab('users')">Users</div>
+    <div class="sidebar-tab" onclick="showSidebarTab('tokens')">Tokens</div>
+  </div>
+  
+  <div class="sidebar-tab-content" id="sidebarTabContent">
+    <!-- Populated by JS -->
+  </div>
+</aside>
+
+<!-- AI Panel - NOW IN CENTER -->
+<section class="ai-panel">
+  <div class="ai-header">
+    <div class="ai-title">
+      🧠 <span>Dysnomia AI Guide</span>
+    </div>
+    <div style="display: flex; gap: 6px;">
+      <button class="btn btn-secondary btn-sm" onclick="clearAIChat()" title="Clear chat">🗑️</button>
+      <button class="btn btn-secondary btn-sm" onclick="openApiKeyModal()" title="API Settings">⚙️</button>
+    </div>
+  </div>
+  
+  <div class="ai-messages" id="aiMessages">
+    <div class="ai-message assistant">
+      <button class="copy-msg-btn" onclick="copyInitialMsg(this)">📋</button>
+      <div>🔮 Hi! I'm your Dysnomia AI Guide.
+```
 
 <b>To get started:</b>
+
 1. Enter your LAU address in the sidebar
-2. Click "Load My Identity" to find your YUE & QINGs
-3. Ask me "what should I do next?"
+1. Click “Load My Identity” to find your YUE & QINGs
+1. Ask me “what should I do next?”
 
 I know the full Dysnomia architecture:
 • Reactor math (SHA, SHIO, modExp64)
@@ -1445,140 +1455,147 @@ I know the full Dysnomia architecture:
 • How to execute transactions
 
 <b>Set your API key to enable me!</b></div>
-        </div>
-      </div>
+</div>
+</div>
 
-      <div class="ai-input-container" style="flex-shrink: 0;">
-        <div class="ai-input-wrapper">
-          <textarea class="ai-input" id="aiInput" placeholder="Ask about Dysnomia, get transaction help, learn the math..." rows="2"></textarea>
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div class="ai-quick-actions" style="margin: 0;">
-              <button class="ai-quick-btn primary" onclick="quickAction('guide')">🧭 Next?</button>
-              <button class="ai-quick-btn" onclick="quickAction('explain')">📖 Explain</button>
-              <button class="ai-quick-btn" onclick="quickAction('react')">⚡ React</button>
-              <button class="ai-quick-btn" onclick="showCurrentState()">📋 State</button>
-            </div>
-            <button class="btn btn-primary" onclick="sendToAI()" style="padding: 12px 24px; font-size: 14px;">Send</button>
-          </div>
+```
+  <div class="ai-input-container" style="flex-shrink: 0;">
+    <div class="ai-input-wrapper">
+      <textarea class="ai-input" id="aiInput" placeholder="Ask about Dysnomia, get transaction help, learn the math..." rows="2"></textarea>
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div class="ai-quick-actions" style="margin: 0;">
+          <button class="ai-quick-btn primary" onclick="quickAction('guide')">🧭 Next?</button>
+          <button class="ai-quick-btn" onclick="quickAction('explain')">📖 Explain</button>
+          <button class="ai-quick-btn" onclick="quickAction('react')">⚡ React</button>
+          <button class="ai-quick-btn" onclick="showCurrentState()">📋 State</button>
         </div>
+        <button class="btn btn-primary" onclick="sendToAI()" style="padding: 12px 24px; font-size: 14px;">Send</button>
       </div>
-      
-      <div class="ai-activity-log" style="flex-shrink: 0;">
-        <div class="ai-activity-header" onclick="toggleActivityLog()">
-          <span>📋 Activity Log</span>
-          <span id="activityLogArrow">▶</span>
-        </div>
-        <div class="ai-activity-content collapsed" id="activityLog">
-          <div class="log-entry">Ready.</div>
-        </div>
-      </div>
-    </section>
+    </div>
+  </div>
+  
+  <div class="ai-activity-log" style="flex-shrink: 0;">
+    <div class="ai-activity-header" onclick="toggleActivityLog()">
+      <span>📋 Activity Log</span>
+      <span id="activityLogArrow">▶</span>
+    </div>
+    <div class="ai-activity-content collapsed" id="activityLog">
+      <div class="log-entry">Ready.</div>
+    </div>
+  </div>
+</section>
 
-    <!-- Right Contract Panel - ENHANCED -->
-    <aside class="contract-panel">
-      <!-- Multi-Contract Switcher -->
-      <div class="contract-switcher" id="contractSwitcher" style="padding: 8px; background: var(--bg-tertiary); border-bottom: 1px solid var(--border-color); display: none;">
-        <div style="font-size: 9px; color: var(--text-muted); margin-bottom: 4px;">LOADED CONTRACTS</div>
-        <div id="loadedContractsList" style="display: flex; flex-wrap: wrap; gap: 4px;"></div>
+<!-- Right Contract Panel - ENHANCED -->
+<aside class="contract-panel">
+  <!-- Multi-Contract Switcher -->
+  <div class="contract-switcher" id="contractSwitcher" style="padding: 8px; background: var(--bg-tertiary); border-bottom: 1px solid var(--border-color); display: none;">
+    <div style="font-size: 9px; color: var(--text-muted); margin-bottom: 4px;">LOADED CONTRACTS</div>
+    <div id="loadedContractsList" style="display: flex; flex-wrap: wrap; gap: 4px;"></div>
+  </div>
+  
+  <!-- Quick Token Info Bar -->
+  <div class="token-info-bar" id="tokenInfoBar" style="padding: 8px 12px; background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1)); border-bottom: 1px solid var(--border-color); display: none;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+      <span id="tokenName" style="font-weight: 600; font-size: 13px;">-</span>
+      <span id="tokenType" style="font-size: 10px; background: var(--accent-primary); color: white; padding: 2px 6px; border-radius: 4px;">-</span>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; font-size: 10px;">
+      <div>
+        <div style="color: var(--text-muted);">Balance</div>
+        <div id="tokenBalance" style="font-family: 'JetBrains Mono', monospace; font-weight: 500;">-</div>
       </div>
-      
-      <!-- Quick Token Info Bar -->
-      <div class="token-info-bar" id="tokenInfoBar" style="padding: 8px 12px; background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1)); border-bottom: 1px solid var(--border-color); display: none;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-          <span id="tokenName" style="font-weight: 600; font-size: 13px;">-</span>
-          <span id="tokenType" style="font-size: 10px; background: var(--accent-primary); color: white; padding: 2px 6px; border-radius: 4px;">-</span>
-        </div>
-        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; font-size: 10px;">
-          <div>
-            <div style="color: var(--text-muted);">Balance</div>
-            <div id="tokenBalance" style="font-family: 'JetBrains Mono', monospace; font-weight: 500;">-</div>
-          </div>
-          <div>
-            <div style="color: var(--text-muted);">Supply</div>
-            <div id="tokenSupply" style="font-family: 'JetBrains Mono', monospace; font-weight: 500;">-</div>
-          </div>
-          <div>
-            <div style="color: var(--text-muted);">Decimals</div>
-            <div id="tokenDecimals" style="font-family: 'JetBrains Mono', monospace; font-weight: 500;">-</div>
-          </div>
-        </div>
+      <div>
+        <div style="color: var(--text-muted);">Supply</div>
+        <div id="tokenSupply" style="font-family: 'JetBrains Mono', monospace; font-weight: 500;">-</div>
       </div>
+      <div>
+        <div style="color: var(--text-muted);">Decimals</div>
+        <div id="tokenDecimals" style="font-family: 'JetBrains Mono', monospace; font-weight: 500;">-</div>
+      </div>
+    </div>
+  </div>
 
-      <div class="contract-panel-tabs">
-        <div class="contract-panel-tab active" onclick="showContractTab('output')">📤 Output</div>
-        <div class="contract-panel-tab" onclick="showContractTab('info')">📋 Info</div>
-        <div class="contract-panel-tab" onclick="showContractTab('functions')">⚡ Funcs</div>
-        <div class="contract-panel-tab" onclick="showContractTab('bytecode')">🔍 Bytes</div>
-      </div>
-      
-      <div class="contract-panel-content" style="flex: 1; overflow: hidden; display: flex; flex-direction: column;">
-        <!-- Output Tab - NOW FIRST AND DEFAULT -->
-        <div class="contract-panel-section active" id="tabOutput" style="flex: 1; overflow: auto;">
-          <div class="output-panel-compact">
-            <div style="display: flex; justify-content: flex-end; margin-bottom: 8px;">
-              <button class="btn btn-secondary btn-sm" onclick="copyOutput()" style="font-size: 10px; padding: 4px 8px;">📋</button>
-            </div>
-            <div class="output-content" id="outputContent" style="font-size: 12px; line-height: 1.5;">
+  <div class="contract-panel-tabs">
+    <div class="contract-panel-tab active" onclick="showContractTab('output')">📤 Output</div>
+    <div class="contract-panel-tab" onclick="showContractTab('info')">📋 Info</div>
+    <div class="contract-panel-tab" onclick="showContractTab('functions')">⚡ Funcs</div>
+    <div class="contract-panel-tab" onclick="showContractTab('bytecode')">🔍 Bytes</div>
+  </div>
+  
+  <div class="contract-panel-content" style="flex: 1; overflow: hidden; display: flex; flex-direction: column;">
+    <!-- Output Tab - NOW FIRST AND DEFAULT -->
+    <div class="contract-panel-section active" id="tabOutput" style="flex: 1; overflow: auto;">
+      <div class="output-panel-compact">
+        <div style="display: flex; justify-content: flex-end; margin-bottom: 8px;">
+          <button class="btn btn-secondary btn-sm" onclick="copyOutput()" style="font-size: 10px; padding: 4px 8px;">📋</button>
+        </div>
+        <div class="output-content" id="outputContent" style="font-size: 12px; line-height: 1.5;">
+```
+
 Enter a contract address to begin.
 
 Quick tips:
 • Load verified contracts for full ABI
 • Unverified contracts use bytecode analysis
 • Use the AI assistant for help
-            </div>
-          </div>
-        </div>
+</div>
+</div>
+</div>
 
-        <!-- Info Tab -->
-        <div class="contract-panel-section" id="tabInfo" style="flex: 1; overflow: auto;">
-          <div id="contractInfoContent">
-            <div style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
-              <div style="font-size: 48px; margin-bottom: 16px;">📋</div>
-              <div style="font-size: 14px;">Load a contract to see details</div>
-              <div style="font-size: 12px; margin-top: 8px;">Enter address in sidebar or click ecosystem contract</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Functions Tab -->
-        <div class="contract-panel-section" id="tabFunctions" style="flex: 1; overflow: auto;">
-          <div id="functionTabContent">
-            <div style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
-              <div style="font-size: 48px; margin-bottom: 16px;">⚡</div>
-              <div style="font-size: 14px;">No contract loaded</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Bytecode Tab -->
-        <div class="contract-panel-section" id="tabBytecode" style="flex: 1; overflow: auto;">
-          <div id="bytecodeTabContent">
-            <div style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
-              <div style="font-size: 48px; margin-bottom: 16px;">🔍</div>
-              <div style="font-size: 14px;">No bytecode loaded</div>
-            </div>
-          </div>
+```
+    <!-- Info Tab -->
+    <div class="contract-panel-section" id="tabInfo" style="flex: 1; overflow: auto;">
+      <div id="contractInfoContent">
+        <div style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
+          <div style="font-size: 48px; margin-bottom: 16px;">📋</div>
+          <div style="font-size: 14px;">Load a contract to see details</div>
+          <div style="font-size: 12px; margin-top: 8px;">Enter address in sidebar or click ecosystem contract</div>
         </div>
       </div>
-      
-      <!-- Debug Console -->
-      <div class="debug-console" style="flex-shrink: 0; border-top: 1px solid var(--border-color);">
-        <div class="debug-header" onclick="toggleDebugConsole()" style="padding: 6px 12px; background: var(--bg-tertiary); cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
-          <span style="font-size: 10px; font-weight: 600; color: var(--text-secondary);">🔧 Debug Console</span>
-          <span id="debugArrow" style="font-size: 10px;">▲</span>
-        </div>
-        <div class="debug-content" id="debugConsole" style="height: 120px; overflow-y: auto; background: #0d0d12; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 8px;">
-          <div class="debug-entry" style="color: var(--text-muted);">[system] Debug console ready</div>
-        </div>
-        <div class="debug-input-area" style="display: flex; border-top: 1px solid var(--border-color);">
-          <span style="padding: 6px 8px; color: var(--accent-primary); font-family: 'JetBrains Mono', monospace; font-size: 11px;">›</span>
-          <input type="text" id="debugInput" placeholder="Enter JS command..." style="flex: 1; background: transparent; border: none; color: var(--text-primary); font-family: 'JetBrains Mono', monospace; font-size: 11px; padding: 6px 0; outline: none;" onkeydown="if(event.key==='Enter')runDebugCommand()">
+    </div>
+
+    <!-- Functions Tab -->
+    <div class="contract-panel-section" id="tabFunctions" style="flex: 1; overflow: auto;">
+      <div id="functionTabContent">
+        <div style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
+          <div style="font-size: 48px; margin-bottom: 16px;">⚡</div>
+          <div style="font-size: 14px;">No contract loaded</div>
         </div>
       </div>
-    </aside>
+    </div>
+
+    <!-- Bytecode Tab -->
+    <div class="contract-panel-section" id="tabBytecode" style="flex: 1; overflow: auto;">
+      <div id="bytecodeTabContent">
+        <div style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
+          <div style="font-size: 48px; margin-bottom: 16px;">🔍</div>
+          <div style="font-size: 14px;">No bytecode loaded</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Debug Console -->
+  <div class="debug-console" style="flex-shrink: 0; border-top: 1px solid var(--border-color);">
+    <div class="debug-header" onclick="toggleDebugConsole()" style="padding: 6px 12px; background: var(--bg-tertiary); cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+      <span style="font-size: 10px; font-weight: 600; color: var(--text-secondary);">🔧 Debug Console</span>
+      <span id="debugArrow" style="font-size: 10px;">▲</span>
+    </div>
+    <div class="debug-content" id="debugConsole" style="height: 120px; overflow-y: auto; background: #0d0d12; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 8px;">
+      <div class="debug-entry" style="color: var(--text-muted);">[system] Debug console ready</div>
+    </div>
+    <div class="debug-input-area" style="display: flex; border-top: 1px solid var(--border-color);">
+      <span style="padding: 6px 8px; color: var(--accent-primary); font-family: 'JetBrains Mono', monospace; font-size: 11px;">›</span>
+      <input type="text" id="debugInput" placeholder="Enter JS command..." style="flex: 1; background: transparent; border: none; color: var(--text-primary); font-family: 'JetBrains Mono', monospace; font-size: 11px; padding: 6px 0; outline: none;" onkeydown="if(event.key==='Enter')runDebugCommand()">
+    </div>
+  </div>
+</aside>
+```
+
   </main>
 
   <!-- API Key Modal -->
+
   <div class="modal-overlay" id="apiKeyModal">
     <div class="modal">
       <div class="modal-header">
@@ -1597,37 +1614,40 @@ Quick tips:
             </button>
           </div>
         </div>
-        
-        <div id="claudeConfig">
-          <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 12px;">
-            Get a Claude API key at <a href="https://console.anthropic.com" target="_blank" style="color: var(--accent-primary);">console.anthropic.com</a>
-          </p>
-          <div class="input-group">
-            <label class="input-label">Anthropic API Key</label>
-            <input type="password" class="input" id="apiKeyInput" placeholder="sk-ant-...">
-          </div>
-        </div>
-        
-        <div id="geminiConfig" style="display: none;">
-          <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 12px;">
-            Get a Gemini API key at <a href="https://aistudio.google.com/apikey" target="_blank" style="color: var(--accent-primary);">aistudio.google.com</a>
-          </p>
-          <div class="input-group">
-            <label class="input-label">Google AI API Key</label>
-            <input type="password" class="input" id="geminiKeyInput" placeholder="AIza...">
-          </div>
-        </div>
-        
-        <p style="color: var(--text-muted); font-size: 11px; margin: 12px 0;">
-          🔒 Keys are stored in your browser only and sent directly to the provider.
-        </p>
-        <div style="display: flex; gap: 12px; margin-top: 20px;">
-          <button class="btn btn-secondary" onclick="clearAllApiKeys()" style="flex: 0.5;">Clear All</button>
-          <button class="btn btn-secondary" onclick="closeApiKeyModal()" style="flex: 0.5;">Cancel</button>
-          <button class="btn btn-primary" onclick="saveApiKey()" style="flex: 1;">Save</button>
-        </div>
+
+```
+    <div id="claudeConfig">
+      <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 12px;">
+        Get a Claude API key at <a href="https://console.anthropic.com" target="_blank" style="color: var(--accent-primary);">console.anthropic.com</a>
+      </p>
+      <div class="input-group">
+        <label class="input-label">Anthropic API Key</label>
+        <input type="password" class="input" id="apiKeyInput" placeholder="sk-ant-...">
       </div>
     </div>
+    
+    <div id="geminiConfig" style="display: none;">
+      <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 12px;">
+        Get a Gemini API key at <a href="https://aistudio.google.com/apikey" target="_blank" style="color: var(--accent-primary);">aistudio.google.com</a>
+      </p>
+      <div class="input-group">
+        <label class="input-label">Google AI API Key</label>
+        <input type="password" class="input" id="geminiKeyInput" placeholder="AIza...">
+      </div>
+    </div>
+    
+    <p style="color: var(--text-muted); font-size: 11px; margin: 12px 0;">
+      🔒 Keys are stored in your browser only and sent directly to the provider.
+    </p>
+    <div style="display: flex; gap: 12px; margin-top: 20px;">
+      <button class="btn btn-secondary" onclick="clearAllApiKeys()" style="flex: 0.5;">Clear All</button>
+      <button class="btn btn-secondary" onclick="closeApiKeyModal()" style="flex: 0.5;">Cancel</button>
+      <button class="btn btn-primary" onclick="saveApiKey()" style="flex: 1;">Save</button>
+    </div>
+  </div>
+</div>
+```
+
   </div>
 
   <script>
@@ -4272,864 +4292,864 @@ Be helpful and suggest actions when appropriate. User confirms before execution.
       const contentDiv = document.createElement('div');
       contentDiv.innerHTML = content
         .replace(/```(\w+)?\n([\s\S]*?)```/g, '<pre>$2</pre>')
-        .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-        .replace(/`([^`]+)`/g, '<code>$1</code>');
-      div.appendChild(contentDiv);
-      
-      messages.appendChild(div);
-      // Scroll within the messages container only, not the whole page
-      messages.scrollTop = div.offsetTop - messages.offsetTop;
-    }
 
-    // Copy helper for initial hardcoded message
-    function copyInitialMsg(btn) {
-      const msgDiv = btn.parentElement;
-      const textContent = msgDiv.textContent.replace('📋', '').replace('✓', '').replace('❌', '').trim();
-      copyToClipboard(
-        textContent,
-        () => {
-          btn.textContent = '✓';
-          setTimeout(() => btn.textContent = '📋', 1500);
-        },
-        (err) => {
-          console.error('Copy failed:', err);
-          btn.textContent = '❌';
-          setTimeout(() => btn.textContent = '📋', 1500);
-        }
-      );
-    }
+```
+    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+    .replace(/`([^`]+)`/g, '<code>$1</code>');
+  div.appendChild(contentDiv);
+  
+  messages.appendChild(div);
+  // Scroll within the messages container only, not the whole page
+  messages.scrollTop = div.offsetTop - messages.offsetTop;
+}
 
-    // Contract Panel Tab Switching
-    function showContractTab(tabName) {
-      // Update tab buttons
-      document.querySelectorAll('.contract-panel-tab').forEach(tab => {
-        tab.classList.remove('active');
-        if (tab.textContent.toLowerCase().includes(tabName.toLowerCase().slice(0,4))) {
-          tab.classList.add('active');
-        }
-      });
-      
-      // Update tab content
-      document.querySelectorAll('.contract-panel-section').forEach(section => {
-        section.classList.remove('active');
-      });
-      const tabId = 'tab' + tabName.charAt(0).toUpperCase() + tabName.slice(1);
-      const tabEl = document.getElementById(tabId);
-      if (tabEl) tabEl.classList.add('active');
+// Copy helper for initial hardcoded message
+function copyInitialMsg(btn) {
+  const msgDiv = btn.parentElement;
+  const textContent = msgDiv.textContent.replace('📋', '').replace('✓', '').replace('❌', '').trim();
+  copyToClipboard(
+    textContent,
+    () => {
+      btn.textContent = '✓';
+      setTimeout(() => btn.textContent = '📋', 1500);
+    },
+    (err) => {
+      console.error('Copy failed:', err);
+      btn.textContent = '❌';
+      setTimeout(() => btn.textContent = '📋', 1500);
     }
+  );
+}
 
-    // Update contract info in the right panel
-    function updateContractPanel(name, address, type, supply, decimals, verified) {
-      document.getElementById('contractInfoContent').innerHTML = `
-        <div style="margin-bottom: 16px;">
-          <div style="font-size: 16px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">${name}</div>
-          <div style="font-size: 11px; font-family: 'JetBrains Mono', monospace; color: var(--text-muted); word-break: break-all;">${address}</div>
-        </div>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-          <div style="padding: 12px; background: var(--bg-tertiary); border-radius: 8px;">
-            <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 4px;">Type</div>
-            <div style="font-size: 13px; font-weight: 500;">${type}</div>
-          </div>
-          <div style="padding: 12px; background: var(--bg-tertiary); border-radius: 8px;">
-            <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 4px;">Verified</div>
-            <div style="font-size: 13px; font-weight: 500;">${verified ? '✅ Yes' : '❌ No'}</div>
-          </div>
-          <div style="padding: 12px; background: var(--bg-tertiary); border-radius: 8px;">
-            <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 4px;">Supply</div>
-            <div style="font-size: 13px; font-weight: 500;">${supply || '-'}</div>
-          </div>
-          <div style="padding: 12px; background: var(--bg-tertiary); border-radius: 8px;">
-            <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 4px;">Decimals</div>
-            <div style="font-size: 13px; font-weight: 500;">${decimals || '-'}</div>
-          </div>
-        </div>
-        <div style="margin-top: 16px; display: flex; gap: 8px;">
-          <button class="btn btn-secondary btn-sm" onclick="copyAddress()" style="flex: 1;">📋</button>
-          <button class="btn btn-secondary btn-sm" onclick="viewOnScan()" style="flex: 1;">🔗 Scan</button>
-        </div>
-      `;
+// Contract Panel Tab Switching
+function showContractTab(tabName) {
+  // Update tab buttons
+  document.querySelectorAll('.contract-panel-tab').forEach(tab => {
+    tab.classList.remove('active');
+    if (tab.textContent.toLowerCase().includes(tabName.toLowerCase().slice(0,4))) {
+      tab.classList.add('active');
     }
+  });
+  
+  // Update tab content
+  document.querySelectorAll('.contract-panel-section').forEach(section => {
+    section.classList.remove('active');
+  });
+  const tabId = 'tab' + tabName.charAt(0).toUpperCase() + tabName.slice(1);
+  const tabEl = document.getElementById(tabId);
+  if (tabEl) tabEl.classList.add('active');
+}
 
-    // Update functions list in right panel
-    function updateFunctionsPanel(functions) {
-      if (!functions || functions.length === 0) {
-        document.getElementById('functionTabContent').innerHTML = `
-          <div style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
-            <div style="font-size: 48px; margin-bottom: 16px;">⚡</div>
-            <div style="font-size: 14px;">No functions found</div>
-          </div>
-        `;
-        return;
-      }
-      
-      let html = '<div class="compact-function-list">';
-      functions.forEach((fn, idx) => {
-        const isRead = fn.stateMutability === 'view' || fn.stateMutability === 'pure';
-        html += `
-          <div class="compact-function-item ${isRead ? 'read' : 'write'}" onclick="selectFunctionCompact(${idx})">
-            <span class="fn-badge">${isRead ? 'R' : 'W'}</span>
-            <span class="fn-name">${fn.name}</span>
-            <span class="fn-params">(${fn.inputs?.length || 0})</span>
-          </div>
-        `;
-      });
-      html += '</div>';
-      
-      html += '<div id="compactBuilder" style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-color); display: none;"></div>';
-      
-      document.getElementById('functionTabContent').innerHTML = html;
-    }
+// Update contract info in the right panel
+function updateContractPanel(name, address, type, supply, decimals, verified) {
+  document.getElementById('contractInfoContent').innerHTML = `
+    <div style="margin-bottom: 16px;">
+      <div style="font-size: 16px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">${name}</div>
+      <div style="font-size: 11px; font-family: 'JetBrains Mono', monospace; color: var(--text-muted); word-break: break-all;">${address}</div>
+    </div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+      <div style="padding: 12px; background: var(--bg-tertiary); border-radius: 8px;">
+        <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 4px;">Type</div>
+        <div style="font-size: 13px; font-weight: 500;">${type}</div>
+      </div>
+      <div style="padding: 12px; background: var(--bg-tertiary); border-radius: 8px;">
+        <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 4px;">Verified</div>
+        <div style="font-size: 13px; font-weight: 500;">${verified ? '✅ Yes' : '❌ No'}</div>
+      </div>
+      <div style="padding: 12px; background: var(--bg-tertiary); border-radius: 8px;">
+        <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 4px;">Supply</div>
+        <div style="font-size: 13px; font-weight: 500;">${supply || '-'}</div>
+      </div>
+      <div style="padding: 12px; background: var(--bg-tertiary); border-radius: 8px;">
+        <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 4px;">Decimals</div>
+        <div style="font-size: 13px; font-weight: 500;">${decimals || '-'}</div>
+      </div>
+    </div>
+    <div style="margin-top: 16px; display: flex; gap: 8px;">
+      <button class="btn btn-secondary btn-sm" onclick="copyAddress()" style="flex: 1;">📋</button>
+      <button class="btn btn-secondary btn-sm" onclick="viewOnScan()" style="flex: 1;">🔗 Scan</button>
+    </div>
+  `;
+}
 
-    function clearAIChat() {
-      // Clear conversation history
-      conversationHistory = [];
-      
-      document.getElementById('aiMessages').innerHTML = `
-        <div class="ai-message assistant">
-          <button class="copy-msg-btn" onclick="copyInitialMsg(this)">📋</button>
-          <div>🔮 Chat cleared! Conversation history reset.
-          
+// Update functions list in right panel
+function updateFunctionsPanel(functions) {
+  if (!functions || functions.length === 0) {
+    document.getElementById('functionTabContent').innerHTML = `
+      <div style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
+        <div style="font-size: 48px; margin-bottom: 16px;">⚡</div>
+        <div style="font-size: 14px;">No functions found</div>
+      </div>
+    `;
+    return;
+  }
+  
+  let html = '<div class="compact-function-list">';
+  functions.forEach((fn, idx) => {
+    const isRead = fn.stateMutability === 'view' || fn.stateMutability === 'pure';
+    html += `
+      <div class="compact-function-item ${isRead ? 'read' : 'write'}" onclick="selectFunctionCompact(${idx})">
+        <span class="fn-badge">${isRead ? 'R' : 'W'}</span>
+        <span class="fn-name">${fn.name}</span>
+        <span class="fn-params">(${fn.inputs?.length || 0})</span>
+      </div>
+    `;
+  });
+  html += '</div>';
+  
+  html += '<div id="compactBuilder" style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-color); display: none;"></div>';
+  
+  document.getElementById('functionTabContent').innerHTML = html;
+}
+
+function clearAIChat() {
+  // Clear conversation history
+  conversationHistory = [];
+  
+  document.getElementById('aiMessages').innerHTML = `
+    <div class="ai-message assistant">
+      <button class="copy-msg-btn" onclick="copyInitialMsg(this)">📋</button>
+      <div>🔮 Chat cleared! Conversation history reset.
+```
+
 I remember the full Dysnomia ecosystem and will guide you through:
 • Setting up your identity (LAU, YUE)
 • Joining territories (QING)
 • Terraforming operations (Alpha, Beta, Pi, React)
 • Understanding your coordinates
 
-I'll keep track of our conversation and help you step-by-step.
+I’ll keep track of our conversation and help you step-by-step.
 What would you like to do?</div>
-        </div>
-      `;
-      log('AI chat and history cleared', 'info');
-    }
+</div>
+`;
+log(‘AI chat and history cleared’, ‘info’);
+}
 
-    function buildContext() {
-      let context = '=== CURRENT ENTROPY AI STATE ===\n\n';
+```
+function buildContext() {
+  let context = '=== CURRENT ENTROPY AI STATE ===\n\n';
+  
+  // User's discovered contracts from "Load My Identity"
+  if (userContracts.lau || userContracts.wallet) {
+    context += `=== USER IDENTITY ===\n`;
+    if (userContracts.wallet) context += `Wallet: ${userContracts.wallet}\n`;
+    if (userContracts.lau) context += `LAU: ${userContracts.lau}\n`;
+    if (userContracts.yue) context += `YUE: ${userContracts.yue}\n`;
+    if (userContracts.currentArea) context += `Current QING: ${userContracts.currentArea}\n`;
+    if (userContracts.qings && userContracts.qings.length > 0) context += `All QINGs: ${userContracts.qings.join(', ')}\n`;
+    context += `Registered in CHO: ${userContracts.registered ? 'Yes' : 'No'}\n`;
+    context += '\n';
+  }
+  
+  // Include the Output Panel content (results from Load My Identity, etc.)
+  const outputContent = document.getElementById('outputContent')?.textContent || '';
+  if (outputContent && outputContent.length > 50 && !outputContent.includes('Enter a contract')) {
+    context += `=== LAST LOOKUP RESULT ===\n${outputContent}\n\n`;
+  }
+  
+  // Currently loaded contract
+  if (currentAddress) {
+    context += `=== LOADED CONTRACT ===\n`;
+    context += `Address: ${currentAddress}\n`;
+    context += `Name: ${currentContractName || 'Unknown'}\n`;
+    context += `Type: ${currentContractType || 'Unknown'}\n`;
+    
+    if (currentABI) {
+      const fns = currentABI.filter(x => x.type === 'function');
+      const reads = fns.filter(f => f.stateMutability === 'view' || f.stateMutability === 'pure');
+      const writes = fns.filter(f => f.stateMutability !== 'view' && f.stateMutability !== 'pure');
       
-      // User's discovered contracts from "Load My Identity"
-      if (userContracts.lau || userContracts.wallet) {
-        context += `=== USER IDENTITY ===\n`;
-        if (userContracts.wallet) context += `Wallet: ${userContracts.wallet}\n`;
-        if (userContracts.lau) context += `LAU: ${userContracts.lau}\n`;
-        if (userContracts.yue) context += `YUE: ${userContracts.yue}\n`;
-        if (userContracts.currentArea) context += `Current QING: ${userContracts.currentArea}\n`;
-        if (userContracts.qings && userContracts.qings.length > 0) context += `All QINGs: ${userContracts.qings.join(', ')}\n`;
-        context += `Registered in CHO: ${userContracts.registered ? 'Yes' : 'No'}\n`;
-        context += '\n';
-      }
+      context += `\nREAD FUNCTIONS (${reads.length}):\n`;
+      reads.slice(0, 20).forEach(f => {
+        context += `  ${f.name}(${f.inputs.map(i => i.type).join(', ')})${f.outputs?.length ? ' → ' + f.outputs.map(o => o.type).join(', ') : ''}\n`;
+      });
+      if (reads.length > 20) context += `  ... and ${reads.length - 20} more\n`;
       
-      // Include the Output Panel content (results from Load My Identity, etc.)
-      const outputContent = document.getElementById('outputContent')?.textContent || '';
-      if (outputContent && outputContent.length > 50 && !outputContent.includes('Enter a contract')) {
-        context += `=== LAST LOOKUP RESULT ===\n${outputContent}\n\n`;
-      }
-      
-      // Currently loaded contract
-      if (currentAddress) {
-        context += `=== LOADED CONTRACT ===\n`;
-        context += `Address: ${currentAddress}\n`;
-        context += `Name: ${currentContractName || 'Unknown'}\n`;
-        context += `Type: ${currentContractType || 'Unknown'}\n`;
-        
-        if (currentABI) {
-          const fns = currentABI.filter(x => x.type === 'function');
-          const reads = fns.filter(f => f.stateMutability === 'view' || f.stateMutability === 'pure');
-          const writes = fns.filter(f => f.stateMutability !== 'view' && f.stateMutability !== 'pure');
-          
-          context += `\nREAD FUNCTIONS (${reads.length}):\n`;
-          reads.slice(0, 20).forEach(f => {
-            context += `  ${f.name}(${f.inputs.map(i => i.type).join(', ')})${f.outputs?.length ? ' → ' + f.outputs.map(o => o.type).join(', ') : ''}\n`;
-          });
-          if (reads.length > 20) context += `  ... and ${reads.length - 20} more\n`;
-          
-          context += `\nWRITE FUNCTIONS (${writes.length}):\n`;
-          writes.slice(0, 15).forEach(f => {
-            context += `  ${f.name}(${f.inputs.map(i => i.type).join(', ')})\n`;
-          });
-          if (writes.length > 15) context += `  ... and ${writes.length - 15} more\n`;
-        }
-      } else {
-        context += `=== NO CONTRACT LOADED ===\n`;
-        context += `User can load a contract or ask general Dysnomia questions.\n`;
-      }
-      
-      // Connection status
-      context += `\n=== CONNECTION ===\n`;
-      context += `Wallet Connected: ${signer ? 'Yes' : 'No'}\n`;
-      if (signer) {
-        context += `Can execute write functions: Yes\n`;
-      }
-      
-      // Available actions the AI can SUGGEST (user confirms)
-      context += `\n=== AI SUGGESTED ACTIONS ===
+      context += `\nWRITE FUNCTIONS (${writes.length}):\n`;
+      writes.slice(0, 15).forEach(f => {
+        context += `  ${f.name}(${f.inputs.map(i => i.type).join(', ')})\n`;
+      });
+      if (writes.length > 15) context += `  ... and ${writes.length - 15} more\n`;
+    }
+  } else {
+    context += `=== NO CONTRACT LOADED ===\n`;
+    context += `User can load a contract or ask general Dysnomia questions.\n`;
+  }
+  
+  // Connection status
+  context += `\n=== CONNECTION ===\n`;
+  context += `Wallet Connected: ${signer ? 'Yes' : 'No'}\n`;
+  if (signer) {
+    context += `Can execute write functions: Yes\n`;
+  }
+  
+  // Available actions the AI can SUGGEST (user confirms)
+  context += `\n=== AI SUGGESTED ACTIONS ===
+```
+
 You can SUGGEST actions for the user to confirm. Use these formats:
 
 {{SUGGEST_NAVIGATE:CONTRACT_NAME:reason}} - Suggest loading a known contract
-{{SUGGEST_LOAD:0x...:reason}} - Suggest loading a contract by address  
+{{SUGGEST_LOAD:0x…:reason}} - Suggest loading a contract by address  
 {{SUGGEST_READ:functionName(args):reason}} - Suggest reading data
 {{SUGGEST_WRITE:functionName(args):reason}} - Suggest a write transaction
 
 The user will see buttons to confirm or decline. Examples:
 
-"To check your YUE status, I need to load the SEI contract. {{SUGGEST_NAVIGATE:SEI:Load SEI to check YUE creation}}"
+“To check your YUE status, I need to load the SEI contract. {{SUGGEST_NAVIGATE:SEI:Load SEI to check YUE creation}}”
 
-"Let me check your current territory. {{SUGGEST_READ:CurrentArea():Check which QING you're in}}"
+“Let me check your current territory. {{SUGGEST_READ:CurrentArea():Check which QING you’re in}}”
 
-"To create your YUE, we need to call Start(). {{SUGGEST_WRITE:Start(0x..., 'name', 'SYM'):Create your YUE token}}"
+“To create your YUE, we need to call Start(). {{SUGGEST_WRITE:Start(0x…, ‘name’, ‘SYM’):Create your YUE token}}”
 
 RULES:
-1. Always explain WHY you're suggesting an action
-2. For write functions, explain gas costs and consequences
-3. Wait for user confirmation before they execute
-4. You can suggest multiple actions - user picks which to run
-5. Keep the "reason" part short (it shows on the button)
-`;
-      
-      return context;
-    }
+
+1. Always explain WHY you’re suggesting an action
+1. For write functions, explain gas costs and consequences
+1. Wait for user confirmation before they execute
+1. You can suggest multiple actions - user picks which to run
+1. Keep the “reason” part short (it shows on the button)
+   `;
+   
+   return context;
+   }
+   
+   // Pending actions waiting for user confirmation
+   let pendingActions = [];
+   
+   // Process AI suggestions and create confirmation buttons
+   function processAISuggestions(responseText) {
+   const suggestions = [];
+   
+   // Find all suggestions
+   const patterns = [
+   { regex: /{{SUGGEST_NAVIGATE:(\w+):([^}]+)}}/g, type: ‘navigate’ },
+   { regex: /{{SUGGEST_LOAD:(0x[a-fA-F0-9]{40}):([^}]+)}}/g, type: ‘load’ },
+   { regex: /{{SUGGEST_READ:(\w+([^)]*)):([^}]+)}}/g, type: ‘read’ },
+   { regex: /{{SUGGEST_WRITE:(\w+([^)]*)):([^}]+)}}/g, type: ‘write’ },
+   ];
+   
+   for (const pattern of patterns) {
+   let match;
+   while ((match = pattern.regex.exec(responseText)) !== null) {
+   suggestions.push({
+   type: pattern.type,
+   action: match[1],
+   reason: match[2],
+   id: `action_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+   });
+   }
+   }
+   
+   return suggestions;
+   }
+   
+   // Create HTML for action buttons
+   function createActionButtons(suggestions) {
+   if (suggestions.length === 0) return ‘’;
+   
+   let html = ‘<div class="ai-action-buttons">’;
+   
+   for (const suggestion of suggestions) {
+   const icon = {
+   ‘navigate’: ‘📂’,
+   ‘load’: ‘📂’,
+   ‘read’: ‘📖’,
+   ‘write’: ‘✍️’
+   }[suggestion.type];
+   
+   ```
+    const btnClass = suggestion.type === 'write' ? 'action-btn write' : 'action-btn';
     
-    // Pending actions waiting for user confirmation
-    let pendingActions = [];
+    // Encode the action to avoid quote issues in onclick
+    const encodedAction = btoa(suggestion.action);
     
-    // Process AI suggestions and create confirmation buttons
-    function processAISuggestions(responseText) {
-      const suggestions = [];
-      
-      // Find all suggestions
-      const patterns = [
-        { regex: /\{\{SUGGEST_NAVIGATE:(\w+):([^}]+)\}\}/g, type: 'navigate' },
-        { regex: /\{\{SUGGEST_LOAD:(0x[a-fA-F0-9]{40}):([^}]+)\}\}/g, type: 'load' },
-        { regex: /\{\{SUGGEST_READ:(\w+\([^)]*\)):([^}]+)\}\}/g, type: 'read' },
-        { regex: /\{\{SUGGEST_WRITE:(\w+\([^)]*\)):([^}]+)\}\}/g, type: 'write' },
-      ];
-      
-      for (const pattern of patterns) {
-        let match;
-        while ((match = pattern.regex.exec(responseText)) !== null) {
-          suggestions.push({
-            type: pattern.type,
-            action: match[1],
-            reason: match[2],
-            id: `action_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-          });
+    html += `
+      <button class="${btnClass}" onclick="executeAIActionEncoded('${suggestion.type}', '${encodedAction}')">
+        ${icon} ${suggestion.reason}
+      </button>
+    `;
+   ```
+   
+   }
+   
+   html += ‘<button class="action-btn decline" onclick="declineActions()">❌ No thanks</button>’;
+   html += ‘</div>’;
+   
+   return html;
+   }
+   
+   // Decode and execute action
+   function executeAIActionEncoded(type, encodedAction) {
+   console.log(‘executeAIActionEncoded called:’, type, encodedAction);
+   try {
+   const action = atob(encodedAction);
+   console.log(‘Decoded action:’, action);
+   executeAIAction(type, action);
+   } catch (e) {
+   console.error(‘Error decoding action:’, e);
+   addAIMessage(`❌ Error decoding action: ${e.message}`, ‘assistant’);
+   }
+   }
+   
+   // Execute a confirmed action
+   async function executeAIAction(type, action) {
+   console.log(‘executeAIAction called:’, type, action);
+   console.log(‘currentContract:’, currentContract);
+   console.log(‘currentAddress:’, currentAddress);
+   console.log(‘signer:’, signer);
+   
+   log(`Executing: ${type} - ${action}`, ‘info’);
+   log(`Current contract: ${currentAddress || 'none'}`, ‘info’);
+   log(`Signer: ${signer ? 'connected' : 'not connected'}`, ‘info’);
+   
+   // Remove action buttons
+   document.querySelectorAll(’.ai-action-buttons’).forEach(el => el.remove());
+   
+   try {
+   switch (type) {
+   case ‘navigate’:
+   // Case-insensitive lookup
+   const actionUpper = action.toUpperCase();
+   const navAddress = KNOWN_CONTRACTS[action] ||
+   KNOWN_CONTRACTS[actionUpper] ||
+   KNOWN_CONTRACTS[action.toLowerCase()] ||
+   Object.entries(KNOWN_CONTRACTS).find(([k, v]) => k.toUpperCase() === actionUpper)?.[1];
+   if (navAddress) {
+   addAIMessage(`✅ Loading ${action}...`, ‘assistant’);
+   await loadContract(navAddress);
+   // Auto-switch to Funcs tab
+   showContractTab(‘funcs’);
+   addAIMessage(`✅ **${action}** loaded! Check the **Funcs tab** in the right panel to see available functions. Click any function to open the input builder.`, ‘assistant’);
+   } else {
+   addAIMessage(`❌ Unknown contract: ${action}. Known contracts: ${Object.keys(KNOWN_CONTRACTS).slice(0,10).join(', ')}...`, ‘assistant’);
+   }
+   break;
+   
+   ```
+      case 'load':
+        addAIMessage(`✅ Loading contract ${action.slice(0,10)}...`, 'assistant');
+        await loadContract(action);
+        // Auto-switch to Funcs tab
+        showContractTab('funcs');
+        addAIMessage(`✅ Contract loaded! Check the **Funcs tab** in the right panel. Click any function to use the input builder.`, 'assistant');
+        break;
+        
+      case 'read':
+        if (!currentContract || !currentAddress) {
+          addAIMessage(`⚠️ No contract loaded. Current state: address=${currentAddress}, contract=${currentContract ? 'exists' : 'null'}`, 'assistant');
+          return;
         }
-      }
-      
-      return suggestions;
-    }
-    
-    // Create HTML for action buttons
-    function createActionButtons(suggestions) {
-      if (suggestions.length === 0) return '';
-      
-      let html = '<div class="ai-action-buttons">';
-      
-      for (const suggestion of suggestions) {
-        const icon = {
-          'navigate': '📂',
-          'load': '📂',
-          'read': '📖',
-          'write': '✍️'
-        }[suggestion.type];
         
-        const btnClass = suggestion.type === 'write' ? 'action-btn write' : 'action-btn';
-        
-        // Encode the action to avoid quote issues in onclick
-        const encodedAction = btoa(suggestion.action);
-        
-        html += `
-          <button class="${btnClass}" onclick="executeAIActionEncoded('${suggestion.type}', '${encodedAction}')">
-            ${icon} ${suggestion.reason}
-          </button>
-        `;
-      }
-      
-      html += '<button class="action-btn decline" onclick="declineActions()">❌ No thanks</button>';
-      html += '</div>';
-      
-      return html;
-    }
-    
-    // Decode and execute action
-    function executeAIActionEncoded(type, encodedAction) {
-      console.log('executeAIActionEncoded called:', type, encodedAction);
-      try {
-        const action = atob(encodedAction);
-        console.log('Decoded action:', action);
-        executeAIAction(type, action);
-      } catch (e) {
-        console.error('Error decoding action:', e);
-        addAIMessage(`❌ Error decoding action: ${e.message}`, 'assistant');
-      }
-    }
-    
-    // Execute a confirmed action
-    async function executeAIAction(type, action) {
-      console.log('executeAIAction called:', type, action);
-      console.log('currentContract:', currentContract);
-      console.log('currentAddress:', currentAddress);
-      console.log('signer:', signer);
-      
-      log(`Executing: ${type} - ${action}`, 'info');
-      log(`Current contract: ${currentAddress || 'none'}`, 'info');
-      log(`Signer: ${signer ? 'connected' : 'not connected'}`, 'info');
-      
-      // Remove action buttons
-      document.querySelectorAll('.ai-action-buttons').forEach(el => el.remove());
-      
-      try {
-        switch (type) {
-          case 'navigate':
-            // Case-insensitive lookup
-            const actionUpper = action.toUpperCase();
-            const navAddress = KNOWN_CONTRACTS[action] || 
-                              KNOWN_CONTRACTS[actionUpper] || 
-                              KNOWN_CONTRACTS[action.toLowerCase()] ||
-                              Object.entries(KNOWN_CONTRACTS).find(([k, v]) => k.toUpperCase() === actionUpper)?.[1];
-            if (navAddress) {
-              addAIMessage(`✅ Loading ${action}...`, 'assistant');
-              await loadContract(navAddress);
-              // Auto-switch to Funcs tab
-              showContractTab('funcs');
-              addAIMessage(`✅ **${action}** loaded! Check the **Funcs tab** in the right panel to see available functions. Click any function to open the input builder.`, 'assistant');
-            } else {
-              addAIMessage(`❌ Unknown contract: ${action}. Known contracts: ${Object.keys(KNOWN_CONTRACTS).slice(0,10).join(', ')}...`, 'assistant');
-            }
-            break;
-            
-          case 'load':
-            addAIMessage(`✅ Loading contract ${action.slice(0,10)}...`, 'assistant');
-            await loadContract(action);
-            // Auto-switch to Funcs tab
-            showContractTab('funcs');
-            addAIMessage(`✅ Contract loaded! Check the **Funcs tab** in the right panel. Click any function to use the input builder.`, 'assistant');
-            break;
-            
-          case 'read':
-            if (!currentContract || !currentAddress) {
-              addAIMessage(`⚠️ No contract loaded. Current state: address=${currentAddress}, contract=${currentContract ? 'exists' : 'null'}`, 'assistant');
-              return;
-            }
-            
-            // Parse function call
-            const readMatch = action.match(/(\w+)\((.*)\)/);
-            if (readMatch) {
-              const fnName = readMatch[1];
-              const argsStr = readMatch[2];
-              const args = argsStr ? argsStr.split(',').map(a => a.trim().replace(/['"]/g, '')) : [];
-              
-              addAIMessage(`📖 Calling ${fnName}(${args.join(', ')}) on ${currentAddress.slice(0,10)}...`, 'assistant');
-              
-              try {
-                const result = await currentContract[fnName](...args);
-                const formatted = formatResult(result);
-                addAIMessage(`📖 **${fnName}()** result:\n\`\`\`\n${formatted}\n\`\`\``, 'assistant');
-              } catch (readErr) {
-                addAIMessage(`❌ Error calling ${fnName}: ${readErr.message}`, 'assistant');
-              }
-            } else {
-              addAIMessage(`❌ Could not parse function call: ${action}`, 'assistant');
-            }
-            break;
-            
-          case 'write':
-            if (!signer) {
-              addAIMessage(`⚠️ Please connect your wallet first. Click "Connect Wallet" in the header.`, 'assistant');
-              return;
-            }
-            if (!currentContract || !currentAddress) {
-              addAIMessage(`⚠️ No contract loaded. Please load a contract first, then try again.`, 'assistant');
-              return;
-            }
-            
-            // Parse function call
-            const writeMatch = action.match(/(\w+)\((.*)\)/);
-            if (writeMatch) {
-              const fnName = writeMatch[1];
-              const argsStr = writeMatch[2];
-              const args = argsStr ? argsStr.split(',').map(a => a.trim().replace(/['"]/g, '')) : [];
-              
-              // Check if function exists on the contract
-              const contractWithSigner = currentContract.connect(signer);
-              if (typeof contractWithSigner[fnName] !== 'function') {
-                // Try to find the function in the ABI
-                const availableFns = Object.keys(contractWithSigner.interface.functions || {})
-                  .map(f => f.split('(')[0])
-                  .filter((v, i, a) => a.indexOf(v) === i);
-                  
-                addAIMessage(`❌ Function "${fnName}" not found on this contract.\n\nAvailable functions: ${availableFns.slice(0,10).join(', ')}${availableFns.length > 10 ? '...' : ''}\n\nContract type: ${currentContractType || 'Unknown'}`, 'assistant');
-                log(`Function ${fnName} not in ABI. Available: ${availableFns.join(', ')}`, 'error');
-                return;
-              }
-              
-              // Try to simulate/preview the transaction first
-              let simulationMsg = '';
-              try {
-                // Determine the category based on function name
-                let category = 'gas';
-                let operation = fnName.toLowerCase();
-                let params = { args };
-                
-                // Terraform operations (including React)
-                if (['alpha', 'beta', 'pi', 'rho', 'upsilon', 'generate', 'react'].includes(operation)) {
-                  category = 'terraform';
-                  params = { a: args[0] || '0' };
-                }
-                // LAU operations
-                else if (['chat', 'username', 'withdraw', 'leave', 'alias'].includes(operation)) {
-                  category = 'lau';
-                  params = { message: args[0] };
-                }
-                // Buy operations
-                else if (operation.startsWith('buy') || operation.includes('mint')) {
-                  category = 'buy';
-                  params = { amount: args[0] || '1' };
-                }
-                
-                const previewResponse = await fetch('/api/preview', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ category, operation, params })
-                });
-                
-                if (previewResponse.ok) {
-                  const preview = await previewResponse.json();
-                  
-                  // Build simulation message
-                  if (preview.estimatedGas || preview.estimates?.[operation]) {
-                    const gas = preview.estimatedGas || preview.estimates?.[operation] || 80000;
-                    simulationMsg = `\n\n📊 **Simulation:**\n• Gas: ~${gas.toLocaleString()}`;
-                  }
-                  if (preview.steps && Array.isArray(preview.steps)) {
-                    simulationMsg += `\n• Steps: ${preview.steps.map(s => s.action || s).join(' → ')}`;
-                  }
-                  if (preview.formula) {
-                    simulationMsg += `\n• Formula: ${preview.formula}`;
-                  }
-                  if (preview.warning) {
-                    simulationMsg += `\n⚠️ ${preview.warning}`;
-                  }
-                }
-              } catch (simErr) {
-                // Simulation failed, continue without it
-                log('Simulation skipped: ' + simErr.message, 'info');
-              }
-              
-              // If no simulation, at least show basic gas estimate
-              if (!simulationMsg) {
-                const basicGas = {
-                  'chat': 80000, 'username': 120000, 'react': 150000,
-                  'alpha': 300000, 'beta': 250000, 'withdraw': 80000
-                }[fnName.toLowerCase()] || 100000;
-                simulationMsg = `\n\n📊 **Estimated Gas:** ~${basicGas.toLocaleString()}`;
-              }
-              
-              addAIMessage(`✍️ **${fnName}(${args.join(', ')})**\nContract: ${currentAddress.slice(0,10)}...${simulationMsg}\n\n⏳ Please confirm in your wallet.`, 'assistant');
-              
-              try {
-                const contractWithSigner = currentContract.connect(signer);
-                const tx = await contractWithSigner[fnName](...args);
-                
-                addAIMessage(`⏳ Transaction submitted!\nHash: ${tx.hash}\n\nWaiting for confirmation...`, 'assistant');
-                
-                const receipt = await tx.wait();
-                addAIMessage(`✅ Transaction confirmed!\n\nHash: ${tx.hash}\nBlock: ${receipt.blockNumber}\nGas used: ${receipt.gasUsed.toString()}`, 'assistant');
-                log(`Transaction confirmed: ${tx.hash}`, 'success');
-              } catch (txErr) {
-                if (txErr.code === 'ACTION_REJECTED') {
-                  addAIMessage(`❌ Transaction rejected by user.`, 'assistant');
-                } else {
-                  addAIMessage(`❌ Transaction failed: ${txErr.message}`, 'assistant');
-                }
-              }
-            } else {
-              addAIMessage(`❌ Could not parse function call: ${action}`, 'assistant');
-            }
-            break;
-        }
-      } catch (e) {
-        addAIMessage(`❌ Error: ${e.message}`, 'assistant');
-        log(`Action error: ${e.message}`, 'error');
-      }
-    }
-    
-    function declineActions() {
-      document.querySelectorAll('.ai-action-buttons').forEach(el => el.remove());
-      addAIMessage(`👍 No problem! Let me know if you need anything else.`, 'assistant');
-    }
-    
-    // Show current system state in chat
-    function showCurrentState() {
-      let state = `📋 **Current System State:**\n\n`;
-      state += `**Wallet:** ${signer ? '✅ Connected' : '❌ Not connected'}\n`;
-      state += `**Contract Loaded:** ${currentAddress ? `✅ ${currentContractName || 'Unknown'} (${currentAddress.slice(0,10)}...)` : '❌ None'}\n`;
-      
-      if (userContracts.lau) {
-        state += `**Your LAU:** ${userContracts.lau.slice(0,10)}...\n`;
-      }
-      if (userContracts.yue) {
-        state += `**Your YUE:** ${userContracts.yue.slice(0,10)}...\n`;
-      }
-      if (userContracts.currentArea) {
-        state += `**Current QING:** ${userContracts.currentArea.slice(0,10)}...\n`;
-      }
-      state += `**CHO Registered:** ${userContracts.registered ? '✅ Yes' : '❌ No'}\n`;
-      
-      addAIMessage(state, 'assistant');
-    }
-
-    function quickAction(action) {
-      let prompt = '';
-      
-      switch (action) {
-        case 'guide':
-          prompt = `Based on my current state (wallet, LAU, YUE, loaded contract), what should I do next in Dysnomia? Give me specific steps and the exact function calls with parameters.`;
-          break;
-        case 'explain':
-          prompt = 'Explain what this contract does in the Dysnomia ecosystem, what its role is, and how it connects to other contracts.';
-          break;
-        case 'react':
-          prompt = 'Explain how to call React() on this contract. What parameters do I need? What will happen? Show me the exact ethers.js code to execute it.';
-          break;
-        case 'math':
-          prompt = 'Explain the mathematical operations in this contract - modExp64, XOR chains, MotzkinPrime, etc. How does the reactor math work? Show examples with actual numbers.';
-          break;
-        case 'terraform':
-          prompt = 'Explain how this contract fits into the terraforming layers (Physics, Terra, Firma, Life). How do I use it to accumulate Hypobar/Epibar on my YUE? What are the steps?';
-          break;
-        case 'functions':
-          prompt = 'List and explain the main functions of this contract, especially the Dysnomia-specific ones.';
-          break;
-        case 'unknown':
-          prompt = 'Help me identify any unknown function selectors in this contract.';
-          break;
-        case 'decode':
-          prompt = 'Analyze the bytecode and help me understand the contract structure.';
-          break;
-      }
-
-      document.getElementById('aiInput').value = prompt;
-      sendToAI();
-    }
-
-    function askClaudeAboutBytecode() {
-      document.getElementById('aiInput').value = 'Analyze the bytecode of this contract and help identify any unknown functions or patterns.';
-      sendToAI();
-    }
-
-    // ═══════════════════════════════════════════════════════════════════════════
-    // UTILITIES
-    // ═══════════════════════════════════════════════════════════════════════════
-
-    function log(msg, type = '') {
-      const logEl = document.getElementById('activityLog');
-      const time = new Date().toLocaleTimeString();
-      const entry = document.createElement('div');
-      entry.className = 'log-entry ' + type;
-      entry.innerHTML = `<span class="log-time">${time}</span><span class="log-msg">${msg}</span>`;
-      logEl.insertBefore(entry, logEl.firstChild);
-    }
-
-    function setOutput(text) {
-      document.getElementById('outputContent').textContent = text;
-    }
-
-    function copyOutput() {
-      navigator.clipboard.writeText(document.getElementById('outputContent').textContent);
-      log('Copied to clipboard', 'success');
-    }
-
-    function copyAddress() {
-      navigator.clipboard.writeText(currentAddress);
-      log('Address copied', 'success');
-    }
-
-    function viewOnScan() {
-      window.open(`https://scan.pulsechain.com/address/${currentAddress}`, '_blank');
-    }
-
-    function formatLargeNumber(value, decimals = 18) {
-      const num = Number(value) / Math.pow(10, decimals);
-      if (num >= 1e12) return (num / 1e12).toFixed(2) + 'T';
-      if (num >= 1e9) return (num / 1e9).toFixed(2) + 'B';
-      if (num >= 1e6) return (num / 1e6).toFixed(2) + 'M';
-      if (num >= 1e3) return (num / 1e3).toFixed(2) + 'K';
-      return num.toFixed(2);
-    }
-
-    // ═══════════════════════════════════════════════════════════════════════════
-    // MULTI-CONTRACT MANAGEMENT
-    // ═══════════════════════════════════════════════════════════════════════════
-    
-    let loadedContracts = {}; // { address: { contract, name, type, abi } }
-    
-    function addLoadedContract(address, contract, name, type, abi) {
-      loadedContracts[address] = { contract, name, type, abi };
-      updateLoadedContractsList();
-    }
-    
-    function updateLoadedContractsList() {
-      const list = document.getElementById('loadedContractsList');
-      const switcher = document.getElementById('contractSwitcher');
-      
-      const addresses = Object.keys(loadedContracts);
-      if (addresses.length <= 1) {
-        switcher.style.display = 'none';
-        return;
-      }
-      
-      switcher.style.display = 'block';
-      list.innerHTML = addresses.map(addr => {
-        const c = loadedContracts[addr];
-        const isActive = addr === currentAddress;
-        return `
-          <div style="display: inline-flex; align-items: center; margin-right: 4px; margin-bottom: 4px;">
-            <button onclick="switchToContract('${addr}')" 
-              style="padding: 3px 8px; font-size: 9px; border-radius: 4px 0 0 4px; border: 1px solid ${isActive ? 'var(--accent-primary)' : 'var(--border-color)'}; border-right: none;
-              background: ${isActive ? 'var(--accent-primary)' : 'var(--bg-secondary)'}; color: ${isActive ? 'white' : 'var(--text-secondary)'}; cursor: pointer;">
-              ${c.name || addr.slice(0,8)}
-            </button>
-            <button onclick="removeLoadedContract('${addr}', event)" 
-              style="padding: 3px 5px; font-size: 9px; border-radius: 0 4px 4px 0; border: 1px solid ${isActive ? 'var(--accent-primary)' : 'var(--border-color)'};
-              background: ${isActive ? 'rgba(239,68,68,0.8)' : 'var(--bg-tertiary)'}; color: ${isActive ? 'white' : 'var(--text-muted)'}; cursor: pointer;"
-              title="Remove contract">✕</button>
-          </div>
-        `;
-      }).join('');
-    }
-    
-    function switchToContract(address) {
-      if (!loadedContracts[address]) return;
-      
-      const c = loadedContracts[address];
-      currentAddress = address;
-      currentContract = c.contract;
-      currentContractName = c.name;
-      currentContractType = c.type;
-      currentABI = c.abi;
-      
-      // Update UI
-      document.getElementById('contractAddress').value = address;
-      updateLoadedContractsList();
-      populateFunctionList(c.abi);
-      updateTokenInfoBar();
-      debugLog(`Switched to ${c.name || address.slice(0,10)}`, 'info');
-    }
-    
-    function removeLoadedContract(address, event) {
-      event.stopPropagation(); // Don't trigger switch
-      
-      // Can't remove the currently active contract if it's the only one
-      const addresses = Object.keys(loadedContracts);
-      if (addresses.length === 1) {
-        debugLog('Cannot remove the only loaded contract', 'warning');
-        return;
-      }
-      
-      delete loadedContracts[address];
-      debugLog(`Removed ${address.slice(0,10)}...`, 'info');
-      
-      // If we removed the active contract, switch to another one
-      if (address === currentAddress) {
-        const remaining = Object.keys(loadedContracts);
-        if (remaining.length > 0) {
-          switchToContract(remaining[0]);
-        }
-      }
-      
-      updateLoadedContractsList();
-    }
-    
-    function clearLoadedContracts() {
-      if (!confirm('Clear all loaded contracts except current?')) return;
-      
-      loadedContracts = {};
-      if (currentAddress) {
-        loadedContracts[currentAddress] = { 
-          contract: currentContract, 
-          name: currentContractName, 
-          type: currentContractType, 
-          abi: currentABI 
-        };
-      }
-      updateLoadedContractsList();
-      debugLog('Cleared loaded contracts', 'info');
-    }
-    
-    // ═══════════════════════════════════════════════════════════════════════════
-    // TOKEN INFO BAR
-    // ═══════════════════════════════════════════════════════════════════════════
-    
-    async function updateTokenInfoBar() {
-      const bar = document.getElementById('tokenInfoBar');
-      if (!currentContract || !currentAddress) {
-        bar.style.display = 'none';
-        return;
-      }
-      
-      bar.style.display = 'block';
-      document.getElementById('tokenName').textContent = currentContractName || 'Unknown';
-      document.getElementById('tokenType').textContent = currentContractType || 'Contract';
-      
-      // Get token info
-      try {
-        const decimals = await currentContract.decimals().catch(() => 18);
-        document.getElementById('tokenDecimals').textContent = decimals.toString();
-        
-        const supply = await currentContract.totalSupply().catch(() => null);
-        document.getElementById('tokenSupply').textContent = supply ? formatLargeNumber(supply, decimals) : '-';
-        
-        if (signer) {
-          const userAddr = await signer.getAddress();
-          const balance = await currentContract.balanceOf(userAddr).catch(() => null);
-          document.getElementById('tokenBalance').textContent = balance ? formatLargeNumber(balance, decimals) : '-';
+        // Parse function call
+        const readMatch = action.match(/(\w+)\((.*)\)/);
+        if (readMatch) {
+          const fnName = readMatch[1];
+          const argsStr = readMatch[2];
+          const args = argsStr ? argsStr.split(',').map(a => a.trim().replace(/['"]/g, '')) : [];
+          
+          addAIMessage(`📖 Calling ${fnName}(${args.join(', ')}) on ${currentAddress.slice(0,10)}...`, 'assistant');
+          
+          try {
+            const result = await currentContract[fnName](...args);
+            const formatted = formatResult(result);
+            addAIMessage(`📖 **${fnName}()** result:\n\`\`\`\n${formatted}\n\`\`\``, 'assistant');
+          } catch (readErr) {
+            addAIMessage(`❌ Error calling ${fnName}: ${readErr.message}`, 'assistant');
+          }
         } else {
-          document.getElementById('tokenBalance').textContent = 'Connect wallet';
+          addAIMessage(`❌ Could not parse function call: ${action}`, 'assistant');
         }
-      } catch (e) {
-        document.getElementById('tokenDecimals').textContent = '-';
-        document.getElementById('tokenSupply').textContent = '-';
-        document.getElementById('tokenBalance').textContent = '-';
-      }
-    }
-    
-    // ═══════════════════════════════════════════════════════════════════════════
-    // DEBUG CONSOLE
-    // ═══════════════════════════════════════════════════════════════════════════
-    
-    function toggleDebugConsole() {
-      const content = document.getElementById('debugConsole');
-      const arrow = document.getElementById('debugArrow');
-      const inputArea = content.nextElementSibling;
-      
-      if (content.style.height === '0px' || content.style.display === 'none') {
-        content.style.height = '120px';
-        content.style.display = 'block';
-        inputArea.style.display = 'flex';
-        arrow.textContent = '▲';
-      } else {
-        content.style.height = '0px';
-        content.style.display = 'none';
-        inputArea.style.display = 'none';
-        arrow.textContent = '▼';
-      }
-    }
-    
-    function debugLog(message, type = 'log') {
-      const console = document.getElementById('debugConsole');
-      const timestamp = new Date().toLocaleTimeString('en-US', { hour12: false });
-      const colors = {
-        log: 'var(--text-secondary)',
-        info: 'var(--info)',
-        success: 'var(--success)',
-        warning: 'var(--warning)',
-        error: 'var(--error)'
-      };
-      
-      const entry = document.createElement('div');
-      entry.className = 'debug-entry';
-      entry.style.color = colors[type] || colors.log;
-      entry.innerHTML = `<span style="color: var(--text-muted)">[${timestamp}]</span> ${message}`;
-      
-      console.appendChild(entry);
-      console.scrollTop = console.scrollHeight;
-      
-      // Keep only last 100 entries
-      while (console.children.length > 100) {
-        console.removeChild(console.firstChild);
-      }
-    }
-    
-    function runDebugCommand() {
-      const input = document.getElementById('debugInput');
-      const cmd = input.value.trim();
-      if (!cmd) return;
-      
-      debugLog(`> ${cmd}`, 'log');
-      input.value = '';
-      
-      try {
-        // Provide context for common variables
-        const context = {
-          contract: currentContract,
-          address: currentAddress,
-          signer: signer,
-          provider: provider,
-          ethers: ethers,
-          loaded: loadedContracts,
-          abi: currentABI
-        };
+        break;
         
-        // Execute command
-        const result = eval(cmd);
-        
-        if (result instanceof Promise) {
-          result.then(r => {
-            debugLog(JSON.stringify(r, (k, v) => typeof v === 'bigint' ? v.toString() : v, 2), 'success');
-          }).catch(e => {
-            debugLog(`Error: ${e.message}`, 'error');
-          });
-        } else if (result !== undefined) {
-          debugLog(JSON.stringify(result, (k, v) => typeof v === 'bigint' ? v.toString() : v, 2), 'success');
+      case 'write':
+        if (!signer) {
+          addAIMessage(`⚠️ Please connect your wallet first. Click "Connect Wallet" in the header.`, 'assistant');
+          return;
         }
-      } catch (e) {
+        if (!currentContract || !currentAddress) {
+          addAIMessage(`⚠️ No contract loaded. Please load a contract first, then try again.`, 'assistant');
+          return;
+        }
+        
+        // Parse function call
+        const writeMatch = action.match(/(\w+)\((.*)\)/);
+        if (writeMatch) {
+          const fnName = writeMatch[1];
+          const argsStr = writeMatch[2];
+          const args = argsStr ? argsStr.split(',').map(a => a.trim().replace(/['"]/g, '')) : [];
+          
+          // Check if function exists on the contract
+          const contractWithSigner = currentContract.connect(signer);
+          if (typeof contractWithSigner[fnName] !== 'function') {
+            // Try to find the function in the ABI
+            const availableFns = Object.keys(contractWithSigner.interface.functions || {})
+              .map(f => f.split('(')[0])
+              .filter((v, i, a) => a.indexOf(v) === i);
+              
+            addAIMessage(`❌ Function "${fnName}" not found on this contract.\n\nAvailable functions: ${availableFns.slice(0,10).join(', ')}${availableFns.length > 10 ? '...' : ''}\n\nContract type: ${currentContractType || 'Unknown'}`, 'assistant');
+            log(`Function ${fnName} not in ABI. Available: ${availableFns.join(', ')}`, 'error');
+            return;
+          }
+          
+          // Try to simulate/preview the transaction first
+          let simulationMsg = '';
+          try {
+            // Determine the category based on function name
+            let category = 'gas';
+            let operation = fnName.toLowerCase();
+            let params = { args };
+            
+            // Terraform operations (including React)
+            if (['alpha', 'beta', 'pi', 'rho', 'upsilon', 'generate', 'react'].includes(operation)) {
+              category = 'terraform';
+              params = { a: args[0] || '0' };
+            }
+            // LAU operations
+            else if (['chat', 'username', 'withdraw', 'leave', 'alias'].includes(operation)) {
+              category = 'lau';
+              params = { message: args[0] };
+            }
+            // Buy operations
+            else if (operation.startsWith('buy') || operation.includes('mint')) {
+              category = 'buy';
+              params = { amount: args[0] || '1' };
+            }
+            
+            const previewResponse = await fetch('/api/preview', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ category, operation, params })
+            });
+            
+            if (previewResponse.ok) {
+              const preview = await previewResponse.json();
+              
+              // Build simulation message
+              if (preview.estimatedGas || preview.estimates?.[operation]) {
+                const gas = preview.estimatedGas || preview.estimates?.[operation] || 80000;
+                simulationMsg = `\n\n📊 **Simulation:**\n• Gas: ~${gas.toLocaleString()}`;
+              }
+              if (preview.steps && Array.isArray(preview.steps)) {
+                simulationMsg += `\n• Steps: ${preview.steps.map(s => s.action || s).join(' → ')}`;
+              }
+              if (preview.formula) {
+                simulationMsg += `\n• Formula: ${preview.formula}`;
+              }
+              if (preview.warning) {
+                simulationMsg += `\n⚠️ ${preview.warning}`;
+              }
+            }
+          } catch (simErr) {
+            // Simulation failed, continue without it
+            log('Simulation skipped: ' + simErr.message, 'info');
+          }
+          
+          // If no simulation, at least show basic gas estimate
+          if (!simulationMsg) {
+            const basicGas = {
+              'chat': 80000, 'username': 120000, 'react': 150000,
+              'alpha': 300000, 'beta': 250000, 'withdraw': 80000
+            }[fnName.toLowerCase()] || 100000;
+            simulationMsg = `\n\n📊 **Estimated Gas:** ~${basicGas.toLocaleString()}`;
+          }
+          
+          addAIMessage(`✍️ **${fnName}(${args.join(', ')})**\nContract: ${currentAddress.slice(0,10)}...${simulationMsg}\n\n⏳ Please confirm in your wallet.`, 'assistant');
+          
+          try {
+            const contractWithSigner = currentContract.connect(signer);
+            const tx = await contractWithSigner[fnName](...args);
+            
+            addAIMessage(`⏳ Transaction submitted!\nHash: ${tx.hash}\n\nWaiting for confirmation...`, 'assistant');
+            
+            const receipt = await tx.wait();
+            addAIMessage(`✅ Transaction confirmed!\n\nHash: ${tx.hash}\nBlock: ${receipt.blockNumber}\nGas used: ${receipt.gasUsed.toString()}`, 'assistant');
+            log(`Transaction confirmed: ${tx.hash}`, 'success');
+          } catch (txErr) {
+            if (txErr.code === 'ACTION_REJECTED') {
+              addAIMessage(`❌ Transaction rejected by user.`, 'assistant');
+            } else {
+              addAIMessage(`❌ Transaction failed: ${txErr.message}`, 'assistant');
+            }
+          }
+        } else {
+          addAIMessage(`❌ Could not parse function call: ${action}`, 'assistant');
+        }
+        break;
+    }
+   ```
+   
+   } catch (e) {
+   addAIMessage(`❌ Error: ${e.message}`, ‘assistant’);
+   log(`Action error: ${e.message}`, ‘error’);
+   }
+   }
+   
+   function declineActions() {
+   document.querySelectorAll(’.ai-action-buttons’).forEach(el => el.remove());
+   addAIMessage(`👍 No problem! Let me know if you need anything else.`, ‘assistant’);
+   }
+   
+   // Show current system state in chat
+   function showCurrentState() {
+   let state = `📋 **Current System State:**\n\n`;
+   state += `**Wallet:** ${signer ? '✅ Connected' : '❌ Not connected'}\n`;
+   state += `**Contract Loaded:** ${currentAddress ? `✅ ${currentContractName || ‘Unknown’} (${currentAddress.slice(0,10)}…)` : '❌ None'}\n`;
+   
+   if (userContracts.lau) {
+   state += `**Your LAU:** ${userContracts.lau.slice(0,10)}...\n`;
+   }
+   if (userContracts.yue) {
+   state += `**Your YUE:** ${userContracts.yue.slice(0,10)}...\n`;
+   }
+   if (userContracts.currentArea) {
+   state += `**Current QING:** ${userContracts.currentArea.slice(0,10)}...\n`;
+   }
+   state += `**CHO Registered:** ${userContracts.registered ? '✅ Yes' : '❌ No'}\n`;
+   
+   addAIMessage(state, ‘assistant’);
+   }
+   
+   function quickAction(action) {
+   let prompt = ‘’;
+   
+   switch (action) {
+   case ‘guide’:
+   prompt = `Based on my current state (wallet, LAU, YUE, loaded contract), what should I do next in Dysnomia? Give me specific steps and the exact function calls with parameters.`;
+   break;
+   case ‘explain’:
+   prompt = ‘Explain what this contract does in the Dysnomia ecosystem, what its role is, and how it connects to other contracts.’;
+   break;
+   case ‘react’:
+   prompt = ‘Explain how to call React() on this contract. What parameters do I need? What will happen? Show me the exact ethers.js code to execute it.’;
+   break;
+   case ‘math’:
+   prompt = ‘Explain the mathematical operations in this contract - modExp64, XOR chains, MotzkinPrime, etc. How does the reactor math work? Show examples with actual numbers.’;
+   break;
+   case ‘terraform’:
+   prompt = ‘Explain how this contract fits into the terraforming layers (Physics, Terra, Firma, Life). How do I use it to accumulate Hypobar/Epibar on my YUE? What are the steps?’;
+   break;
+   case ‘functions’:
+   prompt = ‘List and explain the main functions of this contract, especially the Dysnomia-specific ones.’;
+   break;
+   case ‘unknown’:
+   prompt = ‘Help me identify any unknown function selectors in this contract.’;
+   break;
+   case ‘decode’:
+   prompt = ‘Analyze the bytecode and help me understand the contract structure.’;
+   break;
+   }
+   
+   document.getElementById(‘aiInput’).value = prompt;
+   sendToAI();
+   }
+   
+   function askClaudeAboutBytecode() {
+   document.getElementById(‘aiInput’).value = ‘Analyze the bytecode of this contract and help identify any unknown functions or patterns.’;
+   sendToAI();
+   }
+   
+   // ═══════════════════════════════════════════════════════════════════════════
+   // UTILITIES
+   // ═══════════════════════════════════════════════════════════════════════════
+   
+   function log(msg, type = ‘’) {
+   const logEl = document.getElementById(‘activityLog’);
+   const time = new Date().toLocaleTimeString();
+   const entry = document.createElement(‘div’);
+   entry.className = ’log-entry ’ + type;
+   entry.innerHTML = `<span class="log-time">${time}</span><span class="log-msg">${msg}</span>`;
+   logEl.insertBefore(entry, logEl.firstChild);
+   }
+   
+   function setOutput(text) {
+   document.getElementById(‘outputContent’).textContent = text;
+   }
+   
+   function copyOutput() {
+   navigator.clipboard.writeText(document.getElementById(‘outputContent’).textContent);
+   log(‘Copied to clipboard’, ‘success’);
+   }
+   
+   function copyAddress() {
+   navigator.clipboard.writeText(currentAddress);
+   log(‘Address copied’, ‘success’);
+   }
+   
+   function viewOnScan() {
+   window.open(`https://scan.pulsechain.com/address/${currentAddress}`, ‘_blank’);
+   }
+   
+   function formatLargeNumber(value, decimals = 18) {
+   const num = Number(value) / Math.pow(10, decimals);
+   if (num >= 1e12) return (num / 1e12).toFixed(2) + ‘T’;
+   if (num >= 1e9) return (num / 1e9).toFixed(2) + ‘B’;
+   if (num >= 1e6) return (num / 1e6).toFixed(2) + ‘M’;
+   if (num >= 1e3) return (num / 1e3).toFixed(2) + ‘K’;
+   return num.toFixed(2);
+   }
+   
+   // ═══════════════════════════════════════════════════════════════════════════
+   // MULTI-CONTRACT MANAGEMENT
+   // ═══════════════════════════════════════════════════════════════════════════
+   
+   let loadedContracts = {}; // { address: { contract, name, type, abi } }
+   
+   function addLoadedContract(address, contract, name, type, abi) {
+   loadedContracts[address] = { contract, name, type, abi };
+   updateLoadedContractsList();
+   }
+   
+   function updateLoadedContractsList() {
+   const list = document.getElementById(‘loadedContractsList’);
+   const switcher = document.getElementById(‘contractSwitcher’);
+   
+   const addresses = Object.keys(loadedContracts);
+   if (addresses.length <= 1) {
+   switcher.style.display = ‘none’;
+   return;
+   }
+   
+   switcher.style.display = ‘block’;
+   list.innerHTML = addresses.map(addr => {
+   const c = loadedContracts[addr];
+   const isActive = addr === currentAddress;
+   return `<div style="display: inline-flex; align-items: center; margin-right: 4px; margin-bottom: 4px;"> <button onclick="switchToContract('${addr}')"  style="padding: 3px 8px; font-size: 9px; border-radius: 4px 0 0 4px; border: 1px solid ${isActive ? 'var(--accent-primary)' : 'var(--border-color)'}; border-right: none; background: ${isActive ? 'var(--accent-primary)' : 'var(--bg-secondary)'}; color: ${isActive ? 'white' : 'var(--text-secondary)'}; cursor: pointer;"> ${c.name || addr.slice(0,8)} </button> <button onclick="removeLoadedContract('${addr}', event)"  style="padding: 3px 5px; font-size: 9px; border-radius: 0 4px 4px 0; border: 1px solid ${isActive ? 'var(--accent-primary)' : 'var(--border-color)'}; background: ${isActive ? 'rgba(239,68,68,0.8)' : 'var(--bg-tertiary)'}; color: ${isActive ? 'white' : 'var(--text-muted)'}; cursor: pointer;" title="Remove contract">✕</button> </div>`;
+   }).join(’’);
+   }
+   
+   function switchToContract(address) {
+   if (!loadedContracts[address]) return;
+   
+   const c = loadedContracts[address];
+   currentAddress = address;
+   currentContract = c.contract;
+   currentContractName = c.name;
+   currentContractType = c.type;
+   currentABI = c.abi;
+   
+   // Update UI
+   document.getElementById(‘contractAddress’).value = address;
+   updateLoadedContractsList();
+   populateFunctionList(c.abi);
+   updateTokenInfoBar();
+   debugLog(`Switched to ${c.name || address.slice(0,10)}`, ‘info’);
+   }
+   
+   function removeLoadedContract(address, event) {
+   event.stopPropagation(); // Don’t trigger switch
+   
+   // Can’t remove the currently active contract if it’s the only one
+   const addresses = Object.keys(loadedContracts);
+   if (addresses.length === 1) {
+   debugLog(‘Cannot remove the only loaded contract’, ‘warning’);
+   return;
+   }
+   
+   delete loadedContracts[address];
+   debugLog(`Removed ${address.slice(0,10)}...`, ‘info’);
+   
+   // If we removed the active contract, switch to another one
+   if (address === currentAddress) {
+   const remaining = Object.keys(loadedContracts);
+   if (remaining.length > 0) {
+   switchToContract(remaining[0]);
+   }
+   }
+   
+   updateLoadedContractsList();
+   }
+   
+   function clearLoadedContracts() {
+   if (!confirm(‘Clear all loaded contracts except current?’)) return;
+   
+   loadedContracts = {};
+   if (currentAddress) {
+   loadedContracts[currentAddress] = {
+   contract: currentContract,
+   name: currentContractName,
+   type: currentContractType,
+   abi: currentABI
+   };
+   }
+   updateLoadedContractsList();
+   debugLog(‘Cleared loaded contracts’, ‘info’);
+   }
+   
+   // ═══════════════════════════════════════════════════════════════════════════
+   // TOKEN INFO BAR
+   // ═══════════════════════════════════════════════════════════════════════════
+   
+   async function updateTokenInfoBar() {
+   const bar = document.getElementById(‘tokenInfoBar’);
+   if (!currentContract || !currentAddress) {
+   bar.style.display = ‘none’;
+   return;
+   }
+   
+   bar.style.display = ‘block’;
+   document.getElementById(‘tokenName’).textContent = currentContractName || ‘Unknown’;
+   document.getElementById(‘tokenType’).textContent = currentContractType || ‘Contract’;
+   
+   // Get token info
+   try {
+   const decimals = await currentContract.decimals().catch(() => 18);
+   document.getElementById(‘tokenDecimals’).textContent = decimals.toString();
+   
+   ```
+    const supply = await currentContract.totalSupply().catch(() => null);
+    document.getElementById('tokenSupply').textContent = supply ? formatLargeNumber(supply, decimals) : '-';
+    
+    if (signer) {
+      const userAddr = await signer.getAddress();
+      const balance = await currentContract.balanceOf(userAddr).catch(() => null);
+      document.getElementById('tokenBalance').textContent = balance ? formatLargeNumber(balance, decimals) : '-';
+    } else {
+      document.getElementById('tokenBalance').textContent = 'Connect wallet';
+    }
+   ```
+   
+   } catch (e) {
+   document.getElementById(‘tokenDecimals’).textContent = ‘-’;
+   document.getElementById(‘tokenSupply’).textContent = ‘-’;
+   document.getElementById(‘tokenBalance’).textContent = ‘-’;
+   }
+   }
+   
+   // ═══════════════════════════════════════════════════════════════════════════
+   // DEBUG CONSOLE
+   // ═══════════════════════════════════════════════════════════════════════════
+   
+   function toggleDebugConsole() {
+   const content = document.getElementById(‘debugConsole’);
+   const arrow = document.getElementById(‘debugArrow’);
+   const inputArea = content.nextElementSibling;
+   
+   if (content.style.height === ‘0px’ || content.style.display === ‘none’) {
+   content.style.height = ‘120px’;
+   content.style.display = ‘block’;
+   inputArea.style.display = ‘flex’;
+   arrow.textContent = ‘▲’;
+   } else {
+   content.style.height = ‘0px’;
+   content.style.display = ‘none’;
+   inputArea.style.display = ‘none’;
+   arrow.textContent = ‘▼’;
+   }
+   }
+   
+   function debugLog(message, type = ‘log’) {
+   const console = document.getElementById(‘debugConsole’);
+   const timestamp = new Date().toLocaleTimeString(‘en-US’, { hour12: false });
+   const colors = {
+   log: ‘var(–text-secondary)’,
+   info: ‘var(–info)’,
+   success: ‘var(–success)’,
+   warning: ‘var(–warning)’,
+   error: ‘var(–error)’
+   };
+   
+   const entry = document.createElement(‘div’);
+   entry.className = ‘debug-entry’;
+   entry.style.color = colors[type] || colors.log;
+   entry.innerHTML = `<span style="color: var(--text-muted)">[${timestamp}]</span> ${message}`;
+   
+   console.appendChild(entry);
+   console.scrollTop = console.scrollHeight;
+   
+   // Keep only last 100 entries
+   while (console.children.length > 100) {
+   console.removeChild(console.firstChild);
+   }
+   }
+   
+   function runDebugCommand() {
+   const input = document.getElementById(‘debugInput’);
+   const cmd = input.value.trim();
+   if (!cmd) return;
+   
+   debugLog(`> ${cmd}`, ‘log’);
+   input.value = ‘’;
+   
+   try {
+   // Provide context for common variables
+   const context = {
+   contract: currentContract,
+   address: currentAddress,
+   signer: signer,
+   provider: provider,
+   ethers: ethers,
+   loaded: loadedContracts,
+   abi: currentABI
+   };
+   
+   ```
+    // Execute command
+    const result = eval(cmd);
+    
+    if (result instanceof Promise) {
+      result.then(r => {
+        debugLog(JSON.stringify(r, (k, v) => typeof v === 'bigint' ? v.toString() : v, 2), 'success');
+      }).catch(e => {
         debugLog(`Error: ${e.message}`, 'error');
-      }
-    }
-    
-    // Hook into existing log function to also show in debug console
-    const originalLog = log;
-    log = function(message, type) {
-      originalLog(message, type);
-      debugLog(message, type);
-    };
-
-    function addToRecent(address, name, type) {
-      recentContracts = recentContracts.filter(c => c.address !== address);
-      recentContracts.unshift({ address, name, type });
-      recentContracts = recentContracts.slice(0, 10);
-      localStorage.setItem('entropyAI_recent', JSON.stringify(recentContracts));
-      updateRecentList();
-      updateRecentQuick();
-    }
-
-    function updateRecentList() {
-      const list = document.getElementById('recentContracts');
-      if (!list) return;
-      
-      if (recentContracts.length === 0) {
-        list.innerHTML = '<div class="contract-item" style="justify-content: center; color: var(--text-muted);">No recent contracts</div>';
-        return;
-      }
-      
-      list.innerHTML = '';
-      recentContracts.forEach(c => {
-        list.innerHTML += `
-          <div class="contract-item" onclick="loadContract('${c.address}')">
-            <div>
-              <div class="contract-item-name">${c.name}</div>
-              <div class="contract-item-addr">${c.address.slice(0, 8)}...${c.address.slice(-6)}</div>
-            </div>
-            <span class="contract-item-type">${c.type}</span>
-          </div>
-        `;
       });
+    } else if (result !== undefined) {
+      debugLog(JSON.stringify(result, (k, v) => typeof v === 'bigint' ? v.toString() : v, 2), 'success');
     }
+   ```
+   
+   } catch (e) {
+   debugLog(`Error: ${e.message}`, ‘error’);
+   }
+   }
+   
+   // Hook into existing log function to also show in debug console
+   const originalLog = log;
+   log = function(message, type) {
+   originalLog(message, type);
+   debugLog(message, type);
+   };
+   
+   function addToRecent(address, name, type) {
+   recentContracts = recentContracts.filter(c => c.address !== address);
+   recentContracts.unshift({ address, name, type });
+   recentContracts = recentContracts.slice(0, 10);
+   localStorage.setItem(‘entropyAI_recent’, JSON.stringify(recentContracts));
+   updateRecentList();
+   updateRecentQuick();
+   }
+   
+   function updateRecentList() {
+   const list = document.getElementById(‘recentContracts’);
+   if (!list) return;
+   
+   if (recentContracts.length === 0) {
+   list.innerHTML = ‘<div class="contract-item" style="justify-content: center; color: var(--text-muted);">No recent contracts</div>’;
+   return;
+   }
+   
+   list.innerHTML = ‘’;
+   recentContracts.forEach(c => {
+   list.innerHTML += `<div class="contract-item" onclick="loadContract('${c.address}')"> <div> <div class="contract-item-name">${c.name}</div> <div class="contract-item-addr">${c.address.slice(0, 8)}...${c.address.slice(-6)}</div> </div> <span class="contract-item-type">${c.type}</span> </div>`;
+   });
+   }
+   
+   // Initialize on load
+   window.addEventListener(‘load’, init);
+   
+   // Allow Enter key in AI input and initialize sidebar
+   document.addEventListener(‘DOMContentLoaded’, () => {
+   document.getElementById(‘aiInput’).addEventListener(‘keydown’, (e) => {
+   if (e.key === ‘Enter’ && !e.shiftKey) {
+   e.preventDefault();
+   sendToAI();
+   }
+   });
+   
+   // Initialize sidebar tabs
+   initSidebar();
+   });
 
-    // Initialize on load
-    window.addEventListener('load', init);
-
-    // Allow Enter key in AI input and initialize sidebar
-    document.addEventListener('DOMContentLoaded', () => {
-      document.getElementById('aiInput').addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-          e.preventDefault();
-          sendToAI();
-        }
-      });
-      
-      // Initialize sidebar tabs
-      initSidebar();
-    });
   </script>
 </body>
 </html>
