@@ -6,7 +6,15 @@
       "use": "@vercel/node"
     },
     {
-      "src": "index.html",
+      "src": "**/*.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "abis/**/*.js",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "lib/**/*.js",
       "use": "@vercel/static"
     }
   ],
@@ -20,11 +28,15 @@
       "dest": "/api/preview.js"
     },
     {
-      "src": "/",
-      "dest": "/index.html"
+      "src": "/abis/(.*)",
+      "dest": "/abis/$1"
     },
     {
-      "src": "/((?!api).*)",
+      "src": "/map.html",
+      "dest": "/map.html"
+    },
+    {
+      "src": "/",
       "dest": "/index.html"
     }
   ]
