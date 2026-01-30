@@ -1391,7 +1391,10 @@
 
       <!-- Recent Contracts - More Accessible -->
       <div class="sidebar-section" style="padding-bottom: 8px; border-bottom: 1px solid var(--border-color); margin-bottom: 8px;">
-        <div class="sidebar-title" style="font-size: 11px;">📜 Recent</div>
+        <div class="sidebar-title" style="font-size: 11px; display: flex; justify-content: space-between; align-items: center;">
+          📜 Recent
+          <button class="btn btn-secondary btn-sm" onclick="clearRecentContracts()" style="font-size: 8px; padding: 2px 5px;" title="Clear recent contracts">🗑</button>
+        </div>
         <div id="recentContractsQuick" style="max-height: 80px; overflow-y: auto;">
           <div style="color: var(--text-muted); font-size: 10px;">No recent</div>
         </div>
@@ -1469,8 +1472,36 @@ I know the full Dysnomia architecture:
       </div>
     </section>
 
-    <!-- Right Contract Panel - TABBED -->
+    <!-- Right Contract Panel - ENHANCED -->
     <aside class="contract-panel">
+      <!-- Multi-Contract Switcher -->
+      <div class="contract-switcher" id="contractSwitcher" style="padding: 8px; background: var(--bg-tertiary); border-bottom: 1px solid var(--border-color); display: none;">
+        <div style="font-size: 9px; color: var(--text-muted); margin-bottom: 4px;">LOADED CONTRACTS</div>
+        <div id="loadedContractsList" style="display: flex; flex-wrap: wrap; gap: 4px;"></div>
+      </div>
+      
+      <!-- Quick Token Info Bar -->
+      <div class="token-info-bar" id="tokenInfoBar" style="padding: 8px 12px; background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1)); border-bottom: 1px solid var(--border-color); display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+          <span id="tokenName" style="font-weight: 600; font-size: 13px;">-</span>
+          <span id="tokenType" style="font-size: 10px; background: var(--accent-primary); color: white; padding: 2px 6px; border-radius: 4px;">-</span>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; font-size: 10px;">
+          <div>
+            <div style="color: var(--text-muted);">Balance</div>
+            <div id="tokenBalance" style="font-family: 'JetBrains Mono', monospace; font-weight: 500;">-</div>
+          </div>
+          <div>
+            <div style="color: var(--text-muted);">Supply</div>
+            <div id="tokenSupply" style="font-family: 'JetBrains Mono', monospace; font-weight: 500;">-</div>
+          </div>
+          <div>
+            <div style="color: var(--text-muted);">Decimals</div>
+            <div id="tokenDecimals" style="font-family: 'JetBrains Mono', monospace; font-weight: 500;">-</div>
+          </div>
+        </div>
+      </div>
+
       <div class="contract-panel-tabs">
         <div class="contract-panel-tab active" onclick="showContractTab('output')">📤 Output</div>
         <div class="contract-panel-tab" onclick="showContractTab('info')">📋 Info</div>
@@ -1478,9 +1509,9 @@ I know the full Dysnomia architecture:
         <div class="contract-panel-tab" onclick="showContractTab('bytecode')">🔍 Bytes</div>
       </div>
       
-      <div class="contract-panel-content">
+      <div class="contract-panel-content" style="flex: 1; overflow: hidden; display: flex; flex-direction: column;">
         <!-- Output Tab - NOW FIRST AND DEFAULT -->
-        <div class="contract-panel-section active" id="tabOutput">
+        <div class="contract-panel-section active" id="tabOutput" style="flex: 1; overflow: auto;">
           <div class="output-panel-compact">
             <div style="display: flex; justify-content: flex-end; margin-bottom: 8px;">
               <button class="btn btn-secondary btn-sm" onclick="copyOutput()" style="font-size: 10px; padding: 4px 8px;">📋</button>
@@ -1497,7 +1528,7 @@ Quick tips:
         </div>
 
         <!-- Info Tab -->
-        <div class="contract-panel-section" id="tabInfo">
+        <div class="contract-panel-section" id="tabInfo" style="flex: 1; overflow: auto;">
           <div id="contractInfoContent">
             <div style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
               <div style="font-size: 48px; margin-bottom: 16px;">📋</div>
@@ -1508,7 +1539,7 @@ Quick tips:
         </div>
 
         <!-- Functions Tab -->
-        <div class="contract-panel-section" id="tabFunctions">
+        <div class="contract-panel-section" id="tabFunctions" style="flex: 1; overflow: auto;">
           <div id="functionTabContent">
             <div style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
               <div style="font-size: 48px; margin-bottom: 16px;">⚡</div>
@@ -1518,13 +1549,28 @@ Quick tips:
         </div>
 
         <!-- Bytecode Tab -->
-        <div class="contract-panel-section" id="tabBytecode">
+        <div class="contract-panel-section" id="tabBytecode" style="flex: 1; overflow: auto;">
           <div id="bytecodeTabContent">
             <div style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
               <div style="font-size: 48px; margin-bottom: 16px;">🔍</div>
               <div style="font-size: 14px;">No bytecode loaded</div>
             </div>
           </div>
+        </div>
+      </div>
+      
+      <!-- Debug Console -->
+      <div class="debug-console" style="flex-shrink: 0; border-top: 1px solid var(--border-color);">
+        <div class="debug-header" onclick="toggleDebugConsole()" style="padding: 6px 12px; background: var(--bg-tertiary); cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-size: 10px; font-weight: 600; color: var(--text-secondary);">🔧 Debug Console</span>
+          <span id="debugArrow" style="font-size: 10px;">▲</span>
+        </div>
+        <div class="debug-content" id="debugConsole" style="height: 120px; overflow-y: auto; background: #0d0d12; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 8px;">
+          <div class="debug-entry" style="color: var(--text-muted);">[system] Debug console ready</div>
+        </div>
+        <div class="debug-input-area" style="display: flex; border-top: 1px solid var(--border-color);">
+          <span style="padding: 6px 8px; color: var(--accent-primary); font-family: 'JetBrains Mono', monospace; font-size: 11px;">›</span>
+          <input type="text" id="debugInput" placeholder="Enter JS command..." style="flex: 1; background: transparent; border: none; color: var(--text-primary); font-family: 'JetBrains Mono', monospace; font-size: 11px; padding: 6px 0; outline: none;" onkeydown="if(event.key==='Enter')runDebugCommand()">
         </div>
       </div>
     </aside>
@@ -2043,6 +2089,32 @@ Quick tips:
       AFFECTION: [
         'function React(address,uint256)',
         'function Issuance() view returns (uint256)',
+      ],
+      YUE: [
+        'function Chan() view returns (address)',
+        'function Origin() view returns (address)',
+        'function Hong(address,address,uint256)',
+        'function Hung(address,address,uint256)',
+        'function GetAssetRate(address,address) view returns (uint256)',
+        'function IsValidAsset(address,address) view returns (bool)',
+        'function ChangeOrigin(address)',
+      ],
+      WORLD: [
+        'function Cheon() view returns (address)',
+        'function Meta() view returns (address)',
+        'function Vitus() view returns (address)',
+        'function Map() view returns (address)',
+        'function Bun(int256,int256,address) view returns (uint256)',
+        'function Tail(address,uint256) view returns (uint256)',
+        'function Whitelist(address,address,bool)',
+      ],
+      VITUS: [
+        'function World() view returns (address)',
+        'function Mint(address,uint256)',
+      ],
+      H2O: [
+        'function World() view returns (address)',
+        'function Mint(address,uint256)',
       ],
     };
 
@@ -2930,10 +3002,13 @@ Quick tips:
     }
     
     function clearRecentContracts() {
-      recentContracts = [];
-      localStorage.removeItem('entropyAI_recent');
-      updateRecentList();
-      log('Recent contracts cleared', 'info');
+      if (confirm('Clear all recent contracts?')) {
+        recentContracts = [];
+        localStorage.removeItem('entropyAI_recent');
+        updateRecentList();
+        updateRecentQuick();
+        log('Recent contracts cleared', 'info');
+      }
     }
     
     function toggleActivityLog() {
@@ -3446,6 +3521,12 @@ Or drag this file to a browser tab on a dApp site like app.pulsex.com`;
       
       outputText += `\n\nFunctions: ${Array.isArray(currentABI) ? currentABI.filter(x => x.type === 'function' || typeof x === 'string').length : 0}`;
       setOutput(outputText);
+      
+      // Add to multi-contract system
+      addLoadedContract(address, contract, name, contractType, currentABI);
+      
+      // Update token info bar
+      updateTokenInfoBar();
       
       log('Loaded: ' + name + (isDysnomia ? ` (${contractType})` : ''), 'success');
     }
@@ -4765,6 +4846,200 @@ RULES:
       if (num >= 1e3) return (num / 1e3).toFixed(2) + 'K';
       return num.toFixed(2);
     }
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // MULTI-CONTRACT MANAGEMENT
+    // ═══════════════════════════════════════════════════════════════════════════
+    
+    let loadedContracts = {}; // { address: { contract, name, type, abi } }
+    
+    function addLoadedContract(address, contract, name, type, abi) {
+      loadedContracts[address] = { contract, name, type, abi };
+      updateLoadedContractsList();
+    }
+    
+    function updateLoadedContractsList() {
+      const list = document.getElementById('loadedContractsList');
+      const switcher = document.getElementById('contractSwitcher');
+      
+      const addresses = Object.keys(loadedContracts);
+      if (addresses.length <= 1) {
+        switcher.style.display = 'none';
+        return;
+      }
+      
+      switcher.style.display = 'block';
+      list.innerHTML = addresses.map(addr => {
+        const c = loadedContracts[addr];
+        const isActive = addr === currentAddress;
+        return `
+          <button onclick="switchToContract('${addr}')" 
+            style="padding: 3px 8px; font-size: 9px; border-radius: 4px; border: 1px solid ${isActive ? 'var(--accent-primary)' : 'var(--border-color)'}; 
+            background: ${isActive ? 'var(--accent-primary)' : 'var(--bg-secondary)'}; color: ${isActive ? 'white' : 'var(--text-secondary)'}; cursor: pointer;">
+            ${c.name || addr.slice(0,8)}
+          </button>
+        `;
+      }).join('');
+    }
+    
+    function switchToContract(address) {
+      if (!loadedContracts[address]) return;
+      
+      const c = loadedContracts[address];
+      currentAddress = address;
+      currentContract = c.contract;
+      currentContractName = c.name;
+      currentContractType = c.type;
+      currentABI = c.abi;
+      
+      // Update UI
+      document.getElementById('contractAddress').value = address;
+      updateLoadedContractsList();
+      populateFunctionList(c.abi);
+      updateTokenInfoBar();
+      debugLog(`Switched to ${c.name || address.slice(0,10)}`, 'info');
+    }
+    
+    function clearLoadedContracts() {
+      loadedContracts = {};
+      if (currentAddress) {
+        loadedContracts[currentAddress] = { 
+          contract: currentContract, 
+          name: currentContractName, 
+          type: currentContractType, 
+          abi: currentABI 
+        };
+      }
+      updateLoadedContractsList();
+    }
+    
+    // ═══════════════════════════════════════════════════════════════════════════
+    // TOKEN INFO BAR
+    // ═══════════════════════════════════════════════════════════════════════════
+    
+    async function updateTokenInfoBar() {
+      const bar = document.getElementById('tokenInfoBar');
+      if (!currentContract || !currentAddress) {
+        bar.style.display = 'none';
+        return;
+      }
+      
+      bar.style.display = 'block';
+      document.getElementById('tokenName').textContent = currentContractName || 'Unknown';
+      document.getElementById('tokenType').textContent = currentContractType || 'Contract';
+      
+      // Get token info
+      try {
+        const decimals = await currentContract.decimals().catch(() => 18);
+        document.getElementById('tokenDecimals').textContent = decimals.toString();
+        
+        const supply = await currentContract.totalSupply().catch(() => null);
+        document.getElementById('tokenSupply').textContent = supply ? formatLargeNumber(supply, decimals) : '-';
+        
+        if (signer) {
+          const userAddr = await signer.getAddress();
+          const balance = await currentContract.balanceOf(userAddr).catch(() => null);
+          document.getElementById('tokenBalance').textContent = balance ? formatLargeNumber(balance, decimals) : '-';
+        } else {
+          document.getElementById('tokenBalance').textContent = 'Connect wallet';
+        }
+      } catch (e) {
+        document.getElementById('tokenDecimals').textContent = '-';
+        document.getElementById('tokenSupply').textContent = '-';
+        document.getElementById('tokenBalance').textContent = '-';
+      }
+    }
+    
+    // ═══════════════════════════════════════════════════════════════════════════
+    // DEBUG CONSOLE
+    // ═══════════════════════════════════════════════════════════════════════════
+    
+    function toggleDebugConsole() {
+      const content = document.getElementById('debugConsole');
+      const arrow = document.getElementById('debugArrow');
+      const inputArea = content.nextElementSibling;
+      
+      if (content.style.height === '0px' || content.style.display === 'none') {
+        content.style.height = '120px';
+        content.style.display = 'block';
+        inputArea.style.display = 'flex';
+        arrow.textContent = '▲';
+      } else {
+        content.style.height = '0px';
+        content.style.display = 'none';
+        inputArea.style.display = 'none';
+        arrow.textContent = '▼';
+      }
+    }
+    
+    function debugLog(message, type = 'log') {
+      const console = document.getElementById('debugConsole');
+      const timestamp = new Date().toLocaleTimeString('en-US', { hour12: false });
+      const colors = {
+        log: 'var(--text-secondary)',
+        info: 'var(--info)',
+        success: 'var(--success)',
+        warning: 'var(--warning)',
+        error: 'var(--error)'
+      };
+      
+      const entry = document.createElement('div');
+      entry.className = 'debug-entry';
+      entry.style.color = colors[type] || colors.log;
+      entry.innerHTML = `<span style="color: var(--text-muted)">[${timestamp}]</span> ${message}`;
+      
+      console.appendChild(entry);
+      console.scrollTop = console.scrollHeight;
+      
+      // Keep only last 100 entries
+      while (console.children.length > 100) {
+        console.removeChild(console.firstChild);
+      }
+    }
+    
+    function runDebugCommand() {
+      const input = document.getElementById('debugInput');
+      const cmd = input.value.trim();
+      if (!cmd) return;
+      
+      debugLog(`> ${cmd}`, 'log');
+      input.value = '';
+      
+      try {
+        // Provide context for common variables
+        const context = {
+          contract: currentContract,
+          address: currentAddress,
+          signer: signer,
+          provider: provider,
+          ethers: ethers,
+          loaded: loadedContracts,
+          abi: currentABI
+        };
+        
+        // Execute command
+        const result = eval(cmd);
+        
+        if (result instanceof Promise) {
+          result.then(r => {
+            debugLog(JSON.stringify(r, (k, v) => typeof v === 'bigint' ? v.toString() : v, 2), 'success');
+          }).catch(e => {
+            debugLog(`Error: ${e.message}`, 'error');
+          });
+        } else if (result !== undefined) {
+          debugLog(JSON.stringify(result, (k, v) => typeof v === 'bigint' ? v.toString() : v, 2), 'success');
+        }
+      } catch (e) {
+        debugLog(`Error: ${e.message}`, 'error');
+      }
+    }
+    
+    // Hook into existing log function to also show in debug console
+    const originalLog = log;
+    log = function(message, type) {
+      originalLog(message, type);
+      debugLog(message, type);
+    };
 
     function addToRecent(address, name, type) {
       recentContracts = recentContracts.filter(c => c.address !== address);
