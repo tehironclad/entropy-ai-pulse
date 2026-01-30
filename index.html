@@ -3190,6 +3190,37 @@ Quick tips:
         setOutput(results.join('\n'));
         updateAIContext();
         
+        // Load LAU into contract system for token info bar
+        // Use full LAU ABI for proper functionality
+        const fullLauAbi = [
+          'function Type() view returns (string)',
+          'function name() view returns (string)',
+          'function symbol() view returns (string)',
+          'function decimals() view returns (uint8)',
+          'function totalSupply() view returns (uint256)',
+          'function balanceOf(address) view returns (uint256)',
+          'function Username() view returns (string)',
+          'function Saat(uint256) view returns (uint64)',
+          'function CurrentArea() view returns (address)',
+          'function Eta() view returns (address)',
+          'function On() view returns (tuple(address Phi, uint64 Mu, uint64 Xi, address Pi, address Shio, address Ring, uint64 Omicron, uint64 Omega))',
+        ];
+        
+        currentAddress = lauAddress;
+        currentContract = new ethers.Contract(lauAddress, fullLauAbi, signer || provider);
+        currentContractName = name || 'LAU';
+        currentContractType = 'LAU';
+        currentABI = fullLauAbi;
+        
+        // Update token info bar with the data
+        await updateTokenInfoBar();
+        
+        // Update info panel
+        updateContractInfo(lauAddress, name || 'LAU', 'LAU', false, null, null);
+        
+        // Populate functions list
+        populateFunctionList(fullLauAbi);
+        
       } catch (e) {
         log(`Error loading LAU: ${e.message}`, 'error');
         setOutput(`Error loading LAU:\n${e.message}\n\nMake sure this is a valid LAU contract address.`);
