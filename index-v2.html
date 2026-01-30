@@ -1,0 +1,3122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Entropy AI - Dysnomia Interface</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.9.0/ethers.umd.min.js"></script>
+  <script src="abis/all.js"></script>
+  <script src="data/qings.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-primary: #09090b;
+      --bg-secondary: #0f0f12;
+      --bg-tertiary: #18181b;
+      --bg-card: #1c1c21;
+      --bg-elevated: #232329;
+      --border-color: rgba(255, 255, 255, 0.06);
+      --border-subtle: rgba(255, 255, 255, 0.04);
+      --text-primary: #fafafa;
+      --text-secondary: #a1a1aa;
+      --text-muted: #71717a;
+      --accent-primary: #8b5cf6;
+      --accent-secondary: #a78bfa;
+      --accent-glow: rgba(139, 92, 246, 0.15);
+      --success: #22c55e;
+      --success-muted: rgba(34, 197, 94, 0.15);
+      --warning: #f59e0b;
+      --error: #ef4444;
+      --gradient-primary: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+      --gradient-subtle: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(99, 102, 241, 0.1) 100%);
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════════════
+       HEADER
+       ═══════════════════════════════════════════════════════════════════════════ */
+    .header {
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border-color);
+      padding: 0 32px;
+      height: 64px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--gradient-primary);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+    }
+
+    .logo-text {
+      font-size: 20px;
+      font-weight: 700;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.02em;
+    }
+
+    .header-status {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--success);
+      box-shadow: 0 0 8px var(--success);
+    }
+
+    .status-dot.disconnected {
+      background: var(--text-muted);
+      box-shadow: none;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: var(--gradient-primary);
+      color: white;
+      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.25);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(139, 92, 246, 0.35);
+    }
+
+    .btn-secondary {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+    }
+
+    .btn-secondary:hover {
+      background: var(--bg-elevated);
+      border-color: var(--accent-primary);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-secondary);
+      padding: 8px 12px;
+    }
+
+    .btn-ghost:hover {
+      color: var(--text-primary);
+      background: var(--bg-tertiary);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════════════
+       WELCOME SCREEN (Before LAU loaded)
+       ═══════════════════════════════════════════════════════════════════════════ */
+    .welcome-screen {
+      min-height: calc(100vh - 64px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      background: radial-gradient(ellipse at top, rgba(139, 92, 246, 0.08) 0%, transparent 60%);
+    }
+
+    .welcome-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      padding: 48px;
+      max-width: 520px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+
+    .welcome-icon {
+      width: 80px;
+      height: 80px;
+      background: var(--gradient-subtle);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      margin: 0 auto 24px;
+      border: 1px solid var(--border-color);
+    }
+
+    .welcome-title {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      letter-spacing: -0.02em;
+    }
+
+    .welcome-subtitle {
+      font-size: 16px;
+      color: var(--text-secondary);
+      margin-bottom: 32px;
+      line-height: 1.6;
+    }
+
+    .input-group {
+      margin-bottom: 24px;
+      text-align: left;
+    }
+
+    .input-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+
+    .input {
+      width: 100%;
+      padding: 14px 16px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      color: var(--text-primary);
+      font-size: 15px;
+      font-family: 'JetBrains Mono', monospace;
+      transition: all 0.2s;
+    }
+
+    .input:focus {
+      outline: none;
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    .input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .welcome-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .welcome-actions .btn-primary {
+      width: 100%;
+      justify-content: center;
+      padding: 16px;
+      font-size: 16px;
+    }
+
+    .welcome-help {
+      margin-top: 24px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .welcome-help a {
+      color: var(--accent-primary);
+      text-decoration: none;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .welcome-help a:hover {
+      text-decoration: underline;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════════════
+       MAIN APP (After LAU loaded)
+       ═══════════════════════════════════════════════════════════════════════════ */
+    .app-container {
+      display: none;
+      min-height: calc(100vh - 64px);
+    }
+
+    .app-container.active {
+      display: block;
+    }
+
+    .app-grid {
+      display: grid;
+      grid-template-columns: 280px 1fr 360px;
+      gap: 1px;
+      background: var(--border-color);
+      min-height: calc(100vh - 64px);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════════════
+       LEFT PANEL - IDENTITY
+       ═══════════════════════════════════════════════════════════════════════════ */
+    .identity-panel {
+      background: var(--bg-secondary);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      overflow-y: auto;
+      max-height: calc(100vh - 64px);
+    }
+
+    .panel-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 4px;
+    }
+
+    .identity-card {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 16px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .identity-card:hover {
+      border-color: var(--accent-primary);
+      background: var(--bg-elevated);
+    }
+
+    .identity-card.active {
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    .identity-card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .identity-card-icon {
+      width: 44px;
+      height: 44px;
+      background: var(--gradient-subtle);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+
+    .identity-card-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .identity-card-name {
+      font-size: 15px;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .identity-card-type {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .identity-card-badge {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 4px 8px;
+      border-radius: 6px;
+      background: var(--accent-glow);
+      color: var(--accent-secondary);
+    }
+
+    .identity-card-address {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      margin: 8px 0 0 0;
+      background: var(--bg-primary);
+      border-radius: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .identity-card-address:hover {
+      background: var(--bg-tertiary);
+      color: var(--text-secondary);
+    }
+
+    .identity-card-address .address-text {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .identity-card-address .copy-hint {
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+
+    .identity-card-address:hover .copy-hint {
+      opacity: 1;
+    }
+
+    .identity-card-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .identity-stat {
+      text-align: center;
+      padding: 8px;
+      background: var(--bg-card);
+      border-radius: 8px;
+    }
+
+    .identity-stat-value {
+      font-size: 13px;
+      font-weight: 600;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .identity-stat-label {
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .section-divider {
+      height: 1px;
+      background: var(--border-color);
+      margin: 8px 0;
+    }
+
+    .quick-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .quick-action-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      color: var(--text-primary);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .quick-action-btn:hover {
+      background: var(--bg-elevated);
+      border-color: var(--accent-primary);
+    }
+
+    .ecosystem-section {
+      margin-top: auto;
+    }
+
+    .ecosystem-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .ecosystem-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      background: var(--bg-tertiary);
+      border-radius: 8px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .ecosystem-item:hover {
+      background: var(--bg-elevated);
+    }
+
+    .ecosystem-item-name {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .ecosystem-item-type {
+      font-size: 10px;
+      color: var(--text-muted);
+      padding: 2px 6px;
+      background: var(--bg-card);
+      border-radius: 4px;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════════════
+       CENTER PANEL - AI CHAT
+       ═══════════════════════════════════════════════════════════════════════════ */
+    .ai-panel {
+      background: var(--bg-primary);
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 64px);
+    }
+
+    .ai-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--gradient-subtle);
+    }
+
+    .ai-title {
+      font-size: 16px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .ai-status {
+      font-size: 12px;
+      color: var(--success);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .ai-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .ai-message {
+      max-width: 85%;
+      padding: 16px 20px;
+      border-radius: 16px;
+      font-size: 14px;
+      line-height: 1.6;
+      animation: fadeIn 0.3s ease;
+      position: relative;
+    }
+
+    .ai-message:hover .message-copy-btn {
+      opacity: 1;
+    }
+
+    .message-content {
+      word-wrap: break-word;
+    }
+
+    .message-copy-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-size: 12px;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .message-copy-btn:hover {
+      background: var(--bg-elevated);
+    }
+
+    .ai-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .ai-action-btn {
+      padding: 8px 14px;
+      font-size: 12px;
+      font-weight: 500;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .ai-action-btn:hover {
+      background: var(--accent-glow);
+      border-color: var(--accent-primary);
+    }
+
+    .ai-action-btn.write {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(245, 158, 11, 0.1));
+      border-color: rgba(245, 158, 11, 0.5);
+    }
+
+    .ai-action-btn.write:hover {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.3), rgba(245, 158, 11, 0.2));
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .ai-message.assistant {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-bottom-left-radius: 4px;
+      align-self: flex-start;
+    }
+
+    .ai-message.user {
+      background: var(--gradient-primary);
+      color: white;
+      border-bottom-right-radius: 4px;
+      align-self: flex-end;
+    }
+
+    .ai-message.user .message-copy-btn {
+      background: rgba(255,255,255,0.2);
+      border-color: rgba(255,255,255,0.3);
+      color: white;
+    }
+
+    .ai-message pre {
+      background: var(--bg-tertiary);
+      padding: 12px;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 12px 0;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+    }
+
+    .ai-message code {
+      font-family: 'JetBrains Mono', monospace;
+      background: var(--bg-tertiary);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 13px;
+    }
+
+    .ai-suggestions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .ai-suggestion-btn {
+      padding: 8px 14px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .ai-suggestion-btn:hover {
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+      border-color: var(--accent-primary);
+    }
+
+    .ai-input-area {
+      padding: 20px 24px;
+      border-top: 1px solid var(--border-color);
+      background: var(--bg-secondary);
+    }
+
+    .ai-input-container {
+      display: flex;
+      gap: 12px;
+      align-items: flex-end;
+    }
+
+    .ai-input-wrapper {
+      flex: 1;
+      position: relative;
+    }
+
+    .ai-input {
+      width: 100%;
+      padding: 14px 16px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      color: var(--text-primary);
+      font-size: 14px;
+      resize: none;
+      min-height: 50px;
+      max-height: 150px;
+      font-family: inherit;
+    }
+
+    .ai-input:focus {
+      outline: none;
+      border-color: var(--accent-primary);
+    }
+
+    .ai-send-btn {
+      width: 50px;
+      height: 50px;
+      border-radius: 12px;
+      background: var(--gradient-primary);
+      border: none;
+      color: white;
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .ai-send-btn:hover {
+      transform: scale(1.05);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════════════
+       RIGHT PANEL - CONTRACT DETAILS
+       ═══════════════════════════════════════════════════════════════════════════ */
+    .contract-panel {
+      background: var(--bg-secondary);
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 64px);
+      overflow: hidden;
+    }
+
+    .contract-header {
+      padding: 20px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .contract-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .contract-name {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .contract-type-badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: var(--gradient-primary);
+      color: white;
+    }
+
+    .contract-address {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-muted);
+    }
+
+    .copy-btn {
+      padding: 4px 8px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      color: var(--text-secondary);
+      font-size: 11px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .copy-btn:hover {
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+    }
+
+    .contract-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      padding: 16px 20px;
+      background: var(--bg-tertiary);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .contract-stat {
+      text-align: center;
+    }
+
+    .contract-stat-value {
+      font-size: 16px;
+      font-weight: 600;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .contract-stat-label {
+      font-size: 10px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+
+    .contract-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+    }
+
+    .output-section {
+      background: var(--bg-tertiary);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+
+    .output-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .output-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .output-content {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      color: var(--text-primary);
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .functions-section {
+      margin-top: 20px;
+    }
+
+    .functions-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .functions-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .functions-filter {
+      display: flex;
+      gap: 4px;
+    }
+
+    .filter-btn {
+      padding: 4px 10px;
+      font-size: 11px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .filter-btn:hover,
+    .filter-btn.active {
+      background: var(--accent-glow);
+      border-color: var(--accent-primary);
+      color: var(--accent-secondary);
+    }
+
+    .functions-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-height: 250px;
+      overflow-y: auto;
+    }
+
+    .function-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .function-item:hover {
+      background: var(--bg-elevated);
+      border-color: var(--accent-primary);
+    }
+
+    .function-badge {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 3px 6px;
+      border-radius: 4px;
+    }
+
+    .function-badge.read {
+      background: var(--success-muted);
+      color: var(--success);
+    }
+
+    .function-badge.write {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--warning);
+    }
+
+    .function-name {
+      flex: 1;
+      font-size: 12px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .function-params {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .function-builder {
+      margin-top: 16px;
+      padding: 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--accent-primary);
+      border-radius: 12px;
+      display: none;
+    }
+
+    .function-builder.active {
+      display: block;
+    }
+
+    .function-builder-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .function-builder-name {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .function-builder-inputs {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .function-input-group label {
+      display: block;
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .function-input-group input {
+      width: 100%;
+      padding: 10px 12px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-size: 13px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .function-input-group input:focus {
+      outline: none;
+      border-color: var(--accent-primary);
+    }
+
+    .function-builder-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .function-builder-actions .btn {
+      flex: 1;
+      justify-content: center;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════════════
+       ACTIVITY LOG
+       ═══════════════════════════════════════════════════════════════════════════ */
+    .activity-bar {
+      background: var(--bg-tertiary);
+      border-top: 1px solid var(--border-color);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .activity-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .activity-content {
+      flex: 1;
+      font-size: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .activity-content.success { color: var(--success); }
+    .activity-content.error { color: var(--error); }
+    .activity-content.warning { color: var(--warning); }
+
+    /* ═══════════════════════════════════════════════════════════════════════════
+       LOADING STATES
+       ═══════════════════════════════════════════════════════════════════════════ */
+    .loading-spinner {
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--border-color);
+      border-top-color: var(--accent-primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .skeleton {
+      background: linear-gradient(90deg, var(--bg-tertiary) 25%, var(--bg-elevated) 50%, var(--bg-tertiary) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 8px;
+    }
+
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════════════
+       SCROLLBAR
+       ═══════════════════════════════════════════════════════════════════════════ */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--text-muted);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════════════
+       MODAL
+       ═══════════════════════════════════════════════════════════════════════════ */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      width: 90%;
+      max-width: 500px;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .modal-header h2 {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .modal-body {
+      padding: 24px;
+    }
+
+    .modal-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+
+    .settings-section {
+      margin-bottom: 20px;
+    }
+
+    .settings-section h3 {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+
+    .settings-section .input {
+      width: 100%;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════════════
+       RECENT CONTRACTS
+       ═══════════════════════════════════════════════════════════════════════════ */
+    .recent-section {
+      margin-bottom: 16px;
+    }
+
+    .recent-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      background: var(--bg-tertiary);
+      border-radius: 8px;
+      margin-bottom: 4px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .recent-item:hover {
+      background: var(--bg-elevated);
+    }
+
+    .recent-item-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .recent-item-name {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .recent-item-delete {
+      padding: 4px 8px;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-radius: 4px;
+      font-size: 10px;
+    }
+
+    .recent-item-delete:hover {
+      background: var(--error);
+      color: white;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════════════
+       CONTRACT CATEGORIES
+       ═══════════════════════════════════════════════════════════════════════════ */
+    .category-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 0;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .category-header:hover {
+      color: var(--text-primary);
+    }
+
+    .category-content {
+      display: none;
+      flex-direction: column;
+      gap: 2px;
+      margin-bottom: 8px;
+    }
+
+    .category-content.expanded {
+      display: flex;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════════════
+       RESPONSIVE
+       ═══════════════════════════════════════════════════════════════════════════ */
+    @media (max-width: 1200px) {
+      .app-grid {
+        grid-template-columns: 240px 1fr 320px;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .app-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .identity-panel,
+      .contract-panel {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       HEADER
+       ═══════════════════════════════════════════════════════════════════════════ -->
+  <header class="header">
+    <div class="logo">
+      <div class="logo-icon">🔮</div>
+      <span class="logo-text">Entropy AI</span>
+    </div>
+    <div class="header-status">
+      <div class="status-item">
+        <span class="status-dot"></span>
+        <span id="blockNumber">Block --</span>
+      </div>
+      <div class="status-item">
+        <span id="walletStatus" class="status-dot disconnected"></span>
+        <span id="walletAddress">No Wallet</span>
+      </div>
+      <button class="btn btn-secondary" id="connectBtn" onclick="connectWallet()">Connect Wallet</button>
+      <button class="btn btn-ghost" onclick="toggleSettings()">⚙️</button>
+      <a href="map.html" class="btn btn-ghost">🗺️ Map</a>
+    </div>
+  </header>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       SETTINGS MODAL
+       ═══════════════════════════════════════════════════════════════════════════ -->
+  <div class="modal-overlay" id="settingsModal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>⚙️ Settings</h2>
+        <button class="btn btn-ghost" onclick="toggleSettings()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="settings-section">
+          <h3>AI Provider</h3>
+          <select id="aiProvider" class="input">
+            <option value="claude">Claude (Anthropic)</option>
+            <option value="openrouter">OpenRouter (Multiple Models)</option>
+            <option value="gemini">Gemini (Google)</option>
+            <option value="openai">GPT (OpenAI)</option>
+          </select>
+        </div>
+        <div class="settings-section">
+          <h3>Claude API Key</h3>
+          <input type="password" id="claudeApiKey" class="input" placeholder="sk-ant-api03-...">
+          <small style="color:var(--text-muted);font-size:11px;margin-top:4px;display:block;">Uses serverless API with full Dysnomia knowledge</small>
+        </div>
+        <div class="settings-section">
+          <h3>OpenRouter API Key</h3>
+          <input type="password" id="openrouterApiKey" class="input" placeholder="sk-or-...">
+        </div>
+        <div class="settings-section">
+          <h3>Gemini API Key</h3>
+          <input type="password" id="geminiApiKey" class="input" placeholder="AIza...">
+        </div>
+        <div class="settings-section">
+          <h3>OpenAI API Key</h3>
+          <input type="password" id="openaiApiKey" class="input" placeholder="sk-...">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="clearApiKeys()" style="color: var(--error);">🗑️ Clear</button>
+        <button class="btn btn-primary" onclick="saveSettings()">💾 Save Keys</button>
+        <button class="btn btn-secondary" onclick="toggleSettings()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       WELCOME SCREEN
+       ═══════════════════════════════════════════════════════════════════════════ -->
+  <div class="welcome-screen" id="welcomeScreen">
+    <div class="welcome-card">
+      <div class="welcome-icon">🔮</div>
+      <h1 class="welcome-title">Welcome to Dysnomia</h1>
+      <p class="welcome-subtitle">
+        Enter your LAU address to explore the Dysnomia ecosystem. 
+        Your AI guide will help you navigate territories, terraform, and more.
+      </p>
+      <div class="input-group">
+        <label class="input-label">Your LAU Address</label>
+        <input type="text" class="input" id="lauInput" placeholder="0x..." autocomplete="off">
+      </div>
+      <div class="welcome-actions">
+        <button class="btn btn-primary" onclick="loadIdentity()">
+          🚀 Load My Identity
+        </button>
+      </div>
+      <div class="welcome-help">
+        <a href="#" onclick="showHelp('lau')">What's a LAU? ↗</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       MAIN APP
+       ═══════════════════════════════════════════════════════════════════════════ -->
+  <div class="app-container" id="appContainer">
+    <div class="app-grid">
+      <!-- LEFT PANEL - IDENTITY -->
+      <div class="identity-panel">
+        <div>
+          <div class="panel-title">Your Identity</div>
+          
+          <!-- LAU Card -->
+          <div class="identity-card active" id="lauCard">
+            <div class="identity-card-header" onclick="loadIdentityContract('lau')">
+              <div class="identity-card-icon">👤</div>
+              <div class="identity-card-info">
+                <div class="identity-card-name" id="lauName">Loading...</div>
+                <div class="identity-card-type">LAU Token</div>
+              </div>
+              <div class="identity-card-badge">LAU</div>
+            </div>
+            <div class="identity-card-address" id="lauAddress" onclick="copyIdentityAddress('lau')" style="display: none;">
+              <span class="address-text"></span>
+              <span class="copy-hint">📋</span>
+            </div>
+            <div class="identity-card-stats">
+              <div class="identity-stat">
+                <div class="identity-stat-value" id="lauPole">--</div>
+                <div class="identity-stat-label">Pole</div>
+              </div>
+              <div class="identity-stat">
+                <div class="identity-stat-value" id="lauSoul">--</div>
+                <div class="identity-stat-label">Soul</div>
+              </div>
+              <div class="identity-stat">
+                <div class="identity-stat-value" id="lauAura">--</div>
+                <div class="identity-stat-label">Aura</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- YUE Card -->
+          <div class="identity-card" id="yueCard" style="margin-top: 12px; display: none;">
+            <div class="identity-card-header" onclick="loadIdentityContract('yue')">
+              <div class="identity-card-icon">🌐</div>
+              <div class="identity-card-info">
+                <div class="identity-card-name" id="yueName">--</div>
+                <div class="identity-card-type">YUE Token</div>
+              </div>
+              <div class="identity-card-badge">YUE</div>
+            </div>
+            <div class="identity-card-address" id="yueAddress" onclick="copyIdentityAddress('yue')" style="display: none;">
+              <span class="address-text"></span>
+              <span class="copy-hint">📋</span>
+            </div>
+          </div>
+
+          <!-- QING Card -->
+          <div class="identity-card" id="qingCard" style="margin-top: 12px; display: none;">
+            <div class="identity-card-header" onclick="loadIdentityContract('qing')">
+              <div class="identity-card-icon">📍</div>
+              <div class="identity-card-info">
+                <div class="identity-card-name" id="qingName">--</div>
+                <div class="identity-card-type">Current Territory</div>
+              </div>
+              <div class="identity-card-badge">QING</div>
+            </div>
+            <div class="identity-card-address" id="qingAddress" onclick="copyIdentityAddress('qing')" style="display: none;">
+              <span class="address-text"></span>
+              <span class="copy-hint">📋</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <div>
+          <div class="panel-title">Quick Actions</div>
+          <div class="quick-actions">
+            <button class="quick-action-btn" onclick="askAI('What should I do next?')">
+              🎯 What should I do next?
+            </button>
+            <button class="quick-action-btn" onclick="askAI('Explain my coordinates')">
+              📊 Explain my coordinates
+            </button>
+            <button class="quick-action-btn" onclick="openMap()">
+              🗺️ View on Map
+            </button>
+          </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- Recent Contracts -->
+        <div class="recent-section" id="recentSection" style="display: none;">
+          <div class="panel-title">Recent</div>
+          <div id="recentList"></div>
+        </div>
+
+        <div class="ecosystem-section">
+          <div class="panel-title">Ecosystem</div>
+          <div class="ecosystem-list" id="ecosystemList">
+            <!-- Core Chain -->
+            <div class="category-header" onclick="toggleCategory('core')">
+              🔗 Core Chain <span id="core-arrow">▸</span>
+            </div>
+            <div class="category-content" id="core-content">
+              <div class="ecosystem-item" onclick="loadContract('VOID')">VOID</div>
+              <div class="ecosystem-item" onclick="loadContract('SIU')">SIU</div>
+              <div class="ecosystem-item" onclick="loadContract('YANG')">YANG</div>
+              <div class="ecosystem-item" onclick="loadContract('YAU')">YAU</div>
+              <div class="ecosystem-item" onclick="loadContract('ZHOU')">ZHOU</div>
+              <div class="ecosystem-item" onclick="loadContract('ZHENG')">ZHENG</div>
+              <div class="ecosystem-item" onclick="loadContract('YI')">YI</div>
+            </div>
+
+            <!-- Soeng Domain -->
+            <div class="category-header" onclick="toggleCategory('soeng')">
+              🌀 Soeng Domain <span id="soeng-arrow">▸</span>
+            </div>
+            <div class="category-content" id="soeng-content">
+              <div class="ecosystem-item" onclick="loadContract('META')">META</div>
+              <div class="ecosystem-item" onclick="loadContract('RING')">RING</div>
+              <div class="ecosystem-item" onclick="loadContract('PANG')">PANG</div>
+              <div class="ecosystem-item" onclick="loadContract('ZI')">ZI</div>
+              <div class="ecosystem-item" onclick="loadContract('CHOA')">CHOA</div>
+              <div class="ecosystem-item" onclick="loadContract('SEI')">SEI</div>
+              <div class="ecosystem-item" onclick="loadContract('CHAN')">CHAN</div>
+              <div class="ecosystem-item" onclick="loadContract('XIE')">XIE</div>
+              <div class="ecosystem-item" onclick="loadContract('XIA')">XIA</div>
+              <div class="ecosystem-item" onclick="loadContract('MAI')">MAI</div>
+              <div class="ecosystem-item" onclick="loadContract('QI')">QI</div>
+            </div>
+
+            <!-- Reactors -->
+            <div class="category-header" onclick="toggleCategory('reactors')">
+              ⚡ Reactors <span id="reactors-arrow">▸</span>
+            </div>
+            <div class="category-content" id="reactors-content">
+              <div class="ecosystem-item" onclick="loadContract('SHIO')">SHIO</div>
+              <div class="ecosystem-item" onclick="loadContract('SHAFactory')">SHAFactory</div>
+              <div class="ecosystem-item" onclick="loadContract('SHIOFactory')">SHIOFactory</div>
+            </div>
+
+            <!-- Spatial -->
+            <div class="category-header" onclick="toggleCategory('spatial')">
+              🗺️ Spatial <span id="spatial-arrow">▸</span>
+            </div>
+            <div class="category-content" id="spatial-content">
+              <div class="ecosystem-item" onclick="loadContract('MAP')">MAP</div>
+              <div class="ecosystem-item" onclick="loadContract('HECKE')">HECKE</div>
+              <div class="ecosystem-item" onclick="loadContract('CHO')">CHO</div>
+            </div>
+
+            <!-- Tang Domain -->
+            <div class="category-header" onclick="toggleCategory('tang')">
+              🏯 Tang <span id="tang-arrow">▸</span>
+            </div>
+            <div class="category-content" id="tang-content">
+              <div class="ecosystem-item" onclick="loadContract('CHEON')">CHEON</div>
+            </div>
+
+            <!-- Libraries -->
+            <div class="category-header" onclick="toggleCategory('libs')">
+              📚 Libraries <span id="libs-arrow">▸</span>
+            </div>
+            <div class="category-content" id="libs-content">
+              <div class="ecosystem-item" onclick="loadContract('libAtropaMath')">libAtropaMath</div>
+              <div class="ecosystem-item" onclick="loadContract('ReactionsLib')">ReactionsLib</div>
+              <div class="ecosystem-item" onclick="loadContract('LibAttribute')">LibAttribute</div>
+            </div>
+
+            <!-- Tokens -->
+            <div class="category-header" onclick="toggleCategory('tokens')">
+              🪙 Tokens <span id="tokens-arrow">▸</span>
+            </div>
+            <div class="category-content" id="tokens-content">
+              <div class="ecosystem-item" onclick="loadContract('AFFECTION')">AFFECTION</div>
+              <div class="ecosystem-item" onclick="loadContract('atropa')">atropa</div>
+              <div class="ecosystem-item" onclick="loadContract('Neptune')">Neptune</div>
+              <div class="ecosystem-item" onclick="loadContract('CROWS')">CROWS</div>
+              <div class="ecosystem-item" onclick="loadContract('LOL')">LOL</div>
+            </div>
+
+            <!-- PulseChain -->
+            <div class="category-header" onclick="toggleCategory('pulse')">
+              💜 PulseChain <span id="pulse-arrow">▸</span>
+            </div>
+            <div class="category-content" id="pulse-content">
+              <div class="ecosystem-item" onclick="loadContract('WPLS')">WPLS</div>
+              <div class="ecosystem-item" onclick="loadContract('PLSX')">PLSX</div>
+              <div class="ecosystem-item" onclick="loadContract('INC')">INC</div>
+              <div class="ecosystem-item" onclick="loadContract('HEX')">HEX</div>
+              <div class="ecosystem-item" onclick="loadContract('pDAI')">pDAI</div>
+              <div class="ecosystem-item" onclick="loadContract('pUSDC')">pUSDC</div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Change LAU Option -->
+        <div style="margin-top: 16px;">
+          <button class="quick-action-btn" onclick="changeLau()" style="width: 100%; justify-content: center;">
+            🔄 Change LAU
+          </button>
+        </div>
+      </div>
+
+      <!-- CENTER PANEL - AI CHAT -->
+      <div class="ai-panel">
+        <div class="ai-header">
+          <div class="ai-title">
+            🤖 AI Guide
+          </div>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <button class="btn btn-ghost" onclick="toggleSettings()" title="Settings">⚙️</button>
+            <button class="btn btn-ghost" onclick="clearChat()" title="Clear chat">🗑️</button>
+            <div class="ai-status">
+              <span class="status-dot"></span>
+              Ready
+            </div>
+          </div>
+        </div>
+
+        <div class="ai-messages" id="aiMessages">
+          <!-- Messages will be added here -->
+        </div>
+
+        <div class="ai-input-area">
+          <div class="ai-input-container">
+            <div class="ai-input-wrapper">
+              <textarea class="ai-input" id="aiInput" placeholder="Ask about Dysnomia, get help with transactions..." rows="1" onkeydown="if(event.key==='Enter' && !event.shiftKey) { event.preventDefault(); sendMessage(); }"></textarea>
+            </div>
+            <button class="ai-send-btn" onclick="sendMessage()">→</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT PANEL - CONTRACT DETAILS -->
+      <div class="contract-panel">
+        <div class="contract-header">
+          <div class="contract-title-row">
+            <span class="contract-name" id="contractName">No Contract</span>
+            <span class="contract-type-badge" id="contractType">--</span>
+          </div>
+          <div class="contract-address">
+            <span id="contractAddress">Load a contract to view details</span>
+            <button class="copy-btn" onclick="copyAddress()">📋 Copy</button>
+          </div>
+        </div>
+
+        <div class="contract-stats" id="contractStats" style="display: none;">
+          <div class="contract-stat">
+            <div class="contract-stat-value" id="statSupply">--</div>
+            <div class="contract-stat-label">Supply</div>
+          </div>
+          <div class="contract-stat">
+            <div class="contract-stat-value" id="statDecimals">--</div>
+            <div class="contract-stat-label">Decimals</div>
+          </div>
+          <div class="contract-stat">
+            <div class="contract-stat-value" id="statBalance">--</div>
+            <div class="contract-stat-label">Your Balance</div>
+          </div>
+        </div>
+
+        <div class="contract-content">
+          <div class="output-section">
+            <div class="output-header">
+              <span class="output-title">📤 Output</span>
+              <button class="copy-btn" onclick="copyOutput()">Copy</button>
+            </div>
+            <div class="output-content" id="outputContent">Ready. Load your identity to begin.</div>
+          </div>
+
+          <div class="functions-section" id="functionsSection" style="display: none;">
+            <div class="functions-header">
+              <span class="functions-title">⚡ Functions</span>
+              <div class="functions-filter">
+                <button class="filter-btn active" onclick="filterFunctions('all')">All</button>
+                <button class="filter-btn" onclick="filterFunctions('read')">Read</button>
+                <button class="filter-btn" onclick="filterFunctions('write')">Write</button>
+              </div>
+            </div>
+            <div class="functions-list" id="functionsList">
+              <!-- Functions will be populated here -->
+            </div>
+
+            <div class="function-builder" id="functionBuilder">
+              <div class="function-builder-header">
+                <span class="function-badge read" id="builderBadge">R</span>
+                <span class="function-builder-name" id="builderName">functionName</span>
+              </div>
+              <div class="function-builder-inputs" id="builderInputs">
+                <!-- Inputs will be added here -->
+              </div>
+              <div class="function-builder-actions">
+                <button class="btn btn-primary" id="builderExecute" onclick="executeFunction()">Execute</button>
+                <button class="btn btn-secondary" onclick="closeBuilder()">Cancel</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACTIVITY BAR -->
+    <div class="activity-bar">
+      <span class="activity-title">Activity</span>
+      <span class="activity-content" id="activityContent">Ready</span>
+    </div>
+  </div>
+
+  <script>
+    // ═══════════════════════════════════════════════════════════════════════════
+    // CONSTANTS & STATE
+    // ═══════════════════════════════════════════════════════════════════════════
+    
+    const PULSECHAIN_RPC = 'https://rpc.pulsechain.com';
+    const PULSESCAN_API = 'https://api.scan.pulsechain.com/api';
+    
+    let provider = null;
+    let signer = null;
+    let currentAddress = null;
+    let currentContract = null;
+    let currentABI = null;
+    let currentContractName = null;
+    let currentContractType = null;
+    let selectedFunction = null;
+    
+    // User's loaded identity
+    let userIdentity = {
+      lau: { address: null, name: null, contract: null },
+      yue: { address: null, name: null, contract: null },
+      qing: { address: null, name: null, contract: null }
+    };
+    
+    // Conversation history for AI
+    let conversationHistory = [];
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // ABI DEFINITIONS
+    // ═══════════════════════════════════════════════════════════════════════════
+    
+    const ERC20_ABI = [
+      'function name() view returns (string)',
+      'function symbol() view returns (string)',
+      'function decimals() view returns (uint8)',
+      'function totalSupply() view returns (uint256)',
+      'function balanceOf(address) view returns (uint256)',
+      'function transfer(address,uint256) returns (bool)',
+      'function approve(address,uint256) returns (bool)',
+      'function allowance(address,address) view returns (uint256)',
+      'function transferFrom(address,address,uint256) returns (bool)',
+    ];
+
+    const DYSNOMIA_BASE = [
+      'function maxSupply() view returns (uint256)',
+      'function Xiao() view returns (address)',
+      'function Type() view returns (string)',
+      'function MotzkinPrime() view returns (uint64)',
+      'function GetMarketRate(address) view returns (uint256)',
+      'function Purchase(address,uint256)',
+      'function Redeem(address,uint256)',
+      'function Rename(string,string)',
+      'function mintToCap()',
+      'function addOwner(address)',
+      'function removeOwner(address)',
+      'function isOwner(address) view returns (bool)',
+    ];
+
+    const TYPE_ABI = {
+      LAU: [
+        'function Eta() view returns (address)',
+        'function Yue() view returns (address)',
+        'function Saat(uint256) view returns (uint64)',
+        'function CurrentArea() view returns (address)',
+        'function Username() view returns (string)',
+        'function Alias() view returns (string)',
+        'function Soul() view returns (uint256)',
+        'function Aura() view returns (uint256)',
+        'function On() view returns (address)',
+        'function Luo() view returns (uint64)',
+        'function Chat(string)',
+        'function SetUsername(string)',
+        'function SetAlias(string)',
+        'function Withdraw(address,uint256)',
+        'function Leave()',
+        'function Void(bool,bool)',
+      ],
+      YUE: [
+        'function Chan() view returns (address)',
+        'function Origin() view returns (address)',
+        'function Hong(address,address,uint256)',
+        'function Hung(address,address,uint256)',
+        'function GetAssetRate(address,address) view returns (uint256)',
+        'function IsValidAsset(address,address) view returns (bool)',
+        'function React(address) returns (uint256)',
+        'function Bar() view returns (uint256,uint256)',
+        'function Hypobar(address) view returns (uint256)',
+        'function Epibar(address) view returns (uint256)',
+        'function ChangeOrigin(address)',
+        'function Withdraw(address,address,uint256)',
+        'function ForceTransfer(address,address,uint256)',
+        'function MintToOrigin()',
+      ],
+      QING: [
+        'function Cho() view returns (address)',
+        'function Asset() view returns (address)',
+        'function Waat() view returns (uint256)',
+        'function Entropy() view returns (uint64)',
+        'function GWAT() view returns (bool)',
+        'function BouncerDivisor() view returns (uint16)',
+        'function CoverCharge() view returns (uint256)',
+        'function Join(address)',
+        'function Leave(address)',
+        'function Chat(address,string)',
+        'function Withdraw(address,uint256)',
+        'function GetMembers() view returns (address[])',
+        'function IsMember(address) view returns (bool)',
+        'function Admitted(address) view returns (bool)',
+      ],
+      VOID: [
+        'function Nu() view returns (address)',
+        'function GetLibraryAddress(string) view returns (address)',
+        'function AddLibrary(string,address)',
+        'function Log(string)',
+        'function Chat(string)',
+        'function SetAttribute(string,string)',
+        'function GetAttribute(string) view returns (string)',
+      ],
+      SIU: [
+        'function Psi() view returns (address)',
+        'function Aura() view returns (uint64)',
+      ],
+      CHO: [
+        'function Void() view returns (address)',
+        'function Saat(uint256) view returns (uint64)',
+        'function Entropy() view returns (uint64)',
+        'function Gua() view returns (uint256)',
+        'function Enter(address)',
+        'function GetUser()',
+        'function GetUserSoul() view returns (uint64)',
+        'function React(uint64) returns (uint64,uint64)',
+        'function ReactUser(uint64,uint64) returns (uint64)',
+        'function Luo() returns (uint256)',
+      ],
+    };
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // KNOWN CONTRACTS
+    // ═══════════════════════════════════════════════════════════════════════════
+    
+    const KNOWN_CONTRACTS = {
+      // CORE CHAIN
+      'VOID': '0x965B0d74591bF30327075A247C47dBf487dCff08',
+      'SIU': '0x43136735603D4060f226C279613A4dD97146937c',
+      'YANG': '0xB702b3ec6d9De1011BE963EFe30A28b6dDFbe011',
+      'YAU': '0x7e91d862A346659DaEEd93726e733C8C1347a225',
+      'ZHOU': '0x5cC318d0c01FeD5942B5ED2F53dB07727d36E261',
+      'ZHENG': '0x24E62C39e34d7fE2B7dF1162e1344eB6eb3b3e15',
+      'YI': '0x4757438723055f14A1Af5C9651C2E37730F41A9E',
+      
+      // REACTORS
+      'SHIO': '0xF6C50fFE7efbDeE63A92E52A4D5E9afF7fb4A4D7',
+      'SHIO Rod': '0xE933F32BC3250C18A69f77775652E5C473c77f23',
+      'SHIO Cone': '0x6DB334e06ce501DF6F5F2c4f94BF74cfccc65C89',
+      'SHAFactory': '0x4208333D65A90577E3da39B84D6A95eb9db717D2',
+      'SHIOFactory': '0x5063D2A97960DDE8dc5E3e5A69aAa379C6301F1C',
+      
+      // TANG DOMAIN
+      'CHEON': '0x3d23084cA3F40465553797b5138CFC456E61FB5D',
+      
+      // SOENG DOMAIN
+      'META': '0xE77Bdae31b2219e032178d88504Cc0170a5b9B97',
+      'RING': '0x1574c84Ec7fA78fC6C749e1d242dbde163675e72',
+      'PANG': '0xEe25Ccd41671F3B67d660cf6532085586aec8457',
+      'ZI': '0xCbAdd3C3957Bd9D6C036863CB053FEccf3D53338',
+      'CHOA': '0x0f5a352fd4cA4850c2099C15B3600ff085B66197',
+      'SEI': '0x3dC54d46e030C42979f33C9992348a990acb6067',
+      'CHAN': '0xe250bf9729076B14A8399794B61C72d0F4AeFcd8',
+      'XIE': '0x4Df51741F2926525A21bF63E4769bA70633D2792',
+      'XIA': '0x7f4a4DD4a6f233d2D82BE38b2F9fc0Fef46f25FA',
+      'MAI': '0xc48B0a4E79eF302c8Eb5be71F562d08fB8E6A3d8',
+      'QI': '0x4d9Ce396BE95dbc5F71808c38107eB7422FD9a03',
+      
+      // SPATIAL / USER
+      'MAP': '0xD3a7A95012Edd46Ea115c693B74c5e524b3DdA75',
+      'HECKE': '0x29A924D9B0233026B9844f2aFeB202F1791D7593',
+      'CHO': '0xB6be11F0A788014C1F68C92F8D6CcC1AbF78F2aB',
+      
+      // LIBRARIES
+      'libAtropaMath': '0xB680F0cc810317933F234f67EB6A9E923407f05D',
+      'MATH': '0xB680F0cc810317933F234f67EB6A9E923407f05D',
+      'ReactionsLib': '0x8704d7740735F6DEA0103366fE297Ba3F9fCaCc4',
+      'LibAttribute': '0x529e3e15Da19c7c828f9CCE13C53F7031a30ec7c',
+      
+      // EXAMPLE QINGs
+      'QING Zürich': '0xb0Ba7D36B7F0505879179ecE7401F24eB653c6E1',
+      'QING Illinois': '0xD127839B83cBf537c29B7d268c135f745a0Da2E8',
+      
+      // EXAMPLE LAUs
+      'LAU IronChad': '0xD2a00a61743f39Fe74096653E564107cc80457BA',
+      'LAU mariarahel': '0xD32c39fEE49391c7952d1b30b15921b0D3b42E69',
+      
+      // ATROPA TOKENS
+      'AFFECTION': '0x24F0154C1dCe548AdF15da2098Fdd8B8A3B8151D',
+      'atropa': '0x7a20189B297343CF26d8548764b04891f37F3414',
+      'Neptune': '0x9A3796Cf41B7CbA6921fd50c3f5204ED6506C3e7',
+      'CROWS': '0x203e366A1821570b2f84Ff5ae8B3BdeB48Dc4fa1',
+      'LOL': '0xA63F8061A67ecdbf147Cd1B60f91Cf95464E868D',
+      
+      // PULSECHAIN CORE
+      'WPLS': '0xA1077a294dDE1B09bB078844df40758a5D0f9a27',
+      'PLSX': '0x95B303987A60C71504D99Aa1b13B4DA07b0790ab',
+      'INC': '0x2fa878Ab3F87CC1C9737Fc071108F904c0B0C95d',
+      'HEX': '0x2b591e99afE9f32eAA6214f7B7629768c40Eeb39',
+      'pDAI': '0xefD766cCb38EaF1dfd701853BFCe31359239F305',
+      'pUSDC': '0x15D38573d2feeb82e7ad5187aB8c1D52810B1f07',
+    };
+    
+    // Recent contracts storage
+    let recentContracts = JSON.parse(localStorage.getItem('entropyAI_recent') || '[]');
+    
+    // QING Database loaded from data/qings.js (186 QINGs)
+    // Access via window.QING_DATABASE, window.findQing(), window.findQingByLauName()
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // DYSNOMIA HELPERS
+    // ═══════════════════════════════════════════════════════════════════════════
+    
+    async function checkDysnomia(address) {
+      log('Checking if Dysnomia...', 'info');
+      
+      // First check if it's a known contract
+      const knownType = Object.entries(KNOWN_CONTRACTS).find(([name, addr]) => 
+        addr.toLowerCase() === address.toLowerCase()
+      );
+      if (knownType) {
+        log(`✓ Known contract: ${knownType[0]}`, 'success');
+        return true;
+      }
+      
+      const withTimeout = (promise, ms = 5000) => {
+        return Promise.race([
+          promise,
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), ms))
+        ]);
+      };
+      
+      // Check for Type()
+      try {
+        const c = new ethers.Contract(address, ['function Type() view returns (string)'], provider);
+        const type = await withTimeout(c.Type(), 5000);
+        if (type) {
+          log(`✓ Dysnomia detected via Type(): ${type}`, 'success');
+          return true;
+        }
+      } catch (e) {
+        log(`Type() failed`, 'info');
+      }
+      
+      // Check for Xiao()
+      try {
+        const c = new ethers.Contract(address, ['function Xiao() view returns (address)'], provider);
+        const xiao = await withTimeout(c.Xiao(), 5000);
+        if (xiao && xiao !== '0x0000000000000000000000000000000000000000') {
+          log('✓ Dysnomia detected via Xiao()', 'success');
+          return true;
+        }
+      } catch (e) {
+        log(`Xiao() failed`, 'info');
+      }
+      
+      log('Not a Dysnomia contract', 'info');
+      return false;
+    }
+    
+    async function getDysnomiaType(address) {
+      try {
+        const c = new ethers.Contract(address, ['function Type() view returns (string)'], provider);
+        const type = await c.Type();
+        return type;
+      } catch (e) {
+        return null;
+      }
+    }
+    
+    function buildDysnomiaABI(type) {
+      let abi = [...ERC20_ABI, ...DYSNOMIA_BASE];
+      const normalizedType = (type || '').toUpperCase();
+      
+      console.log(`buildDysnomiaABI: Looking for type "${normalizedType}"`);
+      
+      // Check external DYSNOMIA_ABIS first (from abis/all.js)
+      if (window.DYSNOMIA_ABIS && window.DYSNOMIA_ABIS[normalizedType]) {
+        abi = [...abi, ...window.DYSNOMIA_ABIS[normalizedType]];
+        log(`Built ABI for ${normalizedType}: ${abi.length} functions (external)`, 'success');
+      }
+      // Fall back to inline TYPE_ABI
+      else if (TYPE_ABI[normalizedType]) {
+        abi = [...abi, ...TYPE_ABI[normalizedType]];
+        log(`Built ABI for ${normalizedType}: ${abi.length} functions`, 'success');
+      } else {
+        log(`No specific ABI for "${normalizedType}" - using base`, 'warning');
+      }
+      
+      console.log(`buildDysnomiaABI: Final ABI has ${abi.length} functions`);
+      return abi;
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // INITIALIZATION
+    // ═══════════════════════════════════════════════════════════════════════════
+    
+    async function init() {
+      try {
+        provider = new ethers.JsonRpcProvider(PULSECHAIN_RPC);
+        
+        // Get block number
+        const blockNum = await provider.getBlockNumber();
+        document.getElementById('blockNumber').textContent = `Block ${blockNum.toLocaleString()}`;
+        
+        // Check for saved LAU
+        const savedLau = localStorage.getItem('entropyAI_lau');
+        if (savedLau) {
+          document.getElementById('lauInput').value = savedLau;
+        }
+        
+        log('Ready', 'success');
+      } catch (e) {
+        log('Failed to connect to PulseChain', 'error');
+      }
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // WALLET CONNECTION
+    // ═══════════════════════════════════════════════════════════════════════════
+    
+    async function connectWallet() {
+      if (!window.ethereum) {
+        log('No wallet detected', 'error');
+        return;
+      }
+      
+      try {
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        const browserProvider = new ethers.BrowserProvider(window.ethereum);
+        signer = await browserProvider.getSigner();
+        
+        const address = accounts[0];
+        document.getElementById('walletAddress').textContent = `${address.slice(0,6)}...${address.slice(-4)}`;
+        document.getElementById('walletStatus').classList.remove('disconnected');
+        document.getElementById('connectBtn').textContent = 'Connected';
+        
+        log('Wallet connected', 'success');
+      } catch (e) {
+        log('Failed to connect wallet', 'error');
+      }
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // IDENTITY LOADING
+    // ═══════════════════════════════════════════════════════════════════════════
+    
+    async function loadIdentity() {
+      const lauAddress = document.getElementById('lauInput').value.trim();
+      
+      if (!lauAddress || !ethers.isAddress(lauAddress)) {
+        log('Please enter a valid LAU address', 'error');
+        return;
+      }
+      
+      log('Loading identity...', 'info');
+      
+      try {
+        // Build the full LAU ABI using our helper
+        const fullLauAbi = buildDysnomiaABI('LAU');
+        
+        const lauContract = new ethers.Contract(lauAddress, fullLauAbi, provider);
+        
+        // Verify it's a LAU
+        let contractType = '';
+        try { contractType = await lauContract.Type(); } catch {}
+        
+        if (contractType !== 'LAU') {
+          log(`Warning: This is a ${contractType || 'unknown'} contract, not LAU`, 'warning');
+        }
+        
+        // Get LAU info
+        let name = '', symbol = '';
+        let pole = '--', soul = '--', aura = '--';
+        
+        try { name = await lauContract.name(); } catch {}
+        try { symbol = await lauContract.symbol(); } catch {}
+        try { pole = (await lauContract.Saat(0)).toString(); } catch {}
+        try { soul = (await lauContract.Saat(1)).toString(); } catch {}
+        try { aura = (await lauContract.Saat(2)).toString(); } catch {}
+        
+        // Save identity
+        userIdentity.lau = {
+          address: lauAddress,
+          name: name || symbol || 'LAU',
+          contract: lauContract
+        };
+        
+        // Update UI
+        document.getElementById('lauName').textContent = name || 'Unknown LAU';
+        document.getElementById('lauPole').textContent = formatNumber(pole);
+        document.getElementById('lauSoul').textContent = formatNumber(soul);
+        document.getElementById('lauAura').textContent = formatNumber(aura);
+        
+        // Show LAU address
+        const lauAddrEl = document.getElementById('lauAddress');
+        lauAddrEl.style.display = 'flex';
+        lauAddrEl.querySelector('.address-text').textContent = `${lauAddress.slice(0,8)}...${lauAddress.slice(-6)}`;
+        
+        // Save to localStorage
+        localStorage.setItem('entropyAI_lau', lauAddress);
+        
+        // Try to find matching QING by name
+        await findAndLoadQing(name);
+        
+        // Switch to app view
+        document.getElementById('welcomeScreen').style.display = 'none';
+        document.getElementById('appContainer').classList.add('active');
+        
+        // Load LAU into contract panel with FULL ABI
+        loadContractIntoPanel(lauAddress, name, 'LAU', fullLauAbi);
+        
+        // Send welcome message to AI
+        addAIMessage(`Welcome back, **${name}**! 🎉
+
+I've loaded your identity. Here's what I found:
+
+• **LAU**: ${name}
+• **Coordinates**: Pole ${pole}, Soul ${soul}, Aura ${aura}
+${userIdentity.qing.name ? `• **Current Territory**: ${userIdentity.qing.name}` : '• **Territory**: Not currently in a QING'}
+
+What would you like to do?`, 'assistant');
+        
+        log(`Loaded: ${name}`, 'success');
+        
+      } catch (e) {
+        log(`Error: ${e.message}`, 'error');
+      }
+    }
+    
+    // Find QING by matching LAU name
+    async function findAndLoadQing(lauName) {
+      if (!lauName) return;
+      
+      // Use the shared helper from data/qings.js
+      const matchedQing = window.findQingByLauName ? 
+        window.findQingByLauName(lauName) : 
+        window.QING_DATABASE?.find(q => q.name.toLowerCase().includes(lauName.toLowerCase()));
+      
+      if (matchedQing) {
+        userIdentity.qing = {
+          address: matchedQing.address,
+          name: matchedQing.name,
+          contract: null
+        };
+        
+        // Show QING card
+        document.getElementById('qingCard').style.display = 'block';
+        document.getElementById('qingName').textContent = matchedQing.name;
+        
+        // Show QING address
+        const qingAddrEl = document.getElementById('qingAddress');
+        qingAddrEl.style.display = 'flex';
+        qingAddrEl.querySelector('.address-text').textContent = `${matchedQing.address.slice(0,8)}...${matchedQing.address.slice(-6)}`;
+        
+        log(`Found QING: ${matchedQing.name}`, 'success');
+      } else {
+        log(`No matching QING found for "${lauName}"`, 'info');
+      }
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // CONTRACT PANEL
+    // ═══════════════════════════════════════════════════════════════════════════
+    // ═══════════════════════════════════════════════════════════════════════════
+    // CONTRACT LOADING
+    // ═══════════════════════════════════════════════════════════════════════════
+    
+    async function loadContract(addressOrName) {
+      if (!addressOrName) return;
+      
+      let address = addressOrName;
+      let name = addressOrName;
+      
+      // If it's a name, look up the address
+      if (!addressOrName.startsWith('0x')) {
+        address = KNOWN_CONTRACTS[addressOrName];
+        if (!address) {
+          log(`Unknown contract: ${addressOrName}`, 'error');
+          return;
+        }
+        name = addressOrName;
+      } else {
+        // Reverse lookup for known contracts
+        const found = Object.entries(KNOWN_CONTRACTS).find(([n, a]) => 
+          a.toLowerCase() === addressOrName.toLowerCase()
+        );
+        if (found) name = found[0];
+      }
+      
+      log(`Loading ${name}...`, 'info');
+      setOutput('Loading contract...');
+      
+      try {
+        // Check if Dysnomia contract
+        const isDysnomia = await checkDysnomia(address);
+        let abi, type = 'ERC20';
+        
+        if (isDysnomia) {
+          type = await getDysnomiaType(address) || 'DYSNOMIA';
+          abi = buildDysnomiaABI(type);
+        } else {
+          // Use basic ERC20 ABI
+          abi = [...ERC20_ABI];
+        }
+        
+        // Get contract name if we don't have it
+        const tempContract = new ethers.Contract(address, ERC20_ABI, provider);
+        try {
+          const contractName = await tempContract.name();
+          if (contractName) name = contractName;
+        } catch {}
+        
+        loadContractIntoPanel(address, name, type, abi);
+        addToRecent(name, address);
+        setOutput(`Loaded ${name}\nType: ${type}\nAddress: ${address}`);
+        log(`Loaded ${name} (${type})`, 'success');
+        
+      } catch (e) {
+        log(`Error loading contract: ${e.message}`, 'error');
+        setOutput(`Error: ${e.message}`);
+      }
+    }
+    
+    function loadContractIntoPanel(address, name, type, abi) {
+      currentAddress = address;
+      currentABI = abi;
+      currentContract = new ethers.Contract(address, abi, signer || provider);
+      
+      document.getElementById('contractName').textContent = name || 'Contract';
+      document.getElementById('contractType').textContent = type || 'Unknown';
+      document.getElementById('contractAddress').textContent = `${address.slice(0,10)}...${address.slice(-8)}`;
+      document.getElementById('contractStats').style.display = 'grid';
+      document.getElementById('functionsSection').style.display = 'block';
+      
+      // Populate functions
+      populateFunctions(abi);
+      
+      // Get token stats
+      updateContractStats();
+    }
+    
+    async function updateContractStats() {
+      if (!currentContract) return;
+      
+      try {
+        const decimals = await currentContract.decimals().catch(() => 18);
+        const supply = await currentContract.totalSupply().catch(() => null);
+        
+        document.getElementById('statDecimals').textContent = decimals.toString();
+        document.getElementById('statSupply').textContent = supply ? formatLargeNumber(supply, decimals) : '--';
+        
+        if (signer) {
+          const userAddr = await signer.getAddress();
+          const balance = await currentContract.balanceOf(userAddr).catch(() => null);
+          document.getElementById('statBalance').textContent = balance ? formatLargeNumber(balance, decimals) : '--';
+        } else {
+          document.getElementById('statBalance').textContent = 'Connect wallet';
+        }
+      } catch (e) {
+        // Ignore errors
+      }
+    }
+    
+    function populateFunctions(abi) {
+      const list = document.getElementById('functionsList');
+      list.innerHTML = '';
+      
+      try {
+        const iface = new ethers.Interface(abi);
+        const functions = [];
+        
+        iface.forEachFunction(fn => {
+          const isRead = fn.stateMutability === 'view' || fn.stateMutability === 'pure';
+          functions.push({
+            name: fn.name,
+            inputs: fn.inputs,
+            outputs: fn.outputs,
+            stateMutability: fn.stateMutability,
+            isRead: isRead,
+            fragment: fn
+          });
+        });
+        
+        // Debug: Log what we found
+        const reads = functions.filter(f => f.isRead);
+        const writes = functions.filter(f => !f.isRead);
+        console.log(`populateFunctions: Found ${functions.length} functions (${reads.length} read, ${writes.length} write)`);
+        
+        // Update filter button labels with counts
+        const filterDiv = document.querySelector('.functions-filter');
+        if (filterDiv) {
+          filterDiv.innerHTML = `
+            <button class="filter-btn active" onclick="filterFunctions('all')">All (${functions.length})</button>
+            <button class="filter-btn" onclick="filterFunctions('read')">Read (${reads.length})</button>
+            <button class="filter-btn" onclick="filterFunctions('write')">Write (${writes.length})</button>
+          `;
+        }
+        
+        // Sort: reads first
+        functions.sort((a, b) => {
+          if (a.isRead !== b.isRead) return a.isRead ? -1 : 1;
+          return a.name.localeCompare(b.name);
+        });
+        
+        functions.forEach(fn => {
+          const item = document.createElement('div');
+          item.className = 'function-item';
+          item.dataset.type = fn.isRead ? 'read' : 'write';
+          item.onclick = () => selectFunction(fn);
+          item.innerHTML = `
+            <span class="function-badge ${fn.isRead ? 'read' : 'write'}">${fn.isRead ? 'R' : 'W'}</span>
+            <span class="function-name">${fn.name}</span>
+            <span class="function-params">(${fn.inputs.length})</span>
+          `;
+          list.appendChild(item);
+        });
+        
+        log(`Loaded ${functions.length} functions (${reads.length} read, ${writes.length} write)`, 'success');
+      } catch (e) {
+        console.error('populateFunctions error:', e);
+        list.innerHTML = '<div style="color: var(--text-muted); padding: 20px; text-align: center;">Could not parse ABI</div>';
+      }
+    }
+    
+    function filterFunctions(type) {
+      document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+      
+      document.querySelectorAll('.function-item').forEach(item => {
+        if (type === 'all') {
+          item.style.display = 'flex';
+        } else {
+          item.style.display = item.dataset.type === type ? 'flex' : 'none';
+        }
+      });
+    }
+    
+    function selectFunction(fn) {
+      selectedFunction = fn;
+      
+      const builder = document.getElementById('functionBuilder');
+      const badge = document.getElementById('builderBadge');
+      const name = document.getElementById('builderName');
+      const inputs = document.getElementById('builderInputs');
+      const execBtn = document.getElementById('builderExecute');
+      
+      badge.textContent = fn.isRead ? 'R' : 'W';
+      badge.className = `function-badge ${fn.isRead ? 'read' : 'write'}`;
+      name.textContent = fn.name;
+      execBtn.textContent = fn.isRead ? '📖 Read' : '✍️ Write';
+      
+      inputs.innerHTML = '';
+      if (fn.inputs.length === 0) {
+        inputs.innerHTML = '<div style="color: var(--text-muted); font-size: 12px;">No parameters required</div>';
+      } else {
+        fn.inputs.forEach((input, i) => {
+          inputs.innerHTML += `
+            <div class="function-input-group">
+              <label>${input.name || 'arg' + i} (${input.type})</label>
+              <input type="text" id="param_${i}" placeholder="${input.type}">
+            </div>
+          `;
+        });
+      }
+      
+      builder.classList.add('active');
+    }
+    
+    function closeBuilder() {
+      document.getElementById('functionBuilder').classList.remove('active');
+      selectedFunction = null;
+    }
+    
+    async function executeFunction() {
+      if (!selectedFunction || !currentContract) return;
+      
+      const args = [];
+      for (let i = 0; i < selectedFunction.inputs.length; i++) {
+        args.push(document.getElementById(`param_${i}`).value.trim());
+      }
+      
+      log(`Calling ${selectedFunction.name}...`, 'info');
+      setOutput('Executing...');
+      
+      try {
+        let result;
+        if (selectedFunction.isRead) {
+          result = await currentContract[selectedFunction.name](...args);
+        } else {
+          if (!signer) {
+            log('Connect wallet for write functions', 'error');
+            return;
+          }
+          const tx = await currentContract[selectedFunction.name](...args);
+          setOutput(`Transaction sent!\nHash: ${tx.hash}\n\nWaiting for confirmation...`);
+          const receipt = await tx.wait();
+          result = `Confirmed in block ${receipt.blockNumber}`;
+        }
+        
+        setOutput(`${selectedFunction.name}() Result:\n\n${formatResult(result)}`);
+        log(`${selectedFunction.name} completed`, 'success');
+      } catch (e) {
+        setOutput(`Error: ${e.message}`);
+        log(`Error: ${e.message.slice(0, 50)}`, 'error');
+      }
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // AI CHAT
+    // ═══════════════════════════════════════════════════════════════════════════
+    
+    function addAIMessage(content, role) {
+      const messages = document.getElementById('aiMessages');
+      const div = document.createElement('div');
+      div.className = `ai-message ${role}`;
+      
+      // Process AI actions if assistant message
+      let displayContent = content;
+      let actions = [];
+      
+      if (role === 'assistant') {
+        // Extract action tags: {{ACTION:param1:param2}}
+        const actionRegex = /\{\{(LOAD|READ|WRITE|NAVIGATE):([^:}]+)(?::([^}]*))?\}\}/g;
+        let match;
+        
+        while ((match = actionRegex.exec(content)) !== null) {
+          actions.push({
+            type: match[1],
+            param1: match[2],
+            param2: match[3] || ''
+          });
+        }
+        
+        // Remove action tags from display
+        displayContent = content.replace(actionRegex, '').trim();
+      }
+      
+      // Simple markdown-ish parsing
+      let html = displayContent
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        .replace(/`([^`]+)`/g, '<code>$1</code>')
+        .replace(/\n/g, '<br>');
+      
+      // Create message with copy button
+      const messageId = 'msg-' + Date.now();
+      
+      // Build action buttons HTML
+      let actionsHtml = '';
+      if (actions.length > 0) {
+        actionsHtml = '<div class="ai-actions">';
+        actions.forEach((action, idx) => {
+          if (action.type === 'LOAD' || action.type === 'NAVIGATE') {
+            actionsHtml += `<button class="ai-action-btn" onclick="aiLoadContract('${action.param1}')">📂 Load ${action.param1}</button>`;
+          } else if (action.type === 'READ') {
+            actionsHtml += `<button class="ai-action-btn" onclick="aiCallRead('${action.param1}')">📖 Read ${action.param1}</button>`;
+          } else if (action.type === 'WRITE') {
+            actionsHtml += `<button class="ai-action-btn write" onclick="aiCallWrite('${action.param1}')">✍️ Write ${action.param1}</button>`;
+          }
+        });
+        actionsHtml += '</div>';
+      }
+      
+      div.innerHTML = `
+        <div class="message-content" id="${messageId}">${html}</div>
+        ${actionsHtml}
+        <button class="message-copy-btn" onclick="copyMessage('${messageId}')" title="Copy">📋</button>
+      `;
+      
+      messages.appendChild(div);
+      messages.scrollTop = messages.scrollHeight;
+      
+      // Auto-execute LOAD and READ actions
+      if (role === 'assistant') {
+        actions.forEach(action => {
+          if (action.type === 'LOAD' || action.type === 'NAVIGATE') {
+            setTimeout(() => aiLoadContract(action.param1), 500);
+          } else if (action.type === 'READ') {
+            setTimeout(() => aiCallRead(action.param1), 1000);
+          }
+          // WRITE actions require user click
+        });
+      }
+    }
+    
+    // AI action: Load a contract
+    async function aiLoadContract(nameOrAddress) {
+      log(`AI loading ${nameOrAddress}...`, 'info');
+      await loadContract(nameOrAddress);
+    }
+    
+    // AI action: Call a read function
+    async function aiCallRead(functionCall) {
+      if (!currentContract || !currentABI) {
+        addAIMessage(`⚠️ No contract loaded. Please load a contract first.`, 'assistant');
+        return;
+      }
+      
+      // Parse function call: "functionName()" or "functionName(arg1, arg2)"
+      const match = functionCall.match(/^(\w+)\((.*)\)$/);
+      if (!match) {
+        log(`Invalid function format: ${functionCall}`, 'error');
+        return;
+      }
+      
+      const fnName = match[1];
+      const argsStr = match[2].trim();
+      const args = argsStr ? argsStr.split(',').map(a => a.trim()) : [];
+      
+      log(`AI calling ${fnName}...`, 'info');
+      
+      try {
+        const result = await currentContract[fnName](...args);
+        const formatted = formatResult(result);
+        setOutput(`${fnName}() Result:\n\n${formatted}`);
+        addAIMessage(`**${fnName}()** returned:\n\`\`\`\n${formatted}\n\`\`\``, 'assistant');
+        log(`${fnName} completed`, 'success');
+      } catch (e) {
+        addAIMessage(`⚠️ Error calling ${fnName}: ${e.message}`, 'assistant');
+        log(`Error: ${e.message.slice(0, 50)}`, 'error');
+      }
+    }
+    
+    // AI action: Call a write function (needs wallet)
+    async function aiCallWrite(functionCall) {
+      if (!currentContract || !currentABI) {
+        addAIMessage(`⚠️ No contract loaded. Please load a contract first.`, 'assistant');
+        return;
+      }
+      
+      if (!signer) {
+        addAIMessage(`⚠️ Please connect your wallet to execute write functions.`, 'assistant');
+        return;
+      }
+      
+      // Parse function call
+      const match = functionCall.match(/^(\w+)\((.*)\)$/);
+      if (!match) {
+        log(`Invalid function format: ${functionCall}`, 'error');
+        return;
+      }
+      
+      const fnName = match[1];
+      const argsStr = match[2].trim();
+      const args = argsStr ? argsStr.split(',').map(a => a.trim()) : [];
+      
+      log(`AI executing ${fnName}...`, 'info');
+      
+      try {
+        const contractWithSigner = currentContract.connect(signer);
+        const tx = await contractWithSigner[fnName](...args);
+        setOutput(`Transaction sent!\nHash: ${tx.hash}\n\nWaiting for confirmation...`);
+        addAIMessage(`📤 Transaction sent! Hash: \`${tx.hash.slice(0,20)}...\`\n\nWaiting for confirmation...`, 'assistant');
+        
+        const receipt = await tx.wait();
+        setOutput(`${fnName}() confirmed in block ${receipt.blockNumber}`);
+        addAIMessage(`✅ **${fnName}()** confirmed in block ${receipt.blockNumber}`, 'assistant');
+        log(`${fnName} confirmed`, 'success');
+      } catch (e) {
+        addAIMessage(`⚠️ Error: ${e.message}`, 'assistant');
+        log(`Error: ${e.message.slice(0, 50)}`, 'error');
+      }
+    }
+    
+    function copyMessage(messageId) {
+      const el = document.getElementById(messageId);
+      if (el) {
+        // Get text content without HTML
+        const text = el.innerText;
+        navigator.clipboard.writeText(text);
+        log('Message copied', 'success');
+      }
+    }
+    
+    async function sendMessage() {
+      const input = document.getElementById('aiInput');
+      const message = input.value.trim();
+      if (!message) return;
+      
+      const provider = localStorage.getItem('entropyAI_provider') || 'claude';
+      const apiKey = getApiKey();
+      
+      // All providers require API key
+      if (!apiKey) {
+        addAIMessage('⚠️ Please add your API key in Settings (⚙️) to use the AI chat.', 'assistant');
+        return;
+      }
+      
+      input.value = '';
+      addAIMessage(message, 'user');
+      
+      // Add to history
+      conversationHistory.push({ role: 'user', content: message });
+      
+      // Build context for the AI
+      const context = buildContext();
+      
+      try {
+        log('Thinking...', 'info');
+        
+        let aiResponse;
+        
+        if (provider === 'claude') {
+          // Use serverless API - it has the full Dysnomia system prompt
+          aiResponse = await callClaudeServerless(apiKey, context, conversationHistory);
+        } else if (provider === 'openrouter') {
+          const systemPrompt = getDysnomiaSystemPrompt(context);
+          aiResponse = await callOpenRouter(apiKey, systemPrompt, conversationHistory);
+        } else if (provider === 'gemini') {
+          const systemPrompt = getDysnomiaSystemPrompt(context);
+          aiResponse = await callGemini(apiKey, systemPrompt, conversationHistory);
+        } else if (provider === 'openai') {
+          const systemPrompt = getDysnomiaSystemPrompt(context);
+          aiResponse = await callOpenAI(apiKey, systemPrompt, conversationHistory);
+        }
+        
+        if (aiResponse) {
+          addAIMessage(aiResponse, 'assistant');
+          conversationHistory.push({ role: 'assistant', content: aiResponse });
+        }
+        
+        log('Ready', 'success');
+      } catch (e) {
+        console.error('AI Error:', e);
+        addAIMessage(`Sorry, there was an error: ${e.message}`, 'assistant');
+        log('AI error', 'error');
+      }
+    }
+    
+    // Call Claude via serverless API (uses the rich system prompt in api/chat.js)
+    async function callClaudeServerless(apiKey, context, history) {
+      // Build messages with context prefix
+      const contextMsg = `[CONTEXT] LAU: ${context.lau?.name || 'None'}, QING: ${context.qing?.name || 'None'}, Wallet: ${context.walletConnected ? 'Connected' : 'Not connected'}, Current Contract: ${context.currentContract?.name || 'None'}`;
+      
+      const messages = history.map((m, i) => {
+        // Add context to first user message
+        if (i === 0 && m.role === 'user') {
+          return { role: m.role, content: contextMsg + '\n\n' + m.content };
+        }
+        return { role: m.role, content: m.content };
+      });
+      
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1500,
+          messages: messages
+        })
+      });
+      
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.error?.message || err.error || 'API error');
+      }
+      
+      const data = await response.json();
+      return data.content[0].text;
+    }
+    
+    function getDysnomiaSystemPrompt(context) {
+      return `You are the Dysnomia AI Assistant - an expert guide for the Dysnomia mathematical smart contract ecosystem on PulseChain.
+
+=== CURRENT USER CONTEXT ===
+- LAU: ${context.lau ? context.lau.name + ' (' + context.lau.address + ')' : 'Not loaded'}
+- QING: ${context.qing ? context.qing.name : 'None'}
+- Wallet: ${context.walletConnected ? 'Connected' : 'Not connected'}
+- Current Contract: ${context.currentContract ? context.currentContract.name : 'None'}
+
+=== ACTION TAGS - USE THESE TO EXECUTE ACTIONS ===
+
+You can trigger actions by including these tags in your response:
+
+{{LOAD:CONTRACT_NAME}} - Load a contract by name (e.g., {{LOAD:AFFECTION}}, {{LOAD:SEI}})
+{{NAVIGATE:CONTRACT_NAME}} - Same as LOAD
+{{READ:functionName()}} - Call a read function on the currently loaded contract
+{{WRITE:functionName(args)}} - Show a button to execute a write function (requires wallet)
+
+IMPORTANT RULES:
+1. READ and WRITE only work on the CURRENTLY LOADED contract
+2. If you need to call a function on a different contract, FIRST use {{LOAD:CONTRACT}} 
+3. LOAD and READ auto-execute, WRITE shows a button for user to confirm
+4. Always explain what you're doing before using action tags
+
+EXAMPLES:
+- User: "load SEI" → "I'll load the SEI contract for you. {{LOAD:SEI}}"
+- User: "what's the total supply?" → "Let me check. {{READ:totalSupply()}}"
+- User: "call Alpha with 12345" → "This will terraform your coordinates. {{WRITE:Alpha(12345)}}"
+- User: "check my AFFECTION coordinates" → "I'll load AFFECTION and check your coordinates. {{LOAD:AFFECTION}} Then I'll call View(). {{READ:View()}}"
+
+=== CRITICAL MATHEMATICAL DISCOVERY ===
+
+The CORE operation in Dysnomia is MODULAR EXPONENTIATION:
+  result = base^exponent mod modulus
+
+=== FUNDAMENTAL CONSTANTS ===
+
+MOTZKIN PRIME: 953,467,954,114,363 - the fundamental modulus for ALL operations
+UINT64_MAX: 18,446,744,073,709,551,615 - maximum 64-bit value
+
+=== ALL DYSNOMIA CONTRACTS ===
+
+CORE CHAIN: VOID → SIU → YANG → YAU → ZHOU → ZHENG → YI
+
+SOENG DOMAIN: META → RING → PANG → ZI → CHOA → SEI → CHAN → XIE → XIA → MAI → QI
+
+TANG DOMAIN: CHEON
+
+REACTORS: SHIO, SHA, SHAFactory, SHIOFactory
+
+SPATIAL/USER LAYER: CHO, LAU, YUE, MAP, HECKE, QING
+
+LIBRARIES: libAtropaMath, ReactionsLib, LibAttribute
+
+TERRAFORMING: AFFECTION (0x24F0154C1dCe548AdF15da2098Fdd8B8A3B8151D)
+- View() shows FAUNG coordinates
+- Alpha(seed), Beta(value), Pi(), Rho() for terraforming
+
+Be concise, helpful, and use action tags when the user wants to interact with contracts.`;
+    }
+    
+    async function callClaude(apiKey, systemPrompt, history) {
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true'
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1024,
+          system: systemPrompt,
+          messages: history.map(m => ({ role: m.role, content: m.content }))
+        })
+      });
+      
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.error?.message || 'Claude API error');
+      }
+      
+      const data = await response.json();
+      return data.content[0].text;
+    }
+    
+    async function callOpenRouter(apiKey, systemPrompt, history) {
+      const messages = [
+        { role: 'system', content: systemPrompt },
+        ...history
+      ];
+      
+      const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`,
+          'HTTP-Referer': window.location.origin,
+          'X-Title': 'Entropy AI - Dysnomia'
+        },
+        body: JSON.stringify({
+          model: 'anthropic/claude-3.5-sonnet',
+          messages: messages,
+          max_tokens: 1024
+        })
+      });
+      
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.error?.message || 'OpenRouter API error');
+      }
+      
+      const data = await response.json();
+      return data.choices[0].message.content;
+    }
+    
+    async function callGemini(apiKey, systemPrompt, history) {
+      const contents = history.map(m => ({
+        role: m.role === 'assistant' ? 'model' : 'user',
+        parts: [{ text: m.content }]
+      }));
+      
+      // Add system as first user message
+      contents.unshift({ role: 'user', parts: [{ text: systemPrompt }] });
+      contents.splice(1, 0, { role: 'model', parts: [{ text: 'Understood. I will help with Dysnomia.' }] });
+      
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contents })
+      });
+      
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.error?.message || 'Gemini API error');
+      }
+      
+      const data = await response.json();
+      return data.candidates[0].content.parts[0].text;
+    }
+    
+    async function callOpenAI(apiKey, systemPrompt, history) {
+      const messages = [
+        { role: 'system', content: systemPrompt },
+        ...history
+      ];
+      
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: messages,
+          max_tokens: 1024
+        })
+      });
+      
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.error?.message || 'OpenAI API error');
+      }
+      
+      const data = await response.json();
+      return data.choices[0].message.content;
+    }
+    
+    function askAI(question) {
+      document.getElementById('aiInput').value = question;
+      sendMessage();
+    }
+    
+    function buildContext() {
+      return {
+        lau: userIdentity.lau.name ? {
+          name: userIdentity.lau.name,
+          address: userIdentity.lau.address
+        } : null,
+        qing: userIdentity.qing.name ? {
+          name: userIdentity.qing.name,
+          address: userIdentity.qing.address
+        } : null,
+        walletConnected: !!signer,
+        currentContract: currentAddress ? {
+          address: currentAddress,
+          name: document.getElementById('contractName').textContent
+        } : null
+      };
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // HELPERS
+    // ═══════════════════════════════════════════════════════════════════════════
+    
+    function changeLau() {
+      // Go back to welcome screen
+      document.getElementById('appContainer').classList.remove('active');
+      document.getElementById('welcomeScreen').style.display = 'flex';
+      
+      // Clear current identity
+      userIdentity = {
+        lau: { address: null, name: null, contract: null },
+        yue: { address: null, name: null, contract: null },
+        qing: { address: null, name: null, contract: null }
+      };
+      
+      // Reset UI
+      document.getElementById('qingCard').style.display = 'none';
+      document.getElementById('yueCard').style.display = 'none';
+      document.getElementById('aiMessages').innerHTML = '';
+      
+      log('Ready to load new LAU', 'info');
+    }
+    
+    function log(message, type = '') {
+      const el = document.getElementById('activityContent');
+      el.textContent = message;
+      el.className = 'activity-content ' + type;
+    }
+    
+    function setOutput(text) {
+      document.getElementById('outputContent').textContent = text;
+    }
+    
+    function copyAddress() {
+      if (currentAddress) {
+        navigator.clipboard.writeText(currentAddress);
+        log('Address copied', 'success');
+      }
+    }
+    
+    function copyOutput() {
+      const output = document.getElementById('outputContent').textContent;
+      navigator.clipboard.writeText(output);
+      log('Copied to clipboard', 'success');
+    }
+    
+    function formatNumber(num) {
+      if (!num || num === '--') return '--';
+      const n = parseInt(num);
+      if (n > 1000000) return (n / 1000000).toFixed(1) + 'M';
+      if (n > 1000) return (n / 1000).toFixed(1) + 'K';
+      return n.toLocaleString();
+    }
+    
+    function formatLargeNumber(value, decimals = 18) {
+      try {
+        const num = parseFloat(ethers.formatUnits(value, decimals));
+        if (num > 1000000) return (num / 1000000).toFixed(2) + 'M';
+        if (num > 1000) return (num / 1000).toFixed(2) + 'K';
+        return num.toFixed(2);
+      } catch {
+        return '--';
+      }
+    }
+    
+    function formatResult(result) {
+      if (result === null || result === undefined) return 'null';
+      if (typeof result === 'bigint') return result.toString();
+      if (Array.isArray(result)) {
+        return result.map(formatResult).join('\n');
+      }
+      if (typeof result === 'object') {
+        return JSON.stringify(result, (k, v) => typeof v === 'bigint' ? v.toString() : v, 2);
+      }
+      return String(result);
+    }
+    
+    function selectIdentity(type) {
+      document.querySelectorAll('.identity-card').forEach(card => card.classList.remove('active'));
+      document.getElementById(`${type}Card`).classList.add('active');
+    }
+    
+    async function loadIdentityContract(type) {
+      const identity = userIdentity[type];
+      if (!identity || !identity.address) {
+        log(`No ${type.toUpperCase()} loaded`, 'error');
+        return;
+      }
+      
+      // Build the appropriate ABI
+      const abiType = type.toUpperCase();
+      const abi = buildDysnomiaABI(abiType);
+      
+      // Load into contract panel
+      loadContractIntoPanel(identity.address, identity.name, abiType, abi);
+      addToRecent(identity.name, identity.address);
+      log(`Loaded ${identity.name}`, 'success');
+    }
+    
+    function copyIdentityAddress(type) {
+      const identity = userIdentity[type];
+      if (identity && identity.address) {
+        navigator.clipboard.writeText(identity.address);
+        log(`${type.toUpperCase()} address copied`, 'success');
+      }
+    }
+    
+    function openMap() {
+      if (userIdentity.qing.address) {
+        window.open(`map.html?qing=${userIdentity.qing.address}`, '_blank');
+      } else {
+        window.open('map.html', '_blank');
+      }
+    }
+    
+    function showHelp(topic) {
+      if (topic === 'lau') {
+        alert('A LAU (Localized Autonomous Unit) is your identity token in Dysnomia. It represents you in the ecosystem and tracks your coordinates and territory memberships.');
+      }
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // SETTINGS
+    // ═══════════════════════════════════════════════════════════════════════════
+    
+    function toggleSettings() {
+      const modal = document.getElementById('settingsModal');
+      if (modal.style.display === 'none') {
+        modal.style.display = 'flex';
+        loadSettings();
+      } else {
+        modal.style.display = 'none';
+      }
+    }
+    
+    function loadSettings() {
+      document.getElementById('aiProvider').value = localStorage.getItem('entropyAI_provider') || 'claude';
+      document.getElementById('claudeApiKey').value = localStorage.getItem('entropyAI_claudeKey') || '';
+      document.getElementById('openrouterApiKey').value = localStorage.getItem('entropyAI_openrouterKey') || '';
+      document.getElementById('geminiApiKey').value = localStorage.getItem('entropyAI_geminiKey') || '';
+      document.getElementById('openaiApiKey').value = localStorage.getItem('entropyAI_openaiKey') || '';
+    }
+    
+    function saveSettings() {
+      localStorage.setItem('entropyAI_provider', document.getElementById('aiProvider').value);
+      localStorage.setItem('entropyAI_claudeKey', document.getElementById('claudeApiKey').value);
+      localStorage.setItem('entropyAI_openrouterKey', document.getElementById('openrouterApiKey').value);
+      localStorage.setItem('entropyAI_geminiKey', document.getElementById('geminiApiKey').value);
+      localStorage.setItem('entropyAI_openaiKey', document.getElementById('openaiApiKey').value);
+      log('Settings saved', 'success');
+    }
+    
+    function clearApiKeys() {
+      if (confirm('Clear all API keys?')) {
+        localStorage.removeItem('entropyAI_claudeKey');
+        localStorage.removeItem('entropyAI_openrouterKey');
+        localStorage.removeItem('entropyAI_geminiKey');
+        localStorage.removeItem('entropyAI_openaiKey');
+        document.getElementById('claudeApiKey').value = '';
+        document.getElementById('openrouterApiKey').value = '';
+        document.getElementById('geminiApiKey').value = '';
+        document.getElementById('openaiApiKey').value = '';
+        log('API keys cleared', 'success');
+      }
+    }
+    
+    function getApiKey() {
+      const provider = localStorage.getItem('entropyAI_provider') || 'claude';
+      switch (provider) {
+        case 'claude': return localStorage.getItem('entropyAI_claudeKey');
+        case 'openrouter': return localStorage.getItem('entropyAI_openrouterKey');
+        case 'gemini': return localStorage.getItem('entropyAI_geminiKey');
+        case 'openai': return localStorage.getItem('entropyAI_openaiKey');
+        default: return null;
+      }
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // CATEGORY TOGGLES
+    // ═══════════════════════════════════════════════════════════════════════════
+    
+    function toggleCategory(category) {
+      const content = document.getElementById(`${category}-content`);
+      const arrow = document.getElementById(`${category}-arrow`);
+      
+      if (content.classList.contains('expanded')) {
+        content.classList.remove('expanded');
+        arrow.textContent = '▸';
+      } else {
+        content.classList.add('expanded');
+        arrow.textContent = '▾';
+      }
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // RECENT CONTRACTS
+    // ═══════════════════════════════════════════════════════════════════════════
+    
+    function addToRecent(name, address) {
+      // Remove if already exists
+      recentContracts = recentContracts.filter(c => c.address.toLowerCase() !== address.toLowerCase());
+      
+      // Add to front
+      recentContracts.unshift({ name, address, time: Date.now() });
+      
+      // Keep only last 10
+      recentContracts = recentContracts.slice(0, 10);
+      
+      // Save
+      localStorage.setItem('entropyAI_recent', JSON.stringify(recentContracts));
+      
+      // Update UI
+      renderRecentContracts();
+    }
+    
+    function removeFromRecent(address) {
+      recentContracts = recentContracts.filter(c => c.address.toLowerCase() !== address.toLowerCase());
+      localStorage.setItem('entropyAI_recent', JSON.stringify(recentContracts));
+      renderRecentContracts();
+    }
+    
+    function renderRecentContracts() {
+      const section = document.getElementById('recentSection');
+      const list = document.getElementById('recentList');
+      
+      if (recentContracts.length === 0) {
+        section.style.display = 'none';
+        return;
+      }
+      
+      section.style.display = 'block';
+      list.innerHTML = recentContracts.map(c => `
+        <div class="recent-item">
+          <div class="recent-item-info" onclick="loadContract('${c.address}')">
+            <span class="recent-item-name">${c.name}</span>
+          </div>
+          <button class="recent-item-delete" onclick="event.stopPropagation(); removeFromRecent('${c.address}')">✕</button>
+        </div>
+      `).join('');
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // CLEAR CHAT
+    // ═══════════════════════════════════════════════════════════════════════════
+    
+    function clearChat() {
+      if (confirm('Clear all chat messages?')) {
+        document.getElementById('aiMessages').innerHTML = '';
+        conversationHistory = [];
+        log('Chat cleared', 'success');
+      }
+    }
+    
+    // Initialize
+    init();
+    renderRecentContracts();
+  </script>
+</body>
+</html>
