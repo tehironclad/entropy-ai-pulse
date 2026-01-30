@@ -7,6 +7,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.9.0/ethers.umd.min.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
@@ -43,369 +45,146 @@
       z-index: 1000;
       height: 60px;
     }
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
+    .logo { display: flex; align-items: center; gap: 12px; }
     .logo-icon {
       width: 36px; height: 36px;
       background: var(--accent-gradient);
       border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      display: flex; align-items: center; justify-content: center;
       font-size: 18px;
     }
     .logo-text {
-      font-size: 20px;
-      font-weight: 700;
+      font-size: 20px; font-weight: 700;
       background: var(--accent-gradient);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
     .header-actions { display: flex; gap: 12px; align-items: center; }
     .btn {
-      padding: 8px 16px;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 500;
-      cursor: pointer;
-      border: none;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      text-decoration: none;
-      transition: all 0.2s;
+      padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 500;
+      cursor: pointer; border: none; display: flex; align-items: center; gap: 6px;
+      text-decoration: none; transition: all 0.2s;
     }
     .btn-primary { background: var(--accent-gradient); color: white; }
     .btn-primary:hover { opacity: 0.9; }
-    .btn-secondary {
-      background: var(--bg-tertiary);
-      color: var(--text-primary);
-      border: 1px solid var(--border-color);
-    }
+    .btn-secondary { background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border-color); }
     .btn-secondary:hover { border-color: var(--accent-primary); }
-    .main-container {
-      display: flex;
-      height: calc(100vh - 60px);
-      margin-top: 60px;
-    }
+    
+    .main-container { display: flex; height: calc(100vh - 60px); margin-top: 60px; }
+    
     .sidebar {
-      width: 340px;
-      background: var(--bg-secondary);
+      width: 340px; background: var(--bg-secondary);
       border-right: 1px solid var(--border-color);
-      display: flex;
-      flex-direction: column;
+      display: flex; flex-direction: column;
     }
-    .sidebar-section {
-      padding: 16px;
-      border-bottom: 1px solid var(--border-color);
-    }
+    .sidebar-section { padding: 16px; border-bottom: 1px solid var(--border-color); }
     .sidebar-section h3 {
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 12px;
+      font-size: 11px; font-weight: 600; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px;
     }
     .input-group { display: flex; gap: 8px; }
     .input {
-      flex: 1;
-      padding: 10px 12px;
-      background: var(--bg-tertiary);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      color: var(--text-primary);
-      font-size: 12px;
+      flex: 1; padding: 10px 12px; background: var(--bg-tertiary);
+      border: 1px solid var(--border-color); border-radius: 8px;
+      color: var(--text-primary); font-size: 12px;
       font-family: 'JetBrains Mono', monospace;
     }
     .input:focus { outline: none; border-color: var(--accent-primary); }
+    
     .qing-list { flex: 1; overflow-y: auto; padding: 8px; }
     .qing-item {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: 10px;
-      padding: 12px;
-      margin-bottom: 8px;
-      cursor: pointer;
-      transition: all 0.2s;
+      background: var(--bg-card); border: 1px solid var(--border-color);
+      border-radius: 10px; padding: 12px; margin-bottom: 8px;
+      cursor: pointer; transition: all 0.2s;
     }
     .qing-item:hover { border-color: var(--accent-primary); }
     .qing-item.selected { border-color: var(--accent-primary); background: rgba(99,102,241,0.1); }
+    .qing-item.member { border-left: 3px solid var(--success); }
     .qing-header { display: flex; justify-content: space-between; margin-bottom: 6px; }
     .qing-name { font-weight: 600; font-size: 14px; }
     .qing-badge {
-      font-size: 9px;
-      padding: 2px 6px;
-      border-radius: 4px;
-      background: var(--warning);
-      color: #000;
-      margin-left: 6px;
+      font-size: 9px; padding: 2px 6px; border-radius: 4px;
+      background: var(--warning); color: #000; margin-left: 6px;
     }
-    .qing-remove {
-      background: none;
-      border: none;
-      color: var(--text-muted);
-      cursor: pointer;
-      font-size: 14px;
-    }
+    .qing-remove { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 14px; }
     .qing-remove:hover { color: var(--error); }
-    .qing-details {
-      font-size: 11px;
-      color: var(--text-secondary);
-      font-family: 'JetBrains Mono', monospace;
-    }
+    .qing-details { font-size: 11px; color: var(--text-secondary); font-family: 'JetBrains Mono', monospace; }
     .qing-coords {
-      display: inline-block;
-      margin-top: 6px;
-      padding: 3px 8px;
-      background: var(--bg-tertiary);
-      border-radius: 4px;
-      font-size: 11px;
-      color: var(--accent-primary);
+      display: inline-block; margin-top: 6px; padding: 3px 8px;
+      background: var(--bg-tertiary); border-radius: 4px;
+      font-size: 11px; color: var(--accent-primary);
     }
+    
     .status-bar {
-      padding: 8px 16px;
-      background: var(--bg-tertiary);
+      padding: 8px 16px; background: var(--bg-tertiary);
       border-top: 1px solid var(--border-color);
-      font-size: 11px;
-      color: var(--text-muted);
-      display: flex;
-      justify-content: space-between;
+      font-size: 11px; color: var(--text-muted);
+      display: flex; justify-content: space-between;
     }
     .status-dot {
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      display: inline-block;
-      margin-right: 6px;
-      background: var(--error);
+      width: 8px; height: 8px; border-radius: 50%;
+      display: inline-block; margin-right: 6px; background: var(--error);
     }
     .status-dot.connected { background: var(--success); }
-    .map-container {
-      flex: 1;
-      position: relative;
-      background: var(--bg-primary);
-      background-image: 
-        radial-gradient(circle at 50% 50%, rgba(99,102,241,0.05) 0%, transparent 70%),
-        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
-      background-size: 100% 100%, 60px 60px, 60px 60px;
+    
+    .map-container { flex: 1; position: relative; }
+    #map { width: 100%; height: 100%; background: #1a1a2e; }
+    
+    .leaflet-container { background: #1a1a2e; font-family: 'Inter', sans-serif; }
+    .leaflet-control-zoom a { background: var(--bg-card); color: var(--text-primary); border-color: var(--border-color); }
+    .leaflet-control-zoom a:hover { background: var(--bg-tertiary); }
+    .leaflet-control-attribution { background: rgba(0,0,0,0.5); color: var(--text-muted); }
+    .leaflet-control-attribution a { color: var(--accent-primary); }
+    .leaflet-popup-content-wrapper {
+      background: var(--bg-card); color: var(--text-primary);
+      border-radius: 10px; border: 1px solid var(--border-color);
     }
-    .qing-marker {
-      position: absolute;
-      transform: translate(-50%, -50%);
-      cursor: pointer;
-      z-index: 10;
-      transition: all 0.2s;
-    }
-    .qing-marker:hover { z-index: 20; }
-    .marker-dot {
-      width: 24px; height: 24px;
-      background: var(--accent-gradient);
-      border: 3px solid white;
-      border-radius: 50%;
-      box-shadow: 0 2px 12px rgba(99,102,241,0.5);
-      transition: transform 0.2s;
-    }
-    .marker-dot.gwat {
-      background: linear-gradient(135deg, var(--warning), var(--error));
-      box-shadow: 0 2px 12px rgba(245,158,11,0.5);
-    }
-    .qing-marker:hover .marker-dot { transform: scale(1.2); }
-    .qing-marker.selected .marker-dot {
-      transform: scale(1.3);
-      box-shadow: 0 0 0 6px rgba(99,102,241,0.3);
-    }
-    .marker-label {
-      position: absolute;
-      top: 30px;
-      left: 50%;
-      transform: translateX(-50%);
-      white-space: nowrap;
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text-primary);
-      background: var(--bg-card);
-      padding: 4px 10px;
-      border-radius: 6px;
-      border: 1px solid var(--border-color);
-      opacity: 0;
-      transition: opacity 0.2s;
-      pointer-events: none;
-    }
-    .qing-marker:hover .marker-label,
-    .qing-marker.selected .marker-label { opacity: 1; }
+    .leaflet-popup-tip { background: var(--bg-card); }
+    
     .info-panel {
-      position: absolute;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 16px 20px;
-      min-width: 320px;
-      z-index: 100;
+      position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+      background: var(--bg-card); border: 1px solid var(--border-color);
+      border-radius: 12px; padding: 16px 20px; min-width: 320px; z-index: 1000;
       display: none;
     }
     .info-panel.visible { display: block; }
-    .info-panel-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-    }
-    .info-panel-title {
-      font-weight: 600;
-      font-size: 16px;
-      color: var(--accent-primary);
-    }
-    .info-panel-close {
-      background: none;
-      border: none;
-      color: var(--text-muted);
-      cursor: pointer;
-      font-size: 20px;
-    }
-    .info-grid {
-      display: grid;
-      grid-template-columns: auto 1fr;
-      gap: 6px 12px;
-      font-size: 12px;
-      margin-bottom: 12px;
-    }
+    .info-panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .info-panel-title { font-weight: 600; font-size: 16px; color: var(--accent-primary); }
+    .info-panel-close { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 20px; }
+    .info-grid { display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; font-size: 12px; margin-bottom: 12px; }
     .info-label { color: var(--text-muted); }
-    .info-value {
-      color: var(--text-primary);
-      font-family: 'JetBrains Mono', monospace;
-      word-break: break-all;
-    }
+    .info-value { color: var(--text-primary); font-family: 'JetBrains Mono', monospace; word-break: break-all; }
     .info-actions { display: flex; gap: 8px; }
     .info-actions .btn { flex: 1; justify-content: center; }
-    .empty-state {
-      text-align: center;
-      padding: 40px 20px;
-      color: var(--text-muted);
-    }
+    
+    .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); }
     .empty-state-icon { font-size: 48px; margin-bottom: 12px; }
+    
     .map-legend {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 12px;
-      font-size: 11px;
+      position: absolute; top: 80px; right: 10px; z-index: 1000;
+      background: var(--bg-card); border: 1px solid var(--border-color);
+      border-radius: 8px; padding: 12px; font-size: 11px;
     }
     .legend-title { font-weight: 600; margin-bottom: 8px; color: var(--text-secondary); }
     .legend-item { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
-    .legend-dot {
-      width: 12px; height: 12px;
-      border-radius: 50%;
-      border: 2px solid white;
-    }
+    .legend-dot { width: 12px; height: 12px; border-radius: 50%; border: 2px solid white; }
     .legend-dot.qing { background: var(--accent-primary); }
     .legend-dot.gwat { background: var(--warning); }
-    .toast-container {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      z-index: 2000;
-    }
+    .legend-line { width: 20px; height: 3px; border-radius: 2px; }
+    .legend-line.asset { background: var(--success); }
+    .legend-line.proximity { background: var(--accent-secondary); opacity: 0.5; }
+    .toggle-group { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border-color); }
+    .toggle-item { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; cursor: pointer; }
+    .toggle-item input { accent-color: var(--accent-primary); }
+    
+    .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 2000; }
     .toast {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 12px 16px;
-      margin-top: 8px;
-      font-size: 13px;
+      background: var(--bg-card); border: 1px solid var(--border-color);
+      border-radius: 8px; padding: 12px 16px; margin-top: 8px; font-size: 13px;
     }
     .toast.success { border-left: 3px solid var(--success); }
     .toast.error { border-left: 3px solid var(--error); }
     .toast.info { border-left: 3px solid var(--accent-primary); }
-    
-    /* Connection lines */
-    .connection-line {
-      position: absolute;
-      pointer-events: none;
-      z-index: 5;
-      transform-origin: 0 50%;
-    }
-    .connection-line .line {
-      height: 2px;
-      background: var(--accent-primary);
-      opacity: 0.4;
-      transition: opacity 0.2s;
-    }
-    .connection-line.same-asset .line {
-      background: linear-gradient(90deg, var(--success), var(--success));
-      height: 3px;
-    }
-    .connection-line.shared-member .line {
-      background: linear-gradient(90deg, var(--warning), var(--warning));
-      height: 2px;
-      opacity: 0.6;
-    }
-    .connection-line.proximity .line {
-      background: linear-gradient(90deg, var(--accent-secondary), var(--accent-secondary));
-      height: 1px;
-      opacity: 0.3;
-      stroke-dasharray: 5,5;
-    }
-    .connection-line:hover .line {
-      opacity: 1;
-    }
-    .connection-label {
-      position: absolute;
-      top: -20px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 9px;
-      background: var(--bg-card);
-      padding: 2px 6px;
-      border-radius: 4px;
-      border: 1px solid var(--border-color);
-      white-space: nowrap;
-      opacity: 0;
-      transition: opacity 0.2s;
-      pointer-events: none;
-    }
-    .connection-line:hover .connection-label {
-      opacity: 1;
-    }
-    
-    /* Legend updates */
-    .legend-line {
-      width: 20px;
-      height: 3px;
-      border-radius: 2px;
-    }
-    .legend-line.asset { background: var(--success); }
-    .legend-line.member { background: var(--warning); }
-    .legend-line.proximity { background: var(--accent-secondary); opacity: 0.5; }
-    
-    /* Connection toggle */
-    .toggle-group {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      margin-top: 12px;
-      padding-top: 12px;
-      border-top: 1px solid var(--border-color);
-    }
-    .toggle-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 11px;
-      cursor: pointer;
-    }
-    .toggle-item input {
-      accent-color: var(--accent-primary);
-    }
   </style>
 </head>
 <body>
@@ -428,6 +207,24 @@
           <input type="text" class="input" id="qingInput" placeholder="0x... address">
           <button class="btn btn-primary" onclick="addQing()">Add</button>
         </div>
+        <button class="btn btn-secondary" style="width:100%;margin-top:8px;justify-content:center;" onclick="scanForQings()" id="scanBtn">
+          🔍 Scan for QINGs
+        </button>
+      </div>
+      <div class="sidebar-section">
+        <h3>Search</h3>
+        <input type="text" class="input" id="searchInput" placeholder="Search by name..." oninput="filterList()">
+      </div>
+      <div class="sidebar-section" style="padding:12px 16px;background:var(--bg-tertiary);">
+        <div style="display:flex;justify-content:space-between;font-size:11px;">
+          <span>Total QINGs:</span><span id="statTotal">0</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;margin-top:4px;">
+          <span>GWATs:</span><span id="statGwats">0</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;margin-top:4px;">
+          <span>Your QINGs:</span><span id="statYours">-</span>
+        </div>
       </div>
       <div class="sidebar-section" style="flex:1;display:flex;flex-direction:column;overflow:hidden;padding-bottom:0;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
@@ -447,20 +244,23 @@
       </div>
     </aside>
 
-    <div class="map-container" id="mapContainer">
+    <div class="map-container">
+      <div id="map"></div>
+      
       <div class="map-legend">
         <div class="legend-title">Markers</div>
         <div class="legend-item"><div class="legend-dot qing"></div><span>QING</span></div>
         <div class="legend-item"><div class="legend-dot gwat"></div><span>GWAT</span></div>
-        <div class="legend-title" style="margin-top:10px;">Connections</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--success);"></div><span>Your QING</span></div>
+        <div class="legend-title" style="margin-top:8px;">Connections</div>
         <div class="legend-item"><div class="legend-line asset"></div><span>Same Asset</span></div>
-        <div class="legend-item"><div class="legend-line member"></div><span>Shared Member</span></div>
         <div class="legend-item"><div class="legend-line proximity"></div><span>Nearby</span></div>
         <div class="toggle-group">
-          <label class="toggle-item"><input type="checkbox" id="showAsset" checked onchange="render()"> Show Asset Links</label>
-          <label class="toggle-item"><input type="checkbox" id="showProximity" checked onchange="render()"> Show Proximity</label>
+          <label class="toggle-item"><input type="checkbox" id="showAsset" checked onchange="renderConnections()"> Asset Links</label>
+          <label class="toggle-item"><input type="checkbox" id="showProximity" checked onchange="renderConnections()"> Proximity</label>
         </div>
       </div>
+
       <div class="info-panel" id="infoPanel">
         <div class="info-panel-header">
           <span class="info-panel-title" id="infoTitle">-</span>
@@ -476,7 +276,7 @@
         </div>
         <div class="info-actions">
           <a class="btn btn-secondary" id="infoExplorer" href="#" target="_blank">Explorer</a>
-          <a class="btn btn-primary" id="infoEntropy" href="#">Entropy AI</a>
+          <a class="btn btn-primary" id="infoEntropyAI" href="#">Entropy AI</a>
         </div>
       </div>
     </div>
@@ -486,10 +286,14 @@
 
   <script>
     const RPC = 'https://rpc.pulsechain.com';
-    const HECKE = '0x29A924D9B0233026B9844f2aFeB202F1791D7593';
+    const CONTRACTS = {
+      MAP: '0xD3a7A95012Edd46Ea115c693B74c5e524b3DdA75',
+      HECKE: '0x29A924D9B0233026B9844f2aFeB202F1791D7593',
+      CHO: '0xB6be11F0A788014C1F68C92F8D6CcC1AbF78F2aB',
+    };
     const DEFAULTS = [
-      {address:'0xb0Ba7D36B7F0505879179ecE7401F24eB653c6E1',name:'Zürich'},
-      {address:'0xD127839B83cBf537c29B7d268c135f745a0Da2E8',name:'Illinois'},
+      {address:'0xb0Ba7D36B7F0505879179ecE7401F24eB653c6E1', name:'Zürich'},
+      {address:'0xD127839B83cBf537c29B7d268c135f745a0Da2E8', name:'Illinois'},
     ];
     const QING_ABI = [
       'function Waat() view returns (uint256)',
@@ -497,77 +301,223 @@
       'function Entropy() view returns (uint64)',
       'function GWAT() view returns (bool)',
       'function name() view returns (string)',
+      'function symbol() view returns (string)',
+      'function GetMembers() view returns (address[])',
+      'function IsMember(address) view returns (bool)',
+    ];
+    const MAP_ABI = [
+      'function GetQing(uint256) view returns (address)',
+      'function Offset() view returns (uint256)',
     ];
     const HECKE_ABI = ['function Compliment(uint64) view returns (int64,int64)'];
 
-    let provider, cache = [], selected = null;
+    let provider, map, cache = [], selected = null, userAddress = null;
+    let markers = {}, connectionLines = [];
+    let isScanning = false;
 
     async function init() {
+      map = L.map('map', {
+        center: [30, 0],
+        zoom: 2,
+        minZoom: 2,
+        maxZoom: 18,
+        worldCopyJump: true
+      });
+
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        attribution: '©OpenStreetMap, ©CARTO',
+        subdomains: 'abcd',
+        maxZoom: 20
+      }).addTo(map);
+
       try {
         provider = new ethers.JsonRpcProvider(RPC);
         await provider.getNetwork();
         document.getElementById('statusDot').classList.add('connected');
         document.getElementById('statusText').textContent = 'Connected';
       } catch {
-        document.getElementById('statusText').textContent = 'Error';
+        document.getElementById('statusText').textContent = 'RPC Error';
       }
+
       loadCache();
       if (!cache.length) {
         for (const d of DEFAULTS) await addByAddr(d.address, d.name);
       } else {
-        render();
+        updateStats();
+        renderList();
+        renderMarkers();
       }
     }
 
     async function connectWallet() {
-      if (!window.ethereum) return toast('Install MetaMask','error');
+      if (!window.ethereum) return toast('Install MetaMask', 'error');
       try {
-        const accts = await window.ethereum.request({method:'eth_requestAccounts'});
-        document.getElementById('connectBtn').textContent = accts[0].slice(0,6)+'...'+accts[0].slice(-4);
-        toast('Connected','success');
-      } catch { toast('Failed','error'); }
+        const accts = await window.ethereum.request({method: 'eth_requestAccounts'});
+        userAddress = accts[0];
+        document.getElementById('connectBtn').textContent = userAddress.slice(0,6) + '...' + userAddress.slice(-4);
+        toast('Connected', 'success');
+        checkMemberships();
+      } catch { toast('Failed', 'error'); }
+    }
+
+    async function checkMemberships() {
+      if (!userAddress) {
+        document.getElementById('statYours').textContent = '-';
+        return;
+      }
+      let count = 0;
+      for (const q of cache) {
+        try {
+          const contract = new ethers.Contract(q.address, QING_ABI, provider);
+          const isMember = await contract.IsMember(userAddress);
+          q.isMember = isMember;
+          if (isMember) count++;
+        } catch {
+          q.isMember = false;
+        }
+      }
+      document.getElementById('statYours').textContent = count;
+      renderList();
+      renderMarkers();
     }
 
     async function addQing() {
       const val = document.getElementById('qingInput').value.trim();
-      if (!val || !ethers.isAddress(val)) return toast('Invalid address','error');
-      if (cache.find(q=>q.address.toLowerCase()===val.toLowerCase())) return toast('Already added','info');
+      if (!val || !ethers.isAddress(val)) return toast('Invalid address', 'error');
+      if (cache.find(q => q.address.toLowerCase() === val.toLowerCase())) return toast('Already added', 'info');
       await addByAddr(val);
       document.getElementById('qingInput').value = '';
     }
 
     async function addByAddr(addr, name = null) {
-      toast('Loading...','info');
+      toast('Loading...', 'info');
       try {
         const q = new ethers.Contract(addr, QING_ABI, provider);
-        const h = new ethers.Contract(HECKE, HECKE_ABI, provider);
+        const h = new ethers.Contract(CONTRACTS.HECKE, HECKE_ABI, provider);
+        
         let waat, asset, entropy, gwat;
-        try { name = name || await q.name(); } catch { name = 'QING '+addr.slice(0,8); }
-        try { waat = await q.Waat(); } catch { return toast('Not a QING','error'); }
+        try { name = name || await q.name(); } catch { name = 'QING ' + addr.slice(0,8); }
+        try { waat = await q.Waat(); } catch { return toast('Not a QING', 'error'); }
         try { asset = await q.Asset(); } catch { asset = ethers.ZeroAddress; }
         try { entropy = await q.Entropy(); } catch { entropy = 0n; }
         try { gwat = await q.GWAT(); } catch { gwat = false; }
-        let lat=0, lon=0;
+        
+        let lat = 0, lon = 0;
         try {
           const c = await h.Compliment(waat);
-          lat = Number(c[1])/1e6;
-          lon = Number(c[0])/1e6;
+          lat = Number(c[1]) / 1e6;
+          lon = Number(c[0]) / 1e6;
         } catch {
           lat = Number(waat % 180n) - 90;
-          lon = Number((waat/180n) % 360n) - 180;
+          lon = Number((waat / 180n) % 360n) - 180;
         }
-        cache.push({address:addr,name,waat:waat.toString(),lat,lon,asset,entropy:entropy.toString(),gwat});
+
+        let isMember = false;
+        if (userAddress) {
+          try { isMember = await q.IsMember(userAddress); } catch {}
+        }
+
+        cache.push({address: addr, name, waat: waat.toString(), lat, lon, asset, entropy: entropy.toString(), gwat, isMember});
         saveCache();
-        render();
-        toast('Added '+name,'success');
-      } catch(e) { toast(e.message,'error'); }
+        updateStats();
+        renderList();
+        renderMarkers();
+        toast('Added ' + name, 'success');
+      } catch(e) { toast(e.message, 'error'); }
+    }
+
+    async function scanForQings() {
+      if (isScanning) return;
+      isScanning = true;
+      const btn = document.getElementById('scanBtn');
+      btn.textContent = '⏳ Scanning...';
+      btn.disabled = true;
+
+      try {
+        const mapContract = new ethers.Contract(CONTRACTS.MAP, MAP_ABI, provider);
+        let found = 0;
+        let index = 0;
+        const maxScan = 100;
+
+        while (index < maxScan) {
+          try {
+            const qingAddr = await mapContract.GetQing(index);
+            if (!qingAddr || qingAddr === ethers.ZeroAddress || qingAddr === '0x0000000000000000000000000000000000000000') {
+              break;
+            }
+            if (!cache.find(q => q.address.toLowerCase() === qingAddr.toLowerCase())) {
+              await addByAddrSilent(qingAddr);
+              found++;
+            }
+            index++;
+          } catch {
+            break;
+          }
+        }
+
+        toast(`Found ${found} new QINGs`, 'success');
+        updateStats();
+        renderList();
+        renderMarkers();
+      } catch (e) {
+        toast('Scan failed: ' + e.message, 'error');
+      }
+
+      btn.textContent = '🔍 Scan for QINGs';
+      btn.disabled = false;
+      isScanning = false;
+    }
+
+    async function addByAddrSilent(addr) {
+      try {
+        const q = new ethers.Contract(addr, QING_ABI, provider);
+        const h = new ethers.Contract(CONTRACTS.HECKE, HECKE_ABI, provider);
+        
+        let name, waat, asset, entropy, gwat;
+        try { name = await q.name(); } catch { name = 'QING ' + addr.slice(0,8); }
+        try { waat = await q.Waat(); } catch { return; }
+        try { asset = await q.Asset(); } catch { asset = ethers.ZeroAddress; }
+        try { entropy = await q.Entropy(); } catch { entropy = 0n; }
+        try { gwat = await q.GWAT(); } catch { gwat = false; }
+        
+        let lat = 0, lon = 0;
+        try {
+          const c = await h.Compliment(waat);
+          lat = Number(c[1]) / 1e6;
+          lon = Number(c[0]) / 1e6;
+        } catch {
+          lat = Number(waat % 180n) - 90;
+          lon = Number((waat / 180n) % 360n) - 180;
+        }
+
+        let isMember = false;
+        if (userAddress) {
+          try { isMember = await q.IsMember(userAddress); } catch {}
+        }
+
+        cache.push({address: addr, name, waat: waat.toString(), lat, lon, asset, entropy: entropy.toString(), gwat, isMember});
+        saveCache();
+      } catch {}
+    }
+
+    function filterList() {
+      const search = document.getElementById('searchInput').value.toLowerCase();
+      renderList(search);
+    }
+
+    function updateStats() {
+      document.getElementById('statTotal').textContent = cache.length;
+      document.getElementById('statGwats').textContent = cache.filter(q => q.gwat).length;
+      const memberCount = cache.filter(q => q.isMember).length;
+      document.getElementById('statYours').textContent = userAddress ? memberCount : '-';
     }
 
     function remove(addr) {
-      cache = cache.filter(q=>q.address.toLowerCase()!==addr.toLowerCase());
+      cache = cache.filter(q => q.address.toLowerCase() !== addr.toLowerCase());
       saveCache();
-      if (selected?.address.toLowerCase()===addr.toLowerCase()) closePanel();
-      render();
+      if (selected?.address.toLowerCase() === addr.toLowerCase()) closePanel();
+      renderList();
+      renderMarkers();
     }
 
     function clearAll() {
@@ -575,173 +525,156 @@
       cache = [];
       saveCache();
       closePanel();
-      render();
+      renderList();
+      renderMarkers();
     }
 
-    function render() {
-      // List
+    function renderList(filter = '') {
       const list = document.getElementById('qingList');
+      const filtered = filter 
+        ? cache.filter(q => q.name.toLowerCase().includes(filter) || q.address.toLowerCase().includes(filter))
+        : cache;
+      
       document.getElementById('qingCount').textContent = cache.length;
-      if (!cache.length) {
-        list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📍</div><div>No QINGs</div></div>';
-      } else {
-        list.innerHTML = cache.map(q=>`
-          <div class="qing-item ${selected?.address===q.address?'selected':''}" onclick="select('${q.address}')">
-            <div class="qing-header">
-              <span class="qing-name">${q.name}${q.gwat?'<span class="qing-badge">GWAT</span>':''}</span>
-              <button class="qing-remove" onclick="event.stopPropagation();remove('${q.address}')">×</button>
-            </div>
-            <div class="qing-details">${q.address.slice(0,14)}...${q.address.slice(-6)}</div>
-            <span class="qing-coords">📍 ${q.lat.toFixed(2)}°, ${q.lon.toFixed(2)}°</span>
-          </div>
-        `).join('');
+      
+      if (!filtered.length) {
+        list.innerHTML = `<div class="empty-state"><div class="empty-state-icon">📍</div><div>${filter ? 'No matches' : 'No QINGs'}</div></div>`;
+        return;
       }
-      // Clear map
-      const map = document.getElementById('mapContainer');
-      map.querySelectorAll('.qing-marker, .connection-line').forEach(m=>m.remove());
-      if (!cache.length) return;
       
-      // Calculate bounds
-      const lats = cache.map(q=>q.lat), lons = cache.map(q=>q.lon);
-      const pad = 15;
-      const minLat = Math.min(...lats)-pad, maxLat = Math.max(...lats)+pad;
-      const minLon = Math.min(...lons)-pad, maxLon = Math.max(...lons)+pad;
-      const w = map.offsetWidth, h = map.offsetHeight;
-      
-      // Helper to get screen position
-      const getPos = (q) => ({
-        x: ((q.lon-minLon)/(maxLon-minLon))*w,
-        y: h - ((q.lat-minLat)/(maxLat-minLat))*h
-      });
-      
-      // Draw connection lines first (so markers are on top)
-      const connections = findConnections();
-      const showAsset = document.getElementById('showAsset')?.checked ?? true;
-      const showProximity = document.getElementById('showProximity')?.checked ?? true;
-      
-      connections.forEach(conn => {
-        if (conn.type === 'same-asset' && !showAsset) return;
-        if (conn.type === 'proximity' && !showProximity) return;
-        
-        const pos1 = getPos(conn.q1);
-        const pos2 = getPos(conn.q2);
-        
-        // Calculate line angle and length
-        const dx = pos2.x - pos1.x;
-        const dy = pos2.y - pos1.y;
-        const length = Math.sqrt(dx*dx + dy*dy);
-        const angle = Math.atan2(dy, dx) * 180 / Math.PI;
-        
-        const line = document.createElement('div');
-        line.className = 'connection-line ' + conn.type;
-        line.style.left = pos1.x + 'px';
-        line.style.top = pos1.y + 'px';
-        line.style.width = length + 'px';
-        line.style.transform = `rotate(${angle}deg)`;
-        line.innerHTML = `
-          <div class="line"></div>
-          <div class="connection-label">${conn.label}</div>
-        `;
-        map.appendChild(line);
-      });
-      
-      // Draw markers
-      cache.forEach(q=>{
-        const pos = getPos(q);
-        const m = document.createElement('div');
-        m.className = 'qing-marker'+(selected?.address===q.address?' selected':'');
-        m.style.left = pos.x+'px';
-        m.style.top = pos.y+'px';
-        m.innerHTML = `<div class="marker-dot ${q.gwat?'gwat':''}"></div><div class="marker-label">${q.name}</div>`;
-        m.onclick = () => select(q.address);
-        map.appendChild(m);
-      });
+      list.innerHTML = filtered.map(q => `
+        <div class="qing-item ${selected?.address === q.address ? 'selected' : ''} ${q.isMember ? 'member' : ''}" onclick="selectQing('${q.address}')">
+          <div class="qing-header">
+            <span class="qing-name">
+              ${q.isMember ? '⭐ ' : ''}${q.name}
+              ${q.gwat ? '<span class="qing-badge">GWAT</span>' : ''}
+            </span>
+            <button class="qing-remove" onclick="event.stopPropagation();remove('${q.address}')">×</button>
+          </div>
+          <div class="qing-details">${q.address.slice(0,14)}...${q.address.slice(-6)}</div>
+          <span class="qing-coords">📍 ${q.lat.toFixed(2)}°, ${q.lon.toFixed(2)}°</span>
+        </div>
+      `).join('');
     }
-    
-    function findConnections() {
-      const connections = [];
-      
+
+    function renderMarkers() {
+      Object.values(markers).forEach(m => map.removeLayer(m));
+      markers = {};
+
+      if (!cache.length) return;
+
+      cache.forEach(q => {
+        // Different colors: GWAT=orange, Member=green, Regular=purple
+        let bgColor = 'linear-gradient(135deg, #6366f1, #8b5cf6)';
+        if (q.gwat) bgColor = 'linear-gradient(135deg, #f59e0b, #ef4444)';
+        else if (q.isMember) bgColor = 'linear-gradient(135deg, #22c55e, #16a34a)';
+
+        const icon = L.divIcon({
+          className: '',
+          html: `<div style="
+            width: ${q.isMember ? '24px' : '20px'}; 
+            height: ${q.isMember ? '24px' : '20px'};
+            background: ${bgColor};
+            border: ${q.isMember ? '3px' : '2px'} solid white;
+            border-radius: 50%;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+          "></div>`,
+          iconSize: [q.isMember ? 24 : 20, q.isMember ? 24 : 20],
+          iconAnchor: [q.isMember ? 12 : 10, q.isMember ? 12 : 10]
+        });
+
+        const marker = L.marker([q.lat, q.lon], {icon})
+          .addTo(map)
+          .on('click', () => selectQing(q.address));
+
+        marker.bindTooltip(q.name + (q.isMember ? ' ⭐' : ''), {
+          permanent: false,
+          direction: 'top',
+          offset: [0, -10]
+        });
+
+        markers[q.address] = marker;
+      });
+
+      if (cache.length > 0) {
+        const bounds = cache.map(q => [q.lat, q.lon]);
+        map.fitBounds(bounds, { padding: [50, 50], maxZoom: 4 });
+      }
+
+      renderConnections();
+    }
+
+    function renderConnections() {
+      connectionLines.forEach(line => map.removeLayer(line));
+      connectionLines = [];
+
+      const showAsset = document.getElementById('showAsset').checked;
+      const showProximity = document.getElementById('showProximity').checked;
+
       for (let i = 0; i < cache.length; i++) {
         for (let j = i + 1; j < cache.length; j++) {
           const q1 = cache[i];
           const q2 = cache[j];
-          
-          // Check same asset
-          if (q1.asset && q2.asset && 
-              q1.asset !== ethers.ZeroAddress && 
+
+          if (showAsset && q1.asset && q2.asset &&
+              q1.asset !== ethers.ZeroAddress &&
               q1.asset.toLowerCase() === q2.asset.toLowerCase()) {
-            connections.push({
-              q1, q2,
-              type: 'same-asset',
-              label: 'Same Asset'
-            });
+            const line = L.polyline([[q1.lat, q1.lon], [q2.lat, q2.lon]], {
+              color: '#22c55e', weight: 3, opacity: 0.6
+            }).addTo(map);
+            line.bindTooltip('Same Asset', {sticky: true});
+            connectionLines.push(line);
           }
-          
-          // Check proximity (within ~20 degrees)
-          const latDiff = Math.abs(q1.lat - q2.lat);
-          const lonDiff = Math.abs(q1.lon - q2.lon);
-          const distance = Math.sqrt(latDiff*latDiff + lonDiff*lonDiff);
-          
-          if (distance < 30 && distance > 0) {
-            connections.push({
-              q1, q2,
-              type: 'proximity',
-              label: `${distance.toFixed(1)}° apart`
-            });
+
+          if (showProximity) {
+            const dist = Math.sqrt(Math.pow(q1.lat - q2.lat, 2) + Math.pow(q1.lon - q2.lon, 2));
+            if (dist < 30 && dist > 0) {
+              const line = L.polyline([[q1.lat, q1.lon], [q2.lat, q2.lon]], {
+                color: '#8b5cf6', weight: 1, opacity: 0.4, dashArray: '5,5'
+              }).addTo(map);
+              line.bindTooltip(`${dist.toFixed(1)}° apart`, {sticky: true});
+              connectionLines.push(line);
+            }
           }
         }
       }
-      
-      return connections;
     }
 
-    function select(addr) {
-      const q = cache.find(x=>x.address===addr);
+    function selectQing(addr) {
+      const q = cache.find(x => x.address === addr);
       if (!q) return;
+      
       selected = q;
-      document.getElementById('infoTitle').innerHTML = q.name+(q.gwat?' <span class="qing-badge">GWAT</span>':'');
-      document.getElementById('infoAddr').textContent = q.address.slice(0,12)+'...'+q.address.slice(-6);
-      document.getElementById('infoWaat').textContent = q.waat.length>16?q.waat.slice(0,16)+'...':q.waat;
-      document.getElementById('infoCoords').textContent = q.lat.toFixed(4)+'°, '+q.lon.toFixed(4)+'°';
-      document.getElementById('infoAsset').textContent = q.asset.slice(0,12)+'...'+q.asset.slice(-6);
+      document.getElementById('infoTitle').innerHTML = q.name + (q.gwat ? ' <span class="qing-badge">GWAT</span>' : '');
+      document.getElementById('infoAddr').textContent = q.address.slice(0,12) + '...' + q.address.slice(-6);
+      document.getElementById('infoWaat').textContent = q.waat.length > 16 ? q.waat.slice(0,16) + '...' : q.waat;
+      document.getElementById('infoCoords').textContent = q.lat.toFixed(4) + '°, ' + q.lon.toFixed(4) + '°';
+      document.getElementById('infoAsset').textContent = q.asset.slice(0,12) + '...' + q.asset.slice(-6);
       document.getElementById('infoEntropy').textContent = q.entropy;
-      
-      // Find connections for this QING
+
       const conns = findConnectionsFor(q);
-      if (conns.length > 0) {
-        document.getElementById('infoConnections').innerHTML = conns.map(c => 
-          `<span style="display:block;font-size:10px;">${c.type}: ${c.other.name}</span>`
-        ).join('');
-      } else {
-        document.getElementById('infoConnections').textContent = 'None';
-      }
-      
-      document.getElementById('infoExplorer').href = 'https://scan.pulsechain.com/address/'+q.address;
-      document.getElementById('infoEntropy').href = 'index.html?contract='+q.address;
+      document.getElementById('infoConnections').innerHTML = conns.length > 0
+        ? conns.map(c => `<span style="display:block;font-size:10px;">${c.type}: ${c.other.name}</span>`).join('')
+        : 'None';
+
+      document.getElementById('infoExplorer').href = 'https://scan.pulsechain.com/address/' + q.address;
+      document.getElementById('infoEntropyAI').href = 'index.html?contract=' + q.address;
       document.getElementById('infoPanel').classList.add('visible');
-      render();
+
+      map.panTo([q.lat, q.lon]);
+      renderList();
     }
-    
+
     function findConnectionsFor(q) {
       const conns = [];
       cache.forEach(other => {
         if (other.address === q.address) return;
-        
-        // Same asset
-        if (q.asset && other.asset && 
-            q.asset !== ethers.ZeroAddress && 
+        if (q.asset && other.asset && q.asset !== ethers.ZeroAddress &&
             q.asset.toLowerCase() === other.asset.toLowerCase()) {
-          conns.push({ type: '🔗 Same Asset', other });
+          conns.push({type: '🔗 Same Asset', other});
         }
-        
-        // Proximity
-        const dist = Math.sqrt(
-          Math.pow(q.lat - other.lat, 2) + 
-          Math.pow(q.lon - other.lon, 2)
-        );
-        if (dist < 30) {
-          conns.push({ type: `📍 ${dist.toFixed(1)}° away`, other });
-        }
+        const dist = Math.sqrt(Math.pow(q.lat - other.lat, 2) + Math.pow(q.lon - other.lon, 2));
+        if (dist < 30) conns.push({type: `📍 ${dist.toFixed(1)}°`, other});
       });
       return conns;
     }
@@ -749,26 +682,25 @@
     function closePanel() {
       selected = null;
       document.getElementById('infoPanel').classList.remove('visible');
-      render();
+      renderList();
     }
 
     function saveCache() { localStorage.setItem('qingMap', JSON.stringify(cache)); }
-    function loadCache() { try { cache = JSON.parse(localStorage.getItem('qingMap'))||[]; } catch { cache=[]; } }
+    function loadCache() { try { cache = JSON.parse(localStorage.getItem('qingMap')) || []; } catch { cache = []; } }
 
-    function toast(msg, type='info') {
+    function toast(msg, type = 'info') {
       const t = document.createElement('div');
-      t.className = 'toast '+type;
+      t.className = 'toast ' + type;
       t.textContent = msg;
       document.getElementById('toasts').appendChild(t);
-      setTimeout(()=>t.remove(), 3000);
+      setTimeout(() => t.remove(), 3000);
     }
 
     document.addEventListener('keydown', e => {
-      if (e.key==='Escape') closePanel();
-      if (e.key==='Enter' && document.activeElement.id==='qingInput') addQing();
+      if (e.key === 'Escape') closePanel();
+      if (e.key === 'Enter' && document.activeElement.id === 'qingInput') addQing();
     });
 
-    window.addEventListener('resize', render);
     init();
   </script>
 </body>
