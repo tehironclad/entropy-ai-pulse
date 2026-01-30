@@ -2264,29 +2264,46 @@ Quick tips:
     async function checkDysnomia(address) {
       log('Checking if Dysnomia...', 'info');
       
+      // First check if it's a known contract - skip RPC call
+      const knownType = Object.entries(KNOWN_CONTRACTS).find(([name, addr]) => 
+        addr.toLowerCase() === address.toLowerCase()
+      );
+      if (knownType) {
+        log(`✓ Known contract: ${knownType[0]}`, 'success');
+        return true;
+      }
+      
+      // Add timeout wrapper for RPC calls
+      const withTimeout = (promise, ms = 5000) => {
+        return Promise.race([
+          promise,
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), ms))
+        ]);
+      };
+      
       // Method 1: Check for Type() first - this is the most reliable indicator
       try {
         const c = new ethers.Contract(address, ['function Type() view returns (string)'], provider);
-        const type = await c.Type();
+        const type = await withTimeout(c.Type(), 5000);
         log(`Type() = "${type}"`, 'info');
         if (type) {
           log(`✓ Dysnomia detected via Type()`, 'success');
           return true;
         }
       } catch (e) {
-        log('Type() failed', 'info');
+        log(`Type() failed: ${e.message?.slice(0, 30) || 'unknown'}`, 'info');
       }
       
       // Method 2: Check for Xiao() - standard DYSNOMIA tokens
       try {
         const c = new ethers.Contract(address, ['function Xiao() view returns (address)'], provider);
-        const xiao = await c.Xiao();
+        const xiao = await withTimeout(c.Xiao(), 5000);
         if (xiao && xiao !== '0x0000000000000000000000000000000000000000') {
           log('✓ Dysnomia detected via Xiao()', 'success');
           return true;
         }
       } catch (e) {
-        log('Xiao() failed', 'info');
+        log(`Xiao() failed: ${e.message?.slice(0, 30) || 'unknown'}`, 'info');
       }
       
       log('Not a Dysnomia contract', 'info');
@@ -2310,18 +2327,27 @@ Quick tips:
     function buildDysnomiaABI(type) {
       let abi = [...ERC20_ABI, ...DYSNOMIA_BASE];
       
+      // Normalize type to uppercase for matching
+      const normalizedType = (type || '').toUpperCase();
+      
+      // Debug: log what we're looking for
+      console.log(`buildDysnomiaABI: Looking for type "${normalizedType}"`);
+      console.log(`DYSNOMIA_ABIS available:`, window.DYSNOMIA_ABIS ? Object.keys(window.DYSNOMIA_ABIS) : 'NOT LOADED');
+      
       // Check external DYSNOMIA_ABIS first (from abis/*.js files)
-      if (window.DYSNOMIA_ABIS && window.DYSNOMIA_ABIS[type]) {
-        abi = [...abi, ...window.DYSNOMIA_ABIS[type]];
-        log(`Built ABI for ${type}: ${abi.length} functions (external)`, 'success');
+      if (window.DYSNOMIA_ABIS && window.DYSNOMIA_ABIS[normalizedType]) {
+        abi = [...abi, ...window.DYSNOMIA_ABIS[normalizedType]];
+        log(`Built ABI for ${normalizedType}: ${abi.length} functions (external)`, 'success');
       }
       // Fall back to inline TYPE_ABI
-      else if (TYPE_ABI[type]) {
-        abi = [...abi, ...TYPE_ABI[type]];
-        log(`Built ABI for ${type}: ${abi.length} functions`, 'success');
+      else if (TYPE_ABI[normalizedType]) {
+        abi = [...abi, ...TYPE_ABI[normalizedType]];
+        log(`Built ABI for ${normalizedType}: ${abi.length} functions`, 'success');
       } else {
-        log(`No TYPE_ABI for "${type}" - using base only`, 'warning');
+        log(`No TYPE_ABI for "${normalizedType}" - using base only (${abi.length} functions)`, 'warning');
       }
+      
+      console.log(`buildDysnomiaABI: Final ABI has ${abi.length} functions`);
       return abi;
     }
 
@@ -3567,13 +3593,25 @@ Or drag this file to a browser tab on a dApp site like app.pulsex.com`;
       const input = addressOrName || document.getElementById('contractAddress').value.trim();
       if (!input) return;
 
-      // Resolve name to address
+      // Resolve name to address (or address to name for known contracts)
       let address = input;
+      let knownName = null;
+      
       if (!input.startsWith('0x')) {
         address = KNOWN_CONTRACTS[input];
+        knownName = input;
         if (!address) {
           log('Unknown contract name: ' + input, 'error');
           return;
+        }
+      } else {
+        // Reverse lookup - check if this address is in KNOWN_CONTRACTS
+        const found = Object.entries(KNOWN_CONTRACTS).find(([name, addr]) => 
+          addr.toLowerCase() === input.toLowerCase()
+        );
+        if (found) {
+          knownName = found[0];
+          log(`Recognized as known contract: ${knownName}`, 'info');
         }
       }
 
@@ -3729,15 +3767,27 @@ Or drag this file to a browser tab on a dApp site like app.pulsex.com`;
 
     async function fetchABI(address) {
       try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 8000);
+        
         const url = `${PULSESCAN_API}?module=contract&action=getabi&address=${address}`;
-        const response = await fetch(url);
+        const response = await fetch(url, { signal: controller.signal });
+        clearTimeout(timeoutId);
+        
         const data = await response.json();
         
         if (data.status === '1' && data.result) {
+          log('✓ Verified ABI from PulseScan', 'success');
           return JSON.parse(data.result);
+        } else {
+          log('Contract not verified on PulseScan', 'info');
         }
       } catch (e) {
-        log('PulseScan fetch failed', 'error');
+        if (e.name === 'AbortError') {
+          log('PulseScan timeout - using fallback', 'warning');
+        } else {
+          log(`PulseScan fetch failed: ${e.message?.slice(0,30) || 'unknown'}`, 'warning');
+        }
       }
       return null;
     }
@@ -3858,6 +3908,8 @@ Or drag this file to a browser tab on a dApp site like app.pulsex.com`;
         iface = new ethers.Interface(abi);
       } catch (e) {
         log('Failed to parse ABI: ' + e.message, 'error');
+        console.error('ABI parse error:', e);
+        console.log('ABI that failed:', abi);
         return;
       }
 
@@ -3874,6 +3926,13 @@ Or drag this file to a browser tab on a dApp site like app.pulsex.com`;
         });
       });
 
+      // Debug: Log what we found
+      const reads = functions.filter(f => f.isRead);
+      const writes = functions.filter(f => !f.isRead);
+      console.log(`populateFunctionList: Found ${functions.length} functions (${reads.length} read, ${writes.length} write)`);
+      console.log('Read functions:', reads.map(f => f.name));
+      console.log('Write functions:', writes.map(f => f.name));
+
       // Sort: reads first, then alphabetically
       functions.sort((a, b) => {
         if (a.isRead !== b.isRead) return a.isRead ? -1 : 1;
@@ -3884,9 +3943,9 @@ Or drag this file to a browser tab on a dApp site like app.pulsex.com`;
       let html = `
         <div id="compactBuilder" style="margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--border-color); display: none;"></div>
         <div style="margin-bottom: 8px; display: flex; gap: 4px;">
-          <button class="btn btn-secondary btn-sm" onclick="filterFunctions('all')" style="flex:1; font-size:10px;">All</button>
-          <button class="btn btn-secondary btn-sm" onclick="filterFunctions('read')" style="flex:1; font-size:10px;">Read</button>
-          <button class="btn btn-secondary btn-sm" onclick="filterFunctions('write')" style="flex:1; font-size:10px;">Write</button>
+          <button class="btn btn-secondary btn-sm" onclick="filterFunctions('all')" style="flex:1; font-size:10px;">All (${functions.length})</button>
+          <button class="btn btn-secondary btn-sm" onclick="filterFunctions('read')" style="flex:1; font-size:10px;">Read (${reads.length})</button>
+          <button class="btn btn-secondary btn-sm" onclick="filterFunctions('write')" style="flex:1; font-size:10px;">Write (${writes.length})</button>
         </div>
         <div class="compact-function-list" id="functionListCompact">
       `;
