@@ -141,6 +141,26 @@
       box-shadow: 0 6px 20px rgba(139, 92, 246, 0.35);
     }
 
+    .btn-success {
+      background: var(--success);
+      color: white;
+    }
+
+    .btn-success:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.1);
+    }
+
+    .btn-warning {
+      background: var(--warning);
+      color: #000;
+    }
+
+    .btn-warning:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.1);
+    }
+
     .btn-secondary {
       background: var(--bg-tertiary);
       color: var(--text-primary);
@@ -972,7 +992,7 @@
       display: flex;
       flex-direction: column;
       gap: 6px;
-      max-height: 250px;
+      max-height: 200px;
       overflow-y: auto;
     }
 
@@ -990,6 +1010,11 @@
 
     .function-item:hover {
       background: var(--bg-elevated);
+      border-color: var(--accent-primary);
+    }
+    
+    .function-item.selected {
+      background: var(--accent-glow);
       border-color: var(--accent-primary);
     }
 
@@ -1022,12 +1047,12 @@
     }
 
     .function-builder {
-      margin-top: 16px;
       padding: 16px;
       background: var(--bg-card);
       border: 1px solid var(--accent-primary);
       border-radius: 12px;
       display: none;
+      margin-top: 12px;
     }
 
     .function-builder.active {
@@ -2496,6 +2521,15 @@ What would you like to do?`, 'assistant');
     function selectFunction(fn) {
       selectedFunction = fn;
       
+      // Remove selected class from all items
+      document.querySelectorAll('.function-item').forEach(item => item.classList.remove('selected'));
+      
+      // Add selected class to clicked item
+      if (event && event.target) {
+        const item = event.target.closest('.function-item');
+        if (item) item.classList.add('selected');
+      }
+      
       const builder = document.getElementById('functionBuilder');
       const badge = document.getElementById('builderBadge');
       const name = document.getElementById('builderName');
@@ -2506,6 +2540,7 @@ What would you like to do?`, 'assistant');
       badge.className = `function-badge ${fn.isRead ? 'read' : 'write'}`;
       name.textContent = fn.name;
       execBtn.textContent = fn.isRead ? '📖 Read' : '✍️ Write';
+      execBtn.className = fn.isRead ? 'btn btn-success' : 'btn btn-warning';
       
       inputs.innerHTML = '';
       if (fn.inputs.length === 0) {
@@ -2526,6 +2561,7 @@ What would you like to do?`, 'assistant');
     
     function closeBuilder() {
       document.getElementById('functionBuilder').classList.remove('active');
+      document.querySelectorAll('.function-item').forEach(item => item.classList.remove('selected'));
       selectedFunction = null;
     }
     
@@ -2866,22 +2902,28 @@ What would you like to do?`, 'assistant');
       // Get available functions on currently loaded contract
       let availableFunctions = 'None loaded';
       if (currentABI && currentABI.length > 0) {
-        const fnNames = currentABI
-          .filter(item => item.type === 'function')
-          .map(fn => {
-            const inputs = fn.inputs?.map(i => i.type).join(', ') || '';
-            const viewMark = fn.stateMutability === 'view' ? ' (view)' : '';
-            return `${fn.name}(${inputs})${viewMark}`;
+        try {
+          const iface = new ethers.Interface(currentABI);
+          const fnList = [];
+          iface.forEachFunction(fn => {
+            const inputs = fn.inputs.map(i => `${i.type} ${i.name || ''}`).join(', ');
+            const viewMark = (fn.stateMutability === 'view' || fn.stateMutability === 'pure') ? ' view' : '';
+            fnList.push(`${fn.name}(${inputs})${viewMark}`);
           });
-        availableFunctions = fnNames.join(', ');
+          availableFunctions = fnList.join('\n');
+        } catch (e) {
+          console.log('ABI parse error for AI:', e);
+          availableFunctions = 'Error parsing ABI';
+        }
       }
       
       // Build rich context that AI will always have
       const contextMsg = `[USER CONTEXT]
 LAU: ${context.lau?.name || 'Not loaded'}${context.lau?.address ? ' (' + context.lau.address + ')' : ''}
 QING: ${context.qing?.name || 'None'}${context.qing?.address ? ' (' + context.qing.address + ')' : ''}
+YUE: ${context.yue?.name || 'None'}${context.yue?.address ? ' (' + context.yue.address + ')' : ''}
 Wallet: ${context.walletConnected ? 'Connected' : 'Not connected'}
-Current Contract Loaded: ${context.currentContract?.name || 'None'}
+Current Contract Loaded: ${context.currentContract?.name || 'None'}${context.currentContract?.address ? ' (' + context.currentContract.address + ')' : ''}
 
 AVAILABLE FUNCTIONS ON LOADED CONTRACT:
 ${availableFunctions}
@@ -2889,8 +2931,9 @@ ${availableFunctions}
 IMPORTANT: Only call functions that are listed above. Do NOT make up function names. If you need a function that's not available, tell the user to load the correct contract first.
 
 Common contracts:
-- AFFECTION: Alpha(uint64), Beta(uint64), Pi(uint64), Rho(uint64), Generate() - for terraforming
+- AFFECTION: Alpha(uint64), Beta(uint64), Pi(), Rho(), Generate(), View() - for terraforming
 - LAU: Soul() (view), Aura() (view), Username() (view), CurrentArea() (view) - user identity
+- YUE: Hong(address,address,uint256), Chan() - IOT bridge token
 - QING: Entropy() (view), Waat() (view), Join(address), Leave(address) - territories`;
       
       // Add context as the first message in every request
@@ -3171,6 +3214,10 @@ Be encouraging! Terraforming is exploration - users are pioneers in a new mathem
         qing: userIdentity.qing.name ? {
           name: userIdentity.qing.name,
           address: userIdentity.qing.address
+        } : null,
+        yue: userIdentity.yue?.name ? {
+          name: userIdentity.yue.name,
+          address: userIdentity.yue.address
         } : null,
         walletConnected: !!signer,
         currentContract: currentAddress ? {
