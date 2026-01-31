@@ -74,6 +74,38 @@
       gap: 12px;
     }
 
+    .identity-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 12px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 12px;
+    }
+
+    .identity-bar .id-label {
+      color: var(--text-muted);
+      font-size: 10px;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .identity-bar .id-name {
+      color: var(--accent-secondary);
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .identity-bar .id-name:hover {
+      color: var(--accent-primary);
+    }
+
+    .identity-bar .id-sep {
+      color: var(--border-color);
+    }
+
     .btn {
       padding: 8px 16px;
       border-radius: 8px;
@@ -873,6 +905,16 @@
       <span>Contract Explorer</span>
     </div>
     <div class="header-actions">
+      <div class="identity-bar" id="identityBar" style="display: none;">
+        <span class="id-label">LAU</span>
+        <span class="id-name" id="idLau" onclick="loadIdentityContract('lau')">--</span>
+        <span class="id-sep">|</span>
+        <span class="id-label">YUE</span>
+        <span class="id-name" id="idYue" onclick="loadIdentityContract('yue')">--</span>
+        <span class="id-sep">|</span>
+        <span class="id-label">QING</span>
+        <span class="id-name" id="idQing" onclick="loadIdentityContract('qing')">--</span>
+      </div>
       <div class="status-item">
         <span id="walletStatus" class="status-dot disconnected"></span>
         <span id="walletAddress">No Wallet</span>
@@ -1107,8 +1149,51 @@ function transfer(address, uint256) returns (bool)'></textarea>
     // INITIALIZATION
     // ═══════════════════════════════════════════════════════════════════════════
     
+    // Load identity from shared localStorage (set by index-v2.html)
+    function loadSharedIdentity() {
+      const lau = localStorage.getItem('entropyAI_lau');
+      const lauName = localStorage.getItem('entropyAI_lauName');
+      const yue = localStorage.getItem('entropyAI_yue');
+      const yueName = localStorage.getItem('entropyAI_yueName');
+      const qing = localStorage.getItem('entropyAI_qing');
+      const qingName = localStorage.getItem('entropyAI_qingName');
+      
+      if (lau || yue || qing) {
+        document.getElementById('identityBar').style.display = 'flex';
+      }
+      
+      if (lau) {
+        document.getElementById('idLau').textContent = lauName || `${lau.slice(0,6)}...`;
+        document.getElementById('idLau').dataset.address = lau;
+        document.getElementById('idLau').title = lau;
+      }
+      if (yue) {
+        document.getElementById('idYue').textContent = yueName || `${yue.slice(0,6)}...`;
+        document.getElementById('idYue').dataset.address = yue;
+        document.getElementById('idYue').title = yue;
+      }
+      if (qing) {
+        document.getElementById('idQing').textContent = qingName || `${qing.slice(0,6)}...`;
+        document.getElementById('idQing').dataset.address = qing;
+        document.getElementById('idQing').title = qing;
+      }
+    }
+    
+    // Click identity name to load that contract into explorer
+    function loadIdentityContract(type) {
+      const el = document.getElementById(`id${type.charAt(0).toUpperCase() + type.slice(1)}`);
+      const address = el?.dataset?.address;
+      if (address) {
+        document.getElementById('contractInput').value = address;
+        loadContract();
+      }
+    }
+    
     async function init() {
       provider = new ethers.JsonRpcProvider(PULSECHAIN_RPC);
+      
+      // Load identity from Entropy AI page
+      loadSharedIdentity();
       
       // Load saved contracts
       renderSavedContracts();
