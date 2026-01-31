@@ -1052,7 +1052,10 @@
       border: 1px solid var(--accent-primary);
       border-radius: 12px;
       display: none;
-      margin-top: 12px;
+      margin-bottom: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
     }
 
     .function-builder.active {
@@ -1746,9 +1749,6 @@
                 <button class="filter-btn" onclick="filterFunctions('write')">Write</button>
               </div>
             </div>
-            <div class="functions-list" id="functionsList">
-              <!-- Functions will be populated here -->
-            </div>
 
             <div class="function-builder" id="functionBuilder">
               <div class="function-builder-header">
@@ -1762,6 +1762,10 @@
                 <button class="btn btn-primary" id="builderExecute" onclick="executeFunction()">Execute</button>
                 <button class="btn btn-secondary" onclick="closeBuilder()">Cancel</button>
               </div>
+            </div>
+
+            <div class="functions-list" id="functionsList">
+              <!-- Functions will be populated here -->
             </div>
           </div>
         </div>
@@ -2634,9 +2638,12 @@ What would you like to do?`, 'assistant');
         } else {
           if (!signer) {
             log('Connect wallet for write functions', 'error');
+            setOutput('Error: Please connect your wallet first to execute write functions.');
             return;
           }
-          const tx = await currentContract[selectedFunction.name](...args);
+          // Connect contract with signer for write operations
+          const contractWithSigner = currentContract.connect(signer);
+          const tx = await contractWithSigner[selectedFunction.name](...args);
           setOutput(`Transaction sent!\nHash: ${tx.hash}\n\nWaiting for confirmation...`);
           const receipt = await tx.wait();
           result = `Confirmed in block ${receipt.blockNumber}`;
@@ -2716,7 +2723,9 @@ What would you like to do?`, 'assistant');
         
         // Write action buttons (orange - transactions)
         writeActions.forEach((action) => {
-          actionsHtml += `<button class="ai-action-btn write" onclick="aiCallWrite('${action.param1}')">✍️ ${action.param1}</button>`;
+          // Escape quotes in the function call for HTML attribute
+          const escapedParam = action.param1.replace(/"/g, '&quot;').replace(/'/g, "\\'");
+          actionsHtml += `<button class="ai-action-btn write" onclick="aiCallWrite('${escapedParam}')">✍️ ${action.param1}</button>`;
         });
         
         // Option buttons (suggestions for what to do next)
@@ -2794,6 +2803,9 @@ What would you like to do?`, 'assistant');
         return;
       }
       
+      // Decode HTML entities that were escaped for the onclick attribute
+      const decodedCall = functionCall.replace(/&quot;/g, '"');
+      
       // If no signer, offer to connect wallet
       if (!signer) {
         const msg = document.createElement('div');
@@ -2810,10 +2822,10 @@ What would you like to do?`, 'assistant');
       }
       
       // Parse function call - handle quoted strings properly
-      const match = functionCall.match(/^(\w+)\((.*)\)$/s);
+      const match = decodedCall.match(/^(\w+)\((.*)\)$/s);
       if (!match) {
-        log(`Invalid function format: ${functionCall}`, 'error');
-        addAIMessage(`⚠️ Invalid function format: ${functionCall}`, 'assistant');
+        log(`Invalid function format: ${decodedCall}`, 'error');
+        addAIMessage(`⚠️ Invalid function format: ${decodedCall}`, 'assistant');
         return;
       }
       
