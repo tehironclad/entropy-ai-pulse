@@ -638,6 +638,141 @@
       border-color: rgba(245, 158, 11, 0.4);
     }
 
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      backdrop-filter: blur(4px);
+    }
+
+    .modal-content {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      width: 90%;
+      max-width: 700px;
+      max-height: 90vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .modal-header h2 {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .modal-body {
+      padding: 24px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .modal-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 12px 16px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-size: 14px;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--accent-primary);
+    }
+
+    .form-textarea {
+      width: 100%;
+      padding: 12px 16px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-size: 13px;
+      font-family: 'JetBrains Mono', monospace;
+      min-height: 200px;
+      resize: vertical;
+    }
+
+    .form-textarea:focus {
+      outline: none;
+      border-color: var(--accent-primary);
+    }
+
+    .form-hint {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    .abi-examples {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .abi-example-btn {
+      padding: 4px 10px;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      font-size: 11px;
+      color: var(--text-secondary);
+      cursor: pointer;
+    }
+
+    .abi-example-btn:hover {
+      background: var(--accent-glow);
+      border-color: var(--accent-primary);
+      color: var(--accent-secondary);
+    }
+
+    /* Custom contracts list */
+    .custom-contracts-section {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border-color);
+    }
+
     /* Empty state */
     .empty-state {
       display: flex;
@@ -741,6 +876,7 @@
           <input type="text" id="contractInput" placeholder="Enter contract address (0x...) or name (AFFECTION, SEI, etc.)">
           <button class="btn btn-primary" onclick="loadContract()">Load Contract</button>
           <button class="btn btn-secondary" onclick="saveContract()" title="Save current contract">⭐</button>
+          <button class="btn btn-secondary" onclick="openCustomModal()" title="Add custom contract with ABI">+ Custom</button>
         </div>
         <div class="contract-info" id="contractInfo" style="display: none;">
           <span class="contract-name" id="contractName">Contract</span>
@@ -752,6 +888,12 @@
         <div class="saved-contracts" id="savedContracts" style="display: none;">
           <div class="saved-title">⭐ Saved Contracts</div>
           <div class="saved-list" id="savedList"></div>
+        </div>
+        
+        <!-- Custom Contracts (with custom ABIs) -->
+        <div class="custom-contracts-section" id="customContracts" style="display: none;">
+          <div class="saved-title">📝 Custom Contracts</div>
+          <div class="saved-list" id="customList"></div>
         </div>
         
         <!-- Dysnomia Ecosystem -->
@@ -871,6 +1013,49 @@
     </div>
   </div>
 
+  <!-- Custom Contract Modal -->
+  <div class="modal-overlay" id="customModal" style="display: none;" onclick="if(event.target===this)closeCustomModal()">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>📝 Add Custom Contract</h2>
+        <button class="btn btn-ghost" onclick="closeCustomModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Contract Name</label>
+          <input type="text" class="form-input" id="customName" placeholder="e.g., My Token, DEX Router">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Contract Address</label>
+          <input type="text" class="form-input" id="customAddress" placeholder="0x..." style="font-family: 'JetBrains Mono', monospace;">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">ABI (JSON Array or Human-Readable)</label>
+          <textarea class="form-textarea" id="customABI" placeholder='Paste JSON ABI or human-readable format:
+
+JSON: [{"inputs":[],"name":"totalSupply","outputs":[{"type":"uint256"}],"stateMutability":"view","type":"function"}]
+
+Human-readable:
+function totalSupply() view returns (uint256)
+function balanceOf(address) view returns (uint256)
+function transfer(address, uint256) returns (bool)'></textarea>
+          <div class="form-hint">Supports both JSON ABI format and human-readable format (one function per line)</div>
+          <div class="abi-examples">
+            <button class="abi-example-btn" onclick="insertABIExample('erc20')">ERC20</button>
+            <button class="abi-example-btn" onclick="insertABIExample('erc721')">ERC721</button>
+            <button class="abi-example-btn" onclick="insertABIExample('uniswap')">Uniswap Router</button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeCustomModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="addCustomContract()">Add Contract</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     // ═══════════════════════════════════════════════════════════════════════════
     // CONSTANTS
@@ -946,6 +1131,7 @@
       
       // Load saved contracts
       renderSavedContracts();
+      renderCustomContracts();
       
       // Check URL params
       const params = new URLSearchParams(window.location.search);
@@ -1041,6 +1227,209 @@
     function quickLoad(name) {
       document.getElementById('contractInput').value = name;
       loadContract();
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // CUSTOM CONTRACTS
+    // ═══════════════════════════════════════════════════════════════════════════
+    
+    function getCustomContracts() {
+      try {
+        return JSON.parse(localStorage.getItem('explorer_custom') || '[]');
+      } catch {
+        return [];
+      }
+    }
+    
+    function openCustomModal() {
+      document.getElementById('customModal').style.display = 'flex';
+      document.getElementById('customName').value = '';
+      document.getElementById('customAddress').value = '';
+      document.getElementById('customABI').value = '';
+    }
+    
+    function closeCustomModal() {
+      document.getElementById('customModal').style.display = 'none';
+    }
+    
+    function insertABIExample(type) {
+      const textarea = document.getElementById('customABI');
+      
+      const examples = {
+        erc20: `function name() view returns (string)
+function symbol() view returns (string)
+function decimals() view returns (uint8)
+function totalSupply() view returns (uint256)
+function balanceOf(address) view returns (uint256)
+function transfer(address, uint256) returns (bool)
+function approve(address, uint256) returns (bool)
+function allowance(address, address) view returns (uint256)
+function transferFrom(address, address, uint256) returns (bool)`,
+        
+        erc721: `function name() view returns (string)
+function symbol() view returns (string)
+function balanceOf(address) view returns (uint256)
+function ownerOf(uint256) view returns (address)
+function tokenURI(uint256) view returns (string)
+function approve(address, uint256)
+function getApproved(uint256) view returns (address)
+function setApprovalForAll(address, bool)
+function isApprovedForAll(address, address) view returns (bool)
+function transferFrom(address, address, uint256)
+function safeTransferFrom(address, address, uint256)`,
+        
+        uniswap: `function factory() view returns (address)
+function WETH() view returns (address)
+function swapExactTokensForTokens(uint256, uint256, address[], address, uint256) returns (uint256[])
+function swapTokensForExactTokens(uint256, uint256, address[], address, uint256) returns (uint256[])
+function swapExactETHForTokens(uint256, address[], address, uint256) payable returns (uint256[])
+function swapTokensForExactETH(uint256, uint256, address[], address, uint256) returns (uint256[])
+function swapExactTokensForETH(uint256, uint256, address[], address, uint256) returns (uint256[])
+function getAmountsOut(uint256, address[]) view returns (uint256[])
+function getAmountsIn(uint256, address[]) view returns (uint256[])`
+      };
+      
+      textarea.value = examples[type] || '';
+    }
+    
+    function parseCustomABI(abiInput) {
+      const trimmed = abiInput.trim();
+      
+      // Try JSON first
+      if (trimmed.startsWith('[')) {
+        try {
+          return JSON.parse(trimmed);
+        } catch (e) {
+          throw new Error('Invalid JSON ABI: ' + e.message);
+        }
+      }
+      
+      // Parse human-readable format (one function per line)
+      const lines = trimmed.split('\n').filter(l => l.trim());
+      const abi = [];
+      
+      for (const line of lines) {
+        const trimmedLine = line.trim();
+        if (trimmedLine.startsWith('function ') || 
+            trimmedLine.startsWith('event ') || 
+            trimmedLine.startsWith('constructor')) {
+          abi.push(trimmedLine);
+        }
+      }
+      
+      if (abi.length === 0) {
+        throw new Error('No valid functions found in ABI');
+      }
+      
+      return abi;
+    }
+    
+    function addCustomContract() {
+      const name = document.getElementById('customName').value.trim();
+      const address = document.getElementById('customAddress').value.trim();
+      const abiInput = document.getElementById('customABI').value.trim();
+      
+      // Validate
+      if (!name) {
+        alert('Please enter a contract name');
+        return;
+      }
+      
+      if (!address || !address.startsWith('0x') || address.length !== 42) {
+        alert('Please enter a valid contract address (0x...)');
+        return;
+      }
+      
+      if (!abiInput) {
+        alert('Please enter the contract ABI');
+        return;
+      }
+      
+      let abi;
+      try {
+        abi = parseCustomABI(abiInput);
+      } catch (e) {
+        alert('ABI Error: ' + e.message);
+        return;
+      }
+      
+      // Save to localStorage
+      const customs = getCustomContracts();
+      
+      // Check for duplicate
+      if (customs.find(c => c.address.toLowerCase() === address.toLowerCase())) {
+        alert('Contract with this address already exists');
+        return;
+      }
+      
+      customs.push({
+        name: name,
+        address: address,
+        abi: abi
+      });
+      
+      localStorage.setItem('explorer_custom', JSON.stringify(customs));
+      
+      closeCustomModal();
+      renderCustomContracts();
+      
+      // Load the contract immediately
+      loadCustomContract(address);
+    }
+    
+    function loadCustomContract(address) {
+      const customs = getCustomContracts();
+      const custom = customs.find(c => c.address.toLowerCase() === address.toLowerCase());
+      
+      if (!custom) return;
+      
+      try {
+        currentContract = new ethers.Contract(custom.address, custom.abi, signer || provider);
+        currentAddress = custom.address;
+        currentABI = custom.abi;
+        
+        // Update UI
+        document.getElementById('contractInfo').style.display = 'flex';
+        document.getElementById('contractName').textContent = custom.name;
+        document.getElementById('contractType').textContent = 'Custom';
+        document.getElementById('contractAddress').textContent = `${custom.address.slice(0,10)}...${custom.address.slice(-8)}`;
+        
+        parseFunctions(custom.abi);
+        
+      } catch (e) {
+        console.error('Error loading custom contract:', e);
+        alert('Error loading contract: ' + e.message);
+      }
+    }
+    
+    function removeCustomContract(address) {
+      if (!confirm('Remove this custom contract?')) return;
+      
+      const customs = getCustomContracts().filter(c => c.address.toLowerCase() !== address.toLowerCase());
+      localStorage.setItem('explorer_custom', JSON.stringify(customs));
+      renderCustomContracts();
+    }
+    
+    function renderCustomContracts() {
+      const customs = getCustomContracts();
+      const container = document.getElementById('customContracts');
+      const list = document.getElementById('customList');
+      
+      if (customs.length === 0) {
+        container.style.display = 'none';
+        return;
+      }
+      
+      container.style.display = 'block';
+      list.innerHTML = customs.map(c => `
+        <div class="saved-item" onclick="loadCustomContract('${c.address}')">
+          <div>
+            <div class="saved-item-name">📝 ${c.name}</div>
+            <div class="saved-item-address">${c.address.slice(0,8)}...${c.address.slice(-6)}</div>
+          </div>
+          <button class="saved-item-delete" onclick="event.stopPropagation(); removeCustomContract('${c.address}')" title="Remove">✕</button>
+        </div>
+      `).join('');
     }
 
     // ═══════════════════════════════════════════════════════════════════════════
