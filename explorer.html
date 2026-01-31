@@ -277,6 +277,19 @@
       opacity: 1;
     }
 
+    .dropdown-more {
+      margin-top: 8px;
+      padding: 8px 12px;
+      font-size: 12px;
+      color: var(--accent-secondary);
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .dropdown-more:hover {
+      color: var(--text-primary);
+    }
+
     .contract-info {
       display: flex;
       align-items: center;
@@ -893,6 +906,17 @@
               <div class="dropdown-section">
                 <div class="dropdown-title">🌐 Dysnomia</div>
                 <div class="dropdown-items dropdown-grid">
+                  <span class="dropdown-item highlight" onclick="quickLoad('AFFECTION')">AFFECTION<span class="copy-btn" onclick="event.stopPropagation();copyContractAddr('AFFECTION')">📋</span></span>
+                  <span class="dropdown-item" onclick="quickLoad('SEI')">SEI<span class="copy-btn" onclick="event.stopPropagation();copyContractAddr('SEI')">📋</span></span>
+                  <span class="dropdown-item" onclick="quickLoad('CHAN')">CHAN<span class="copy-btn" onclick="event.stopPropagation();copyContractAddr('CHAN')">📋</span></span>
+                  <span class="dropdown-item" onclick="quickLoad('CHO')">CHO<span class="copy-btn" onclick="event.stopPropagation();copyContractAddr('CHO')">📋</span></span>
+                  <span class="dropdown-item" onclick="quickLoad('MAP')">MAP<span class="copy-btn" onclick="event.stopPropagation();copyContractAddr('MAP')">📋</span></span>
+                  <span class="dropdown-item" onclick="quickLoad('MATH')">MATH<span class="copy-btn" onclick="event.stopPropagation();copyContractAddr('MATH')">📋</span></span>
+                  <span class="dropdown-item" onclick="quickLoad('SHIO')">SHIO<span class="copy-btn" onclick="event.stopPropagation();copyContractAddr('SHIO')">📋</span></span>
+                  <span class="dropdown-item" onclick="quickLoad('CHEON')">CHEON<span class="copy-btn" onclick="event.stopPropagation();copyContractAddr('CHEON')">📋</span></span>
+                </div>
+                <div class="dropdown-more" onclick="toggleFullEcosystem()">Show all contracts <span id="moreArrow">▸</span></div>
+                <div class="dropdown-items dropdown-grid" id="fullEcosystem" style="display: none; margin-top: 8px;">
                   <span class="dropdown-item" onclick="quickLoad('VOID')">VOID<span class="copy-btn" onclick="event.stopPropagation();copyContractAddr('VOID')">📋</span></span>
                   <span class="dropdown-item" onclick="quickLoad('SIU')">SIU<span class="copy-btn" onclick="event.stopPropagation();copyContractAddr('SIU')">📋</span></span>
                   <span class="dropdown-item" onclick="quickLoad('YANG')">YANG<span class="copy-btn" onclick="event.stopPropagation();copyContractAddr('YANG')">📋</span></span>
@@ -901,16 +925,22 @@
                   <span class="dropdown-item" onclick="quickLoad('ZHENG')">ZHENG<span class="copy-btn" onclick="event.stopPropagation();copyContractAddr('ZHENG')">📋</span></span>
                   <span class="dropdown-item" onclick="quickLoad('YI')">YI<span class="copy-btn" onclick="event.stopPropagation();copyContractAddr('YI')">📋</span></span>
                   <span class="dropdown-item" onclick="quickLoad('META')">META<span class="copy-btn" onclick="event.stopPropagation();copyContractAddr('META')">📋</span></span>
-                  <span class="dropdown-item" onclick="quickLoad('SEI')">SEI<span class="copy-btn" onclick="event.stopPropagation();copyContractAddr('SEI')">📋</span></span>
-                  <span class="dropdown-item" onclick="quickLoad('CHAN')">CHAN<span class="copy-btn" onclick="event.stopPropagation();copyContractAddr('CHAN')">📋</span></span>
-                  <span class="dropdown-item" onclick="quickLoad('CHO')">CHO<span class="copy-btn" onclick="event.stopPropagation();copyContractAddr('CHO')">📋</span></span>
-                  <span class="dropdown-item" onclick="quickLoad('MAP')">MAP<span class="copy-btn" onclick="event.stopPropagation();copyContractAddr('MAP')">📋</span></span>
-                  <span class="dropdown-item highlight" onclick="quickLoad('AFFECTION')">AFFECTION<span class="copy-btn" onclick="event.stopPropagation();copyContractAddr('AFFECTION')">📋</span></span>
-                  <span class="dropdown-item" onclick="quickLoad('MATH')">MATH<span class="copy-btn" onclick="event.stopPropagation();copyContractAddr('MATH')">📋</span></span>
-                  <span class="dropdown-item" onclick="quickLoad('SHIO')">SHIO<span class="copy-btn" onclick="event.stopPropagation();copyContractAddr('SHIO')">📋</span></span>
-                  <span class="dropdown-item" onclick="quickLoad('CHEON')">CHEON<span class="copy-btn" onclick="event.stopPropagation();copyContractAddr('CHEON')">📋</span></span>
+                  <span class="dropdown-item" onclick="quickLoad('RING')">RING<span class="copy-btn" onclick="event.stopPropagation();copyContractAddr('RING')">📋</span></span>
+                  <span class="dropdown-item" onclick="quickLoad('PANG')">PANG<span class="copy-btn" onclick="event.stopPropagation();copyContractAddr('PANG')">📋</span></span>
+                  <span class="dropdown-item" onclick="quickLoad('ZI')">ZI<span class="copy-btn" onclick="event.stopPropagation();copyContractAddr('ZI')">📋</span></span>
+                  <span class="dropdown-item" onclick="quickLoad('CHOA')">CHOA<span class="copy-btn" onclick="event.stopPropagation();copyContractAddr('CHOA')">📋</span></span>
+                  <span class="dropdown-item" onclick="quickLoad('XIE')">XIE<span class="copy-btn" onclick="event.stopPropagation();copyContractAddr('XIE')">📋</span></span>
+                  <span class="dropdown-item" onclick="quickLoad('XIA')">XIA<span class="copy-btn" onclick="event.stopPropagation();copyContractAddr('XIA')">📋</span></span>
+                  <span class="dropdown-item" onclick="quickLoad('MAI')">MAI<span class="copy-btn" onclick="event.stopPropagation();copyContractAddr('MAI')">📋</span></span>
+                  <span class="dropdown-item" onclick="quickLoad('QI')">QI<span class="copy-btn" onclick="event.stopPropagation();copyContractAddr('QI')">📋</span></span>
+                  <span class="dropdown-item" onclick="quickLoad('HECKE')">HECKE<span class="copy-btn" onclick="event.stopPropagation();copyContractAddr('HECKE')">📋</span></span>
+                  <span class="dropdown-item" onclick="quickLoad('SHAFactory')">SHAFactory<span class="copy-btn" onclick="event.stopPropagation();copyContractAddr('SHAFactory')">📋</span></span>
+                  <span class="dropdown-item" onclick="quickLoad('SHIOFactory')">SHIOFactory<span class="copy-btn" onclick="event.stopPropagation();copyContractAddr('SHIOFactory')">📋</span></span>
+                  <span class="dropdown-item" onclick="quickLoad('WPLS')">WPLS<span class="copy-btn" onclick="event.stopPropagation();copyContractAddr('WPLS')">📋</span></span>
+                  <span class="dropdown-item" onclick="quickLoad('PLSX')">PLSX<span class="copy-btn" onclick="event.stopPropagation();copyContractAddr('PLSX')">📋</span></span>
+                  <span class="dropdown-item" onclick="quickLoad('INC')">INC<span class="copy-btn" onclick="event.stopPropagation();copyContractAddr('INC')">📋</span></span>
+                  <span class="dropdown-item" onclick="quickLoad('HEX')">HEX<span class="copy-btn" onclick="event.stopPropagation();copyContractAddr('HEX')">📋</span></span>
                 </div>
-                <div class="dropdown-more" onclick="toggleFullEcosystem()">Show all contracts ▸</div>
               </div>
             </div>
           </div>
@@ -1186,6 +1216,18 @@ function transfer(address, uint256) returns (bool)'></textarea>
       const toggle = document.querySelector('.dropdown-toggle');
       if (!dropdown.contains(e.target) && e.target !== toggle) {
         closeSavedDropdown();
+      }
+    }
+    
+    function toggleFullEcosystem() {
+      const full = document.getElementById('fullEcosystem');
+      const arrow = document.getElementById('moreArrow');
+      if (full.style.display === 'none') {
+        full.style.display = 'grid';
+        arrow.textContent = '▾';
+      } else {
+        full.style.display = 'none';
+        arrow.textContent = '▸';
       }
     }
     
