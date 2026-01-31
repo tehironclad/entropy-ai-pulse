@@ -2163,6 +2163,9 @@
         lauAddrEl.style.display = 'flex';
         lauAddrEl.querySelector('.address-text').textContent = `${lauAddress.slice(0,8)}...${lauAddress.slice(-6)}`;
         
+        // Try to load YUE from LAU
+        await loadYueFromLau(lauContract);
+        
         // Save to localStorage
         localStorage.setItem('entropyAI_lau', lauAddress);
         
@@ -2177,13 +2180,18 @@
         loadContractIntoPanel(lauAddress, name, 'LAU', fullLauAbi);
         
         // Send welcome message to AI
+        let yueInfo = '';
+        if (userIdentity.yue && userIdentity.yue.name) {
+          yueInfo = `• **YUE Token**: ${userIdentity.yue.name}\n`;
+        }
+        
         addAIMessage(`Welcome back, **${name}**! 🎉
 
 I've loaded your identity. Here's what I found:
 
 • **LAU**: ${name}
 • **Coordinates**: Pole ${pole}, Soul ${soul}, Aura ${aura}
-${userIdentity.qing.name ? `• **Current Territory**: ${userIdentity.qing.name}` : '• **Territory**: Not currently in a QING'}
+${yueInfo}${userIdentity.qing.name ? `• **Current Territory**: ${userIdentity.qing.name}` : '• **Territory**: Not currently in a QING'}
 
 What would you like to do?`, 'assistant');
         
@@ -2191,6 +2199,53 @@ What would you like to do?`, 'assistant');
         
       } catch (e) {
         log(`Error: ${e.message}`, 'error');
+      }
+    }
+    
+    // Load YUE token from LAU.Yue()
+    async function loadYueFromLau(lauContract) {
+      try {
+        const yueAddress = await lauContract.Yue();
+        
+        // Check if YUE exists (not zero address)
+        if (!yueAddress || yueAddress === '0x0000000000000000000000000000000000000000') {
+          log('No YUE token found for this LAU', 'info');
+          document.getElementById('yueCard').style.display = 'none';
+          userIdentity.yue = { address: null, name: null, contract: null };
+          return;
+        }
+        
+        // Load YUE contract
+        const yueAbi = buildDysnomiaABI('YUE');
+        const yueContract = new ethers.Contract(yueAddress, yueAbi, provider);
+        
+        // Get YUE info
+        let yueName = '', yueSymbol = '';
+        try { yueName = await yueContract.name(); } catch {}
+        try { yueSymbol = await yueContract.symbol(); } catch {}
+        
+        // Save to identity
+        userIdentity.yue = {
+          address: yueAddress,
+          name: yueName || yueSymbol || 'YUE',
+          contract: yueContract
+        };
+        
+        // Update YUE card UI
+        document.getElementById('yueCard').style.display = 'block';
+        document.getElementById('yueName').textContent = yueName || yueSymbol || 'YUE Token';
+        
+        // Show YUE address
+        const yueAddrEl = document.getElementById('yueAddress');
+        yueAddrEl.style.display = 'flex';
+        yueAddrEl.querySelector('.address-text').textContent = `${yueAddress.slice(0,8)}...${yueAddress.slice(-6)}`;
+        
+        log(`Found YUE: ${yueName || yueSymbol}`, 'success');
+        
+      } catch (e) {
+        console.log('No YUE found or error:', e.message);
+        document.getElementById('yueCard').style.display = 'none';
+        userIdentity.yue = { address: null, name: null, contract: null };
       }
     }
     
