@@ -44,6 +44,10 @@
       "dest": "/map.html"
     },
     {
+      "src": "/explorer",
+      "dest": "/explorer.html"
+    },
+    {
       "src": "/",
       "dest": "/index-v2.html"
     }
