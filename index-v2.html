@@ -2372,11 +2372,22 @@ Enter a contract address above to start exploring, or ask me anything about Dysn
         // Try to load YUE from wallet (requires wallet connected)
         await loadYueFromWallet();
         
-        // Save to localStorage
+        // Save to localStorage (shared with explorer page)
         localStorage.setItem('entropyAI_lau', lauAddress);
+        localStorage.setItem('entropyAI_lauName', name || '');
         
         // Try to find matching QING by name
         await findAndLoadQing(name);
+        
+        // Save YUE and QING to localStorage if loaded
+        if (userIdentity.yue && userIdentity.yue.address) {
+          localStorage.setItem('entropyAI_yue', userIdentity.yue.address);
+          localStorage.setItem('entropyAI_yueName', userIdentity.yue.name || '');
+        }
+        if (userIdentity.qing && userIdentity.qing.address) {
+          localStorage.setItem('entropyAI_qing', userIdentity.qing.address);
+          localStorage.setItem('entropyAI_qingName', userIdentity.qing.name || '');
+        }
         
         // Switch to app view
         document.getElementById('welcomeScreen').style.display = 'none';
