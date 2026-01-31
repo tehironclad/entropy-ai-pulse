@@ -1046,40 +1046,41 @@
       color: var(--text-muted);
     }
 
-    .function-builder {
-      padding: 16px;
-      background: var(--bg-card);
-      border: 1px solid var(--accent-primary);
-      border-radius: 12px;
-      display: none;
-      margin-bottom: 12px;
-      position: sticky;
-      top: 0;
-      z-index: 10;
+    .function-expand {
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-left: auto;
+      transition: transform 0.2s;
     }
 
-    .function-builder.active {
+    .function-wrapper {
+      margin-bottom: 4px;
+    }
+
+    .function-inline-builder {
+      display: none;
+      padding: 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--accent-primary);
+      border-radius: 0 0 8px 8px;
+      margin-top: -1px;
+      animation: slideDown 0.2s ease;
+    }
+
+    .function-inline-builder.active {
       display: block;
     }
 
-    .function-builder-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 16px;
-    }
-
-    .function-builder-name {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 14px;
-      font-weight: 600;
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .function-builder-inputs {
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      margin-bottom: 16px;
+      gap: 10px;
+      margin-bottom: 12px;
     }
 
     .function-input-group label {
@@ -1091,12 +1092,12 @@
 
     .function-input-group input {
       width: 100%;
-      padding: 10px 12px;
+      padding: 8px 10px;
       background: var(--bg-tertiary);
       border: 1px solid var(--border-color);
-      border-radius: 8px;
+      border-radius: 6px;
       color: var(--text-primary);
-      font-size: 13px;
+      font-size: 12px;
       font-family: 'JetBrains Mono', monospace;
     }
 
@@ -1113,6 +1114,115 @@
     .function-builder-actions .btn {
       flex: 1;
       justify-content: center;
+      padding: 8px 12px;
+      font-size: 12px;
+    }
+
+    .function-result {
+      display: none;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .result-loading {
+      color: var(--text-secondary);
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .result-loading::before {
+      content: '';
+      width: 12px;
+      height: 12px;
+      border: 2px solid var(--border-color);
+      border-top-color: var(--accent-primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    .result-success {
+      background: var(--success-muted);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      border-radius: 8px;
+      padding: 10px;
+    }
+
+    .result-pending {
+      background: rgba(245, 158, 11, 0.1);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      border-radius: 8px;
+      padding: 10px;
+    }
+
+    .result-error {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      border-radius: 8px;
+      padding: 10px;
+      color: var(--error);
+      font-size: 12px;
+    }
+
+    .result-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+
+    .result-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: var(--text-primary);
+      word-break: break-all;
+      margin-bottom: 8px;
+    }
+
+    .result-hash {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--accent-secondary);
+      cursor: pointer;
+      padding: 6px 8px;
+      background: var(--bg-tertiary);
+      border-radius: 4px;
+      display: inline-block;
+      margin-bottom: 8px;
+      transition: all 0.15s;
+    }
+
+    .result-hash:hover {
+      background: var(--bg-elevated);
+    }
+
+    .result-copy-btn {
+      padding: 4px 10px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      color: var(--text-secondary);
+      font-size: 11px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .result-copy-btn:hover {
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+    }
+
+    .result-link {
+      display: inline-block;
+      font-size: 11px;
+      color: var(--accent-primary);
+      text-decoration: none;
+    }
+
+    .result-link:hover {
+      text-decoration: underline;
     }
 
     /* ═══════════════════════════════════════════════════════════════════════════
@@ -1750,22 +1860,8 @@
               </div>
             </div>
 
-            <div class="function-builder" id="functionBuilder">
-              <div class="function-builder-header">
-                <span class="function-badge read" id="builderBadge">R</span>
-                <span class="function-builder-name" id="builderName">functionName</span>
-              </div>
-              <div class="function-builder-inputs" id="builderInputs">
-                <!-- Inputs will be added here -->
-              </div>
-              <div class="function-builder-actions">
-                <button class="btn btn-primary" id="builderExecute" onclick="executeFunction()">Execute</button>
-                <button class="btn btn-secondary" onclick="closeBuilder()">Cancel</button>
-              </div>
-            </div>
-
             <div class="functions-list" id="functionsList">
-              <!-- Functions will be populated here -->
+              <!-- Functions will be populated here with inline builders -->
             </div>
           </div>
         </div>
@@ -2540,18 +2636,47 @@ What would you like to do?`, 'assistant');
           return a.name.localeCompare(b.name);
         });
         
-        functions.forEach(fn => {
-          const item = document.createElement('div');
-          item.className = 'function-item';
-          item.dataset.type = fn.isRead ? 'read' : 'write';
-          item.onclick = () => selectFunction(fn);
-          item.innerHTML = `
-            <span class="function-badge ${fn.isRead ? 'read' : 'write'}">${fn.isRead ? 'R' : 'W'}</span>
-            <span class="function-name">${fn.name}</span>
-            <span class="function-params">(${fn.inputs.length})</span>
+        functions.forEach((fn, idx) => {
+          const wrapper = document.createElement('div');
+          wrapper.className = 'function-wrapper';
+          wrapper.dataset.type = fn.isRead ? 'read' : 'write';
+          wrapper.dataset.fnIdx = idx;
+          
+          // Store function data on the wrapper
+          wrapper.fnData = fn;
+          
+          wrapper.innerHTML = `
+            <div class="function-item" onclick="toggleFunctionBuilder(${idx})">
+              <span class="function-badge ${fn.isRead ? 'read' : 'write'}">${fn.isRead ? 'R' : 'W'}</span>
+              <span class="function-name">${fn.name}</span>
+              <span class="function-params">(${fn.inputs.length})</span>
+              <span class="function-expand">▸</span>
+            </div>
+            <div class="function-inline-builder" id="builder_${idx}">
+              <div class="function-builder-inputs" id="inputs_${idx}">
+                ${fn.inputs.length === 0 
+                  ? '<div style="color: var(--text-muted); font-size: 12px;">No parameters required</div>'
+                  : fn.inputs.map((input, i) => `
+                      <div class="function-input-group">
+                        <label>${input.name || 'arg' + i} (${input.type})</label>
+                        <input type="text" id="param_${idx}_${i}" placeholder="${input.type}">
+                      </div>
+                    `).join('')
+                }
+              </div>
+              <div class="function-builder-actions">
+                <button class="btn ${fn.isRead ? 'btn-success' : 'btn-warning'}" onclick="executeFunctionInline(${idx})">
+                  ${fn.isRead ? '📖 Read' : '✍️ Write'}
+                </button>
+              </div>
+              <div class="function-result" id="result_${idx}"></div>
+            </div>
           `;
-          list.appendChild(item);
+          list.appendChild(wrapper);
         });
+        
+        // Store functions array for later access
+        window.loadedFunctions = functions;
         
         log(`Loaded ${functions.length} functions (${reads.length} read, ${writes.length} write)`, 'success');
       } catch (e) {
@@ -2564,99 +2689,115 @@ What would you like to do?`, 'assistant');
       document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
       event.target.classList.add('active');
       
-      document.querySelectorAll('.function-item').forEach(item => {
+      document.querySelectorAll('.function-wrapper').forEach(wrapper => {
         if (type === 'all') {
-          item.style.display = 'flex';
+          wrapper.style.display = 'block';
         } else {
-          item.style.display = item.dataset.type === type ? 'flex' : 'none';
+          wrapper.style.display = wrapper.dataset.type === type ? 'block' : 'none';
         }
       });
     }
     
-    function selectFunction(fn) {
-      selectedFunction = fn;
+    function toggleFunctionBuilder(idx) {
+      const builder = document.getElementById(`builder_${idx}`);
+      const wrapper = builder.closest('.function-wrapper');
+      const item = wrapper.querySelector('.function-item');
+      const expand = wrapper.querySelector('.function-expand');
       
-      // Remove selected class from all items
-      document.querySelectorAll('.function-item').forEach(item => item.classList.remove('selected'));
+      // Close other open builders
+      document.querySelectorAll('.function-inline-builder.active').forEach(b => {
+        if (b.id !== `builder_${idx}`) {
+          b.classList.remove('active');
+          b.closest('.function-wrapper').querySelector('.function-item').classList.remove('selected');
+          b.closest('.function-wrapper').querySelector('.function-expand').textContent = '▸';
+        }
+      });
       
-      // Add selected class to clicked item
-      if (event && event.target) {
-        const item = event.target.closest('.function-item');
-        if (item) item.classList.add('selected');
-      }
-      
-      const builder = document.getElementById('functionBuilder');
-      const badge = document.getElementById('builderBadge');
-      const name = document.getElementById('builderName');
-      const inputs = document.getElementById('builderInputs');
-      const execBtn = document.getElementById('builderExecute');
-      
-      badge.textContent = fn.isRead ? 'R' : 'W';
-      badge.className = `function-badge ${fn.isRead ? 'read' : 'write'}`;
-      name.textContent = fn.name;
-      execBtn.textContent = fn.isRead ? '📖 Read' : '✍️ Write';
-      execBtn.className = fn.isRead ? 'btn btn-success' : 'btn btn-warning';
-      
-      inputs.innerHTML = '';
-      if (fn.inputs.length === 0) {
-        inputs.innerHTML = '<div style="color: var(--text-muted); font-size: 12px;">No parameters required</div>';
+      // Toggle this builder
+      if (builder.classList.contains('active')) {
+        builder.classList.remove('active');
+        item.classList.remove('selected');
+        expand.textContent = '▸';
       } else {
-        fn.inputs.forEach((input, i) => {
-          inputs.innerHTML += `
-            <div class="function-input-group">
-              <label>${input.name || 'arg' + i} (${input.type})</label>
-              <input type="text" id="param_${i}" placeholder="${input.type}">
-            </div>
-          `;
-        });
+        builder.classList.add('active');
+        item.classList.add('selected');
+        expand.textContent = '▾';
       }
+    }
+    
+    async function executeFunctionInline(idx) {
+      const fn = window.loadedFunctions[idx];
+      if (!fn || !currentContract) return;
       
-      builder.classList.add('active');
-    }
-    
-    function closeBuilder() {
-      document.getElementById('functionBuilder').classList.remove('active');
-      document.querySelectorAll('.function-item').forEach(item => item.classList.remove('selected'));
-      selectedFunction = null;
-    }
-    
-    async function executeFunction() {
-      if (!selectedFunction || !currentContract) return;
+      const resultDiv = document.getElementById(`result_${idx}`);
+      resultDiv.innerHTML = '<div class="result-loading">Executing...</div>';
+      resultDiv.style.display = 'block';
       
       const args = [];
-      for (let i = 0; i < selectedFunction.inputs.length; i++) {
-        args.push(document.getElementById(`param_${i}`).value.trim());
+      for (let i = 0; i < fn.inputs.length; i++) {
+        args.push(document.getElementById(`param_${idx}_${i}`).value.trim());
       }
       
-      log(`Calling ${selectedFunction.name}...`, 'info');
-      setOutput('Executing...');
+      log(`Calling ${fn.name}...`, 'info');
       
       try {
         let result;
-        if (selectedFunction.isRead) {
-          result = await currentContract[selectedFunction.name](...args);
+        if (fn.isRead) {
+          result = await currentContract[fn.name](...args);
+          const formatted = formatResult(result);
+          resultDiv.innerHTML = `
+            <div class="result-success">
+              <div class="result-label">Result:</div>
+              <div class="result-value">${formatted}</div>
+              <button class="result-copy-btn" onclick="copyToClipboard('${formatted.replace(/'/g, "\\'")}')">📋 Copy</button>
+            </div>
+          `;
+          setOutput(`${fn.name}() Result:\n\n${formatted}`);
         } else {
           if (!signer) {
+            resultDiv.innerHTML = '<div class="result-error">⚠️ Connect wallet first</div>';
             log('Connect wallet for write functions', 'error');
-            setOutput('Error: Please connect your wallet first to execute write functions.');
             return;
           }
-          // Connect contract with signer for write operations
           const contractWithSigner = currentContract.connect(signer);
-          const tx = await contractWithSigner[selectedFunction.name](...args);
+          resultDiv.innerHTML = '<div class="result-loading">📤 Confirm in wallet...</div>';
+          const tx = await contractWithSigner[fn.name](...args);
+          resultDiv.innerHTML = `
+            <div class="result-pending">
+              <div class="result-label">Transaction Sent!</div>
+              <div class="result-hash" onclick="copyToClipboard('${tx.hash}')" title="Click to copy">
+                ${tx.hash.slice(0, 20)}...${tx.hash.slice(-8)} 📋
+              </div>
+              <div class="result-loading">Waiting for confirmation...</div>
+            </div>
+          `;
           setOutput(`Transaction sent!\nHash: ${tx.hash}\n\nWaiting for confirmation...`);
+          
           const receipt = await tx.wait();
-          result = `Confirmed in block ${receipt.blockNumber}`;
+          resultDiv.innerHTML = `
+            <div class="result-success">
+              <div class="result-label">✅ Confirmed in block ${receipt.blockNumber}</div>
+              <div class="result-hash" onclick="copyToClipboard('${tx.hash}')" title="Click to copy">
+                ${tx.hash.slice(0, 20)}...${tx.hash.slice(-8)} 📋
+              </div>
+              <a href="https://scan.pulsechain.com/tx/${tx.hash}" target="_blank" class="result-link">View on PulseScan ↗</a>
+            </div>
+          `;
+          setOutput(`${fn.name}() confirmed in block ${receipt.blockNumber}\nHash: ${tx.hash}`);
         }
-        
-        setOutput(`${selectedFunction.name}() Result:\n\n${formatResult(result)}`);
-        log(`${selectedFunction.name} completed`, 'success');
+        log(`${fn.name} completed`, 'success');
       } catch (e) {
+        resultDiv.innerHTML = `<div class="result-error">⚠️ ${e.message.slice(0, 100)}</div>`;
         setOutput(`Error: ${e.message}`);
         log(`Error: ${e.message.slice(0, 50)}`, 'error');
       }
     }
-
+    
+    function copyToClipboard(text) {
+      navigator.clipboard.writeText(text);
+      log('Copied to clipboard', 'success');
+    }
+    
     // ═══════════════════════════════════════════════════════════════════════════
     // AI CHAT
     // ═══════════════════════════════════════════════════════════════════════════
@@ -2860,11 +3001,35 @@ What would you like to do?`, 'assistant');
         addAIMessage(`🔄 Calling ${fnName}()... Check your wallet to confirm.`, 'assistant');
         const tx = await contractWithSigner[fnName](...args);
         setOutput(`Transaction sent!\nHash: ${tx.hash}\n\nWaiting for confirmation...`);
-        addAIMessage(`📤 Transaction sent! Hash: \`${tx.hash.slice(0,20)}...\`\n\nWaiting for confirmation...`, 'assistant');
+        
+        // Show pending message with copyable hash
+        const pendingMsg = document.createElement('div');
+        pendingMsg.className = 'ai-message assistant';
+        pendingMsg.innerHTML = `
+          <div class="message-content">
+            📤 <strong>Transaction Sent!</strong><br><br>
+            <span class="result-hash" onclick="copyToClipboard('${tx.hash}')" style="cursor:pointer;background:var(--bg-tertiary);padding:6px 10px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:11px;">
+              ${tx.hash.slice(0,22)}...${tx.hash.slice(-8)} 📋
+            </span><br><br>
+            ⏳ Waiting for confirmation...
+          </div>
+        `;
+        document.getElementById('aiMessages').appendChild(pendingMsg);
+        document.getElementById('aiMessages').scrollTop = document.getElementById('aiMessages').scrollHeight;
         
         const receipt = await tx.wait();
-        setOutput(`${fnName}() confirmed in block ${receipt.blockNumber}`);
-        addAIMessage(`✅ **${fnName}()** confirmed in block ${receipt.blockNumber}`, 'assistant');
+        setOutput(`${fnName}() confirmed in block ${receipt.blockNumber}\nHash: ${tx.hash}`);
+        
+        // Update the pending message to confirmed
+        pendingMsg.innerHTML = `
+          <div class="message-content">
+            ✅ <strong>${fnName}() Confirmed!</strong> Block ${receipt.blockNumber}<br><br>
+            <span class="result-hash" onclick="copyToClipboard('${tx.hash}')" style="cursor:pointer;background:var(--bg-tertiary);padding:6px 10px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:11px;">
+              ${tx.hash.slice(0,22)}...${tx.hash.slice(-8)} 📋
+            </span><br><br>
+            <a href="https://scan.pulsechain.com/tx/${tx.hash}" target="_blank" style="color:var(--accent-primary);font-size:12px;">View on PulseScan ↗</a>
+          </div>
+        `;
         log(`${fnName} confirmed`, 'success');
       } catch (e) {
         console.error('Write error:', e);
