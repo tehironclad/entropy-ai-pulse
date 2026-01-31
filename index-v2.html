@@ -2092,6 +2092,12 @@
         document.getElementById('disconnectBtn').style.display = 'inline-flex';
         
         log('Wallet connected', 'success');
+        
+        // Try to detect YUE now that wallet is connected
+        if (userIdentity.lau.address) {
+          await loadYueFromWallet();
+        }
+        
       } catch (e) {
         log('Failed to connect wallet', 'error');
       }
@@ -2163,8 +2169,8 @@
         lauAddrEl.style.display = 'flex';
         lauAddrEl.querySelector('.address-text').textContent = `${lauAddress.slice(0,8)}...${lauAddress.slice(-6)}`;
         
-        // Try to load YUE from LAU
-        await loadYueFromLau(lauContract);
+        // Try to load YUE from wallet (requires wallet connected)
+        await loadYueFromWallet();
         
         // Save to localStorage
         localStorage.setItem('entropyAI_lau', lauAddress);
@@ -2202,20 +2208,34 @@ What would you like to do?`, 'assistant');
       }
     }
     
-    // Load YUE token from LAU.Yue()
-    async function loadYueFromLau(lauContract) {
+    // Load YUE token via CHAN.Yan(walletAddress)
+    async function loadYueFromWallet() {
+      // Need wallet connected to find YUE
+      if (!signer) {
+        log('Connect wallet to detect YUE', 'info');
+        return;
+      }
+      
       try {
-        const yueAddress = await lauContract.Yue();
+        const walletAddress = await signer.getAddress();
+        
+        // CHAN contract - Yan(address) returns the YUE for that wallet
+        const chanAddress = KNOWN_CONTRACTS['CHAN'];
+        const chan = new ethers.Contract(chanAddress, [
+          'function Yan(address) view returns (address)',
+        ], provider);
+        
+        const yueAddress = await chan.Yan(walletAddress);
         
         // Check if YUE exists (not zero address)
         if (!yueAddress || yueAddress === '0x0000000000000000000000000000000000000000') {
-          log('No YUE token found for this LAU', 'info');
+          log('No YUE found - call SEI.Start() to create one', 'info');
           document.getElementById('yueCard').style.display = 'none';
           userIdentity.yue = { address: null, name: null, contract: null };
           return;
         }
         
-        // Load YUE contract
+        // Load YUE contract info
         const yueAbi = buildDysnomiaABI('YUE');
         const yueContract = new ethers.Contract(yueAddress, yueAbi, provider);
         
@@ -2242,8 +2262,13 @@ What would you like to do?`, 'assistant');
         
         log(`Found YUE: ${yueName || yueSymbol}`, 'success');
         
+        // Update AI welcome if already shown
+        if (userIdentity.lau.name) {
+          addAIMessage(`🌐 Detected your YUE token: **${yueName || yueSymbol}** (${yueAddress.slice(0,8)}...)`, 'assistant');
+        }
+        
       } catch (e) {
-        console.log('No YUE found or error:', e.message);
+        console.log('YUE lookup error:', e.message);
         document.getElementById('yueCard').style.display = 'none';
         userIdentity.yue = { address: null, name: null, contract: null };
       }
