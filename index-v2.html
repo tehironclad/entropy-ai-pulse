@@ -1225,6 +1225,19 @@
       text-decoration: underline;
     }
 
+    /* Small loading spinner for buttons */
+    .loading-spinner-small {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+
     /* ═══════════════════════════════════════════════════════════════════════════
        ACTIVITY LOG
        ═══════════════════════════════════════════════════════════════════════════ */
@@ -1539,9 +1552,14 @@
           <h3>OpenAI API Key</h3>
           <input type="password" id="openaiApiKey" class="input" placeholder="sk-...">
         </div>
+        <div class="settings-section" style="border-top: 1px solid var(--border-color); padding-top: 16px; margin-top: 8px;">
+          <h3>Cache & Data</h3>
+          <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">Clear all cached data including saved LAU, recent contracts, and conversation history.</p>
+          <button class="btn btn-ghost" onclick="clearAllCache()" style="color: var(--error); width: 100%;">🧹 Clear All Cache & Reload</button>
+        </div>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-ghost" onclick="clearApiKeys()" style="color: var(--error);">🗑️ Clear</button>
+        <button class="btn btn-ghost" onclick="clearApiKeys()" style="color: var(--error);">🗑️ Clear Keys</button>
         <button class="btn btn-primary" onclick="saveSettings()">💾 Save Keys</button>
         <button class="btn btn-secondary" onclick="toggleSettings()">Close</button>
       </div>
@@ -2301,6 +2319,12 @@ Enter a contract address above to start exploring, or ask me anything about Dysn
         return;
       }
       
+      // Show loading state on button
+      const loadBtn = document.querySelector('.welcome-actions .btn-primary');
+      const originalText = loadBtn.innerHTML;
+      loadBtn.innerHTML = '<span class="loading-spinner-small"></span> Loading...';
+      loadBtn.disabled = true;
+      
       log('Loading identity...', 'info');
       
       try {
@@ -2381,6 +2405,9 @@ What would you like to do?`, 'assistant');
         
       } catch (e) {
         log(`Error: ${e.message}`, 'error');
+        // Reset button on error
+        loadBtn.innerHTML = originalText;
+        loadBtn.disabled = false;
       }
     }
     
@@ -3619,6 +3646,36 @@ Be encouraging! Terraforming is exploration - users are pioneers in a new mathem
         document.getElementById('geminiApiKey').value = '';
         document.getElementById('openaiApiKey').value = '';
         log('API keys cleared', 'success');
+      }
+    }
+    
+    function clearAllCache() {
+      if (confirm('This will clear all cached data and reload the page. Continue?')) {
+        // Clear all localStorage items for this app
+        const keysToRemove = [];
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && key.startsWith('entropyAI_')) {
+            keysToRemove.push(key);
+          }
+        }
+        keysToRemove.forEach(key => localStorage.removeItem(key));
+        
+        // Clear sessionStorage
+        sessionStorage.clear();
+        
+        // Clear caches if available (Service Worker caches)
+        if ('caches' in window) {
+          caches.keys().then(names => {
+            names.forEach(name => caches.delete(name));
+          });
+        }
+        
+        // Force reload from server (bypass browser cache)
+        log('Cache cleared, reloading...', 'success');
+        setTimeout(() => {
+          window.location.reload(true);
+        }, 500);
       }
     }
     
