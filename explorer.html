@@ -125,20 +125,27 @@
     }
 
     .contract-header {
-      padding: 20px 24px;
+      padding: 16px 24px;
       background: var(--bg-secondary);
       border-bottom: 1px solid var(--border-color);
     }
 
     .contract-loader {
       display: flex;
-      gap: 12px;
-      margin-bottom: 16px;
+      gap: 8px;
+      align-items: center;
     }
 
-    .contract-loader input {
+    .input-with-dropdown {
+      flex: 1;
+      position: relative;
+      display: flex;
+    }
+
+    .input-with-dropdown input {
       flex: 1;
       padding: 12px 16px;
+      padding-right: 40px;
       background: var(--bg-tertiary);
       border: 1px solid var(--border-color);
       border-radius: 8px;
@@ -147,19 +154,138 @@
       font-family: 'JetBrains Mono', monospace;
     }
 
-    .contract-loader input:focus {
+    .input-with-dropdown input:focus {
       outline: none;
       border-color: var(--accent-primary);
+    }
+
+    .dropdown-toggle {
+      position: absolute;
+      right: 4px;
+      top: 50%;
+      transform: translateY(-50%);
+      padding: 8px 10px;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    .dropdown-toggle:hover {
+      color: var(--accent-secondary);
+    }
+
+    .saved-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      margin-top: 4px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      z-index: 100;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .dropdown-section {
+      padding: 12px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .dropdown-section:last-child {
+      border-bottom: none;
+    }
+
+    .dropdown-title {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .dropdown-items {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .dropdown-items.dropdown-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+    }
+
+    .dropdown-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      font-size: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .dropdown-item:hover {
+      background: var(--accent-glow);
+      border-color: var(--accent-primary);
+    }
+
+    .dropdown-item.highlight {
+      background: var(--accent-glow);
+      border-color: rgba(139, 92, 246, 0.3);
+      color: var(--accent-secondary);
+    }
+
+    .dropdown-item .item-name {
+      flex: 1;
+    }
+
+    .dropdown-item .item-addr {
+      font-size: 10px;
+      color: var(--text-muted);
+      margin: 0 8px;
+    }
+
+    .dropdown-item .copy-btn {
+      padding: 2px 6px;
+      font-size: 10px;
+      opacity: 0.5;
+    }
+
+    .dropdown-item:hover .copy-btn {
+      opacity: 1;
+    }
+
+    .dropdown-item .delete-btn {
+      padding: 2px 6px;
+      font-size: 10px;
+      color: var(--error);
+      opacity: 0.5;
+    }
+
+    .dropdown-item:hover .delete-btn {
+      opacity: 1;
     }
 
     .contract-info {
       display: flex;
       align-items: center;
       gap: 16px;
+      margin-top: 12px;
     }
 
     .contract-name {
-      font-size: 20px;
+      font-size: 18px;
       font-weight: 600;
     }
 
@@ -180,129 +306,6 @@
     }
 
     .contract-address:hover {
-      color: var(--accent-secondary);
-    }
-
-    /* Saved Contracts */
-    .saved-contracts {
-      margin-top: 16px;
-      padding-top: 16px;
-      border-top: 1px solid var(--border-color);
-    }
-
-    .saved-title {
-      font-size: 11px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--text-muted);
-      margin-bottom: 10px;
-    }
-
-    .saved-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .saved-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 12px;
-      background: var(--bg-tertiary);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      font-size: 13px;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-
-    .saved-item:hover {
-      background: var(--accent-glow);
-      border-color: var(--accent-primary);
-    }
-
-    .saved-item-name {
-      font-weight: 500;
-    }
-
-    .saved-item-address {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 10px;
-      color: var(--text-muted);
-    }
-
-    .saved-item-delete {
-      margin-left: 4px;
-      padding: 2px 6px;
-      background: transparent;
-      border: none;
-      color: var(--text-muted);
-      cursor: pointer;
-      font-size: 12px;
-      border-radius: 4px;
-    }
-
-    .saved-item-delete:hover {
-      background: rgba(239, 68, 68, 0.2);
-      color: var(--error);
-    }
-
-    /* Ecosystem Section */
-    .ecosystem-section {
-      margin-top: 16px;
-      padding-top: 16px;
-      border-top: 1px solid var(--border-color);
-    }
-
-    .ecosystem-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 16px;
-      margin-top: 12px;
-    }
-
-    .eco-category {
-      background: var(--bg-tertiary);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 12px;
-    }
-
-    .eco-category-title {
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--text-muted);
-      margin-bottom: 8px;
-    }
-
-    .eco-items {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-    }
-
-    .eco-item {
-      padding: 4px 10px;
-      background: var(--bg-secondary);
-      border: 1px solid var(--border-color);
-      border-radius: 6px;
-      font-size: 12px;
-      font-family: 'JetBrains Mono', monospace;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-
-    .eco-item:hover {
-      background: var(--accent-glow);
-      border-color: var(--accent-primary);
-      color: var(--accent-secondary);
-    }
-
-    .eco-item.highlight {
-      background: var(--accent-glow);
-      border-color: rgba(139, 92, 246, 0.3);
       color: var(--accent-secondary);
     }
 
@@ -873,104 +876,52 @@
     <div class="contract-panel">
       <div class="contract-header">
         <div class="contract-loader">
-          <input type="text" id="contractInput" placeholder="Enter contract address (0x...) or name (AFFECTION, SEI, etc.)">
-          <button class="btn btn-primary" onclick="loadContract()">Load Contract</button>
+          <div class="input-with-dropdown">
+            <input type="text" id="contractInput" placeholder="Enter contract address (0x...) or name (AFFECTION, SEI, etc.)">
+            <button class="dropdown-toggle" onclick="toggleSavedDropdown()" title="Saved contracts">▼</button>
+            
+            <!-- Dropdown for saved contracts -->
+            <div class="saved-dropdown" id="savedDropdown" style="display: none;">
+              <div class="dropdown-section" id="savedSection" style="display: none;">
+                <div class="dropdown-title">⭐ Saved</div>
+                <div class="dropdown-items" id="savedDropdownList"></div>
+              </div>
+              <div class="dropdown-section" id="customSection" style="display: none;">
+                <div class="dropdown-title">📝 Custom</div>
+                <div class="dropdown-items" id="customDropdownList"></div>
+              </div>
+              <div class="dropdown-section">
+                <div class="dropdown-title">🌐 Dysnomia</div>
+                <div class="dropdown-items dropdown-grid">
+                  <span class="dropdown-item" onclick="quickLoad('VOID')">VOID<span class="copy-btn" onclick="event.stopPropagation();copyContractAddr('VOID')">📋</span></span>
+                  <span class="dropdown-item" onclick="quickLoad('SIU')">SIU<span class="copy-btn" onclick="event.stopPropagation();copyContractAddr('SIU')">📋</span></span>
+                  <span class="dropdown-item" onclick="quickLoad('YANG')">YANG<span class="copy-btn" onclick="event.stopPropagation();copyContractAddr('YANG')">📋</span></span>
+                  <span class="dropdown-item" onclick="quickLoad('YAU')">YAU<span class="copy-btn" onclick="event.stopPropagation();copyContractAddr('YAU')">📋</span></span>
+                  <span class="dropdown-item" onclick="quickLoad('ZHOU')">ZHOU<span class="copy-btn" onclick="event.stopPropagation();copyContractAddr('ZHOU')">📋</span></span>
+                  <span class="dropdown-item" onclick="quickLoad('ZHENG')">ZHENG<span class="copy-btn" onclick="event.stopPropagation();copyContractAddr('ZHENG')">📋</span></span>
+                  <span class="dropdown-item" onclick="quickLoad('YI')">YI<span class="copy-btn" onclick="event.stopPropagation();copyContractAddr('YI')">📋</span></span>
+                  <span class="dropdown-item" onclick="quickLoad('META')">META<span class="copy-btn" onclick="event.stopPropagation();copyContractAddr('META')">📋</span></span>
+                  <span class="dropdown-item" onclick="quickLoad('SEI')">SEI<span class="copy-btn" onclick="event.stopPropagation();copyContractAddr('SEI')">📋</span></span>
+                  <span class="dropdown-item" onclick="quickLoad('CHAN')">CHAN<span class="copy-btn" onclick="event.stopPropagation();copyContractAddr('CHAN')">📋</span></span>
+                  <span class="dropdown-item" onclick="quickLoad('CHO')">CHO<span class="copy-btn" onclick="event.stopPropagation();copyContractAddr('CHO')">📋</span></span>
+                  <span class="dropdown-item" onclick="quickLoad('MAP')">MAP<span class="copy-btn" onclick="event.stopPropagation();copyContractAddr('MAP')">📋</span></span>
+                  <span class="dropdown-item highlight" onclick="quickLoad('AFFECTION')">AFFECTION<span class="copy-btn" onclick="event.stopPropagation();copyContractAddr('AFFECTION')">📋</span></span>
+                  <span class="dropdown-item" onclick="quickLoad('MATH')">MATH<span class="copy-btn" onclick="event.stopPropagation();copyContractAddr('MATH')">📋</span></span>
+                  <span class="dropdown-item" onclick="quickLoad('SHIO')">SHIO<span class="copy-btn" onclick="event.stopPropagation();copyContractAddr('SHIO')">📋</span></span>
+                  <span class="dropdown-item" onclick="quickLoad('CHEON')">CHEON<span class="copy-btn" onclick="event.stopPropagation();copyContractAddr('CHEON')">📋</span></span>
+                </div>
+                <div class="dropdown-more" onclick="toggleFullEcosystem()">Show all contracts ▸</div>
+              </div>
+            </div>
+          </div>
+          <button class="btn btn-primary" onclick="loadContract()">Load</button>
           <button class="btn btn-secondary" onclick="saveContract()" title="Save current contract">⭐</button>
-          <button class="btn btn-secondary" onclick="openCustomModal()" title="Add custom contract with ABI">+ Custom</button>
+          <button class="btn btn-secondary" onclick="openCustomModal()" title="Add custom contract">+</button>
         </div>
         <div class="contract-info" id="contractInfo" style="display: none;">
           <span class="contract-name" id="contractName">Contract</span>
           <span class="contract-type" id="contractType">ERC20</span>
           <span class="contract-address" id="contractAddress" onclick="copyAddress()">0x...</span>
-        </div>
-        
-        <!-- Saved Contracts -->
-        <div class="saved-contracts" id="savedContracts" style="display: none;">
-          <div class="saved-title">⭐ Saved Contracts</div>
-          <div class="saved-list" id="savedList"></div>
-        </div>
-        
-        <!-- Custom Contracts (with custom ABIs) -->
-        <div class="custom-contracts-section" id="customContracts" style="display: none;">
-          <div class="saved-title">📝 Custom Contracts</div>
-          <div class="saved-list" id="customList"></div>
-        </div>
-        
-        <!-- Dysnomia Ecosystem -->
-        <div class="ecosystem-section">
-          <div class="saved-title" style="margin-top: 16px; cursor: pointer;" onclick="toggleEcosystem()">
-            🌐 Dysnomia Ecosystem <span id="ecosystem-arrow">▸</span>
-          </div>
-          <div class="ecosystem-grid" id="ecosystemGrid" style="display: none;">
-            
-            <div class="eco-category">
-              <div class="eco-category-title">🔗 Core Chain</div>
-              <div class="eco-items">
-                <span class="eco-item" onclick="quickLoad('VOID')">VOID</span>
-                <span class="eco-item" onclick="quickLoad('SIU')">SIU</span>
-                <span class="eco-item" onclick="quickLoad('YANG')">YANG</span>
-                <span class="eco-item" onclick="quickLoad('YAU')">YAU</span>
-                <span class="eco-item" onclick="quickLoad('ZHOU')">ZHOU</span>
-                <span class="eco-item" onclick="quickLoad('ZHENG')">ZHENG</span>
-                <span class="eco-item" onclick="quickLoad('YI')">YI</span>
-              </div>
-            </div>
-            
-            <div class="eco-category">
-              <div class="eco-category-title">🌀 Soeng Domain</div>
-              <div class="eco-items">
-                <span class="eco-item" onclick="quickLoad('META')">META</span>
-                <span class="eco-item" onclick="quickLoad('RING')">RING</span>
-                <span class="eco-item" onclick="quickLoad('PANG')">PANG</span>
-                <span class="eco-item" onclick="quickLoad('ZI')">ZI</span>
-                <span class="eco-item" onclick="quickLoad('CHOA')">CHOA</span>
-                <span class="eco-item" onclick="quickLoad('SEI')">SEI</span>
-                <span class="eco-item" onclick="quickLoad('CHAN')">CHAN</span>
-                <span class="eco-item" onclick="quickLoad('XIE')">XIE</span>
-                <span class="eco-item" onclick="quickLoad('XIA')">XIA</span>
-                <span class="eco-item" onclick="quickLoad('MAI')">MAI</span>
-                <span class="eco-item" onclick="quickLoad('QI')">QI</span>
-              </div>
-            </div>
-            
-            <div class="eco-category">
-              <div class="eco-category-title">⚡ Reactors</div>
-              <div class="eco-items">
-                <span class="eco-item" onclick="quickLoad('SHIO')">SHIO</span>
-                <span class="eco-item" onclick="quickLoad('SHAFactory')">SHAFactory</span>
-                <span class="eco-item" onclick="quickLoad('SHIOFactory')">SHIOFactory</span>
-              </div>
-            </div>
-            
-            <div class="eco-category">
-              <div class="eco-category-title">🗺️ Spatial</div>
-              <div class="eco-items">
-                <span class="eco-item" onclick="quickLoad('MAP')">MAP</span>
-                <span class="eco-item" onclick="quickLoad('HECKE')">HECKE</span>
-                <span class="eco-item" onclick="quickLoad('CHO')">CHO</span>
-              </div>
-            </div>
-            
-            <div class="eco-category">
-              <div class="eco-category-title">🏯 Tang</div>
-              <div class="eco-items">
-                <span class="eco-item" onclick="quickLoad('CHEON')">CHEON</span>
-              </div>
-            </div>
-            
-            <div class="eco-category">
-              <div class="eco-category-title">🪙 Tokens</div>
-              <div class="eco-items">
-                <span class="eco-item highlight" onclick="quickLoad('AFFECTION')">AFFECTION</span>
-                <span class="eco-item" onclick="quickLoad('MATH')">MATH</span>
-                <span class="eco-item" onclick="quickLoad('WPLS')">WPLS</span>
-                <span class="eco-item" onclick="quickLoad('PLSX')">PLSX</span>
-                <span class="eco-item" onclick="quickLoad('INC')">INC</span>
-                <span class="eco-item" onclick="quickLoad('HEX')">HEX</span>
-              </div>
-            </div>
-            
-          </div>
         </div>
       </div>
 
@@ -1188,45 +1139,79 @@ function transfer(address, uint256) returns (bool)'></textarea>
     function loadSavedContract(address) {
       document.getElementById('contractInput').value = address;
       loadContract();
+      closeSavedDropdown();
     }
     
     function renderSavedContracts() {
       const saved = getSavedContracts();
-      const container = document.getElementById('savedContracts');
-      const list = document.getElementById('savedList');
+      const section = document.getElementById('savedSection');
+      const list = document.getElementById('savedDropdownList');
       
       if (saved.length === 0) {
-        container.style.display = 'none';
+        section.style.display = 'none';
         return;
       }
       
-      container.style.display = 'block';
+      section.style.display = 'block';
       list.innerHTML = saved.map(c => `
-        <div class="saved-item" onclick="loadSavedContract('${c.address}')">
-          <div>
-            <div class="saved-item-name">${c.name}</div>
-            <div class="saved-item-address">${c.address.slice(0,8)}...${c.address.slice(-6)}</div>
-          </div>
-          <button class="saved-item-delete" onclick="event.stopPropagation(); removeSavedContract('${c.address}')" title="Remove">✕</button>
+        <div class="dropdown-item" onclick="loadSavedContract('${c.address}')">
+          <span class="item-name">${c.name}</span>
+          <span class="item-addr">${c.address.slice(0,6)}...${c.address.slice(-4)}</span>
+          <span class="copy-btn" onclick="event.stopPropagation();navigator.clipboard.writeText('${c.address}')">📋</span>
+          <span class="delete-btn" onclick="event.stopPropagation();removeSavedContract('${c.address}')">✕</span>
         </div>
       `).join('');
     }
     
-    function toggleEcosystem() {
-      const grid = document.getElementById('ecosystemGrid');
-      const arrow = document.getElementById('ecosystem-arrow');
-      if (grid.style.display === 'none') {
-        grid.style.display = 'grid';
-        arrow.textContent = '▾';
+    function toggleSavedDropdown() {
+      const dropdown = document.getElementById('savedDropdown');
+      if (dropdown.style.display === 'none') {
+        dropdown.style.display = 'block';
+        // Close on outside click
+        setTimeout(() => {
+          document.addEventListener('click', closeSavedDropdownOnOutside);
+        }, 10);
       } else {
-        grid.style.display = 'none';
-        arrow.textContent = '▸';
+        closeSavedDropdown();
+      }
+    }
+    
+    function closeSavedDropdown() {
+      document.getElementById('savedDropdown').style.display = 'none';
+      document.removeEventListener('click', closeSavedDropdownOnOutside);
+    }
+    
+    function closeSavedDropdownOnOutside(e) {
+      const dropdown = document.getElementById('savedDropdown');
+      const toggle = document.querySelector('.dropdown-toggle');
+      if (!dropdown.contains(e.target) && e.target !== toggle) {
+        closeSavedDropdown();
       }
     }
     
     function quickLoad(name) {
       document.getElementById('contractInput').value = name;
       loadContract();
+      closeSavedDropdown();
+    }
+    
+    function copyContractAddr(name) {
+      const address = KNOWN_CONTRACTS[name] || KNOWN_CONTRACTS[name.toUpperCase()];
+      if (address) {
+        navigator.clipboard.writeText(address);
+        // Brief visual feedback
+        const items = document.querySelectorAll('.dropdown-item');
+        items.forEach(item => {
+          if (item.textContent.includes(name)) {
+            item.style.background = 'var(--success)';
+            item.style.color = 'white';
+            setTimeout(() => {
+              item.style.background = '';
+              item.style.color = '';
+            }, 300);
+          }
+        });
+      }
     }
 
     // ═══════════════════════════════════════════════════════════════════════════
@@ -1383,6 +1368,8 @@ function getAmountsIn(uint256, address[]) view returns (uint256[])`
       
       if (!custom) return;
       
+      closeSavedDropdown();
+      
       try {
         currentContract = new ethers.Contract(custom.address, custom.abi, signer || provider);
         currentAddress = custom.address;
@@ -1412,22 +1399,21 @@ function getAmountsIn(uint256, address[]) view returns (uint256[])`
     
     function renderCustomContracts() {
       const customs = getCustomContracts();
-      const container = document.getElementById('customContracts');
-      const list = document.getElementById('customList');
+      const section = document.getElementById('customSection');
+      const list = document.getElementById('customDropdownList');
       
       if (customs.length === 0) {
-        container.style.display = 'none';
+        section.style.display = 'none';
         return;
       }
       
-      container.style.display = 'block';
+      section.style.display = 'block';
       list.innerHTML = customs.map(c => `
-        <div class="saved-item" onclick="loadCustomContract('${c.address}')">
-          <div>
-            <div class="saved-item-name">📝 ${c.name}</div>
-            <div class="saved-item-address">${c.address.slice(0,8)}...${c.address.slice(-6)}</div>
-          </div>
-          <button class="saved-item-delete" onclick="event.stopPropagation(); removeCustomContract('${c.address}')" title="Remove">✕</button>
+        <div class="dropdown-item" onclick="loadCustomContract('${c.address}')">
+          <span class="item-name">📝 ${c.name}</span>
+          <span class="item-addr">${c.address.slice(0,6)}...${c.address.slice(-4)}</span>
+          <span class="copy-btn" onclick="event.stopPropagation();navigator.clipboard.writeText('${c.address}')">📋</span>
+          <span class="delete-btn" onclick="event.stopPropagation();removeCustomContract('${c.address}')">✕</span>
         </div>
       `).join('');
     }
