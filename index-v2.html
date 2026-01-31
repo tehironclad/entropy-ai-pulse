@@ -1454,6 +1454,9 @@
         <button class="btn btn-primary" onclick="loadIdentity()">
           🚀 Load My Identity
         </button>
+        <button class="btn btn-secondary" onclick="bypassWelcome()" style="margin-top: 12px; width: 100%;">
+          👁️ Explore Without LAU
+        </button>
       </div>
       <div class="welcome-help">
         <a href="#" onclick="showHelp('lau')">What's a LAU? ↗</a>
@@ -1815,20 +1818,7 @@
       'function transferFrom(address,address,uint256) returns (bool)',
     ];
 
-    const DYSNOMIA_BASE = [
-      'function maxSupply() view returns (uint256)',
-      'function Xiao() view returns (address)',
-      'function Type() view returns (string)',
-      'function MotzkinPrime() view returns (uint64)',
-      'function GetMarketRate(address) view returns (uint256)',
-      'function Purchase(address,uint256)',
-      'function Redeem(address,uint256)',
-      'function Rename(string,string)',
-      'function mintToCap()',
-      'function addOwner(address)',
-      'function removeOwner(address)',
-      'function isOwner(address) view returns (bool)',
-    ];
+    // DYSNOMIA_BASE is now defined in abis/all.js - removed duplicate to avoid conflict
 
     const TYPE_ABI = {
       LAU: [
@@ -2048,22 +2038,26 @@
     }
     
     function buildDysnomiaABI(type) {
-      let abi = [...ERC20_ABI, ...DYSNOMIA_BASE];
+      // Use DYSNOMIA_ABIS from all.js (includes base functions)
       const normalizedType = (type || '').toUpperCase();
       
       console.log(`buildDysnomiaABI: Looking for type "${normalizedType}"`);
       
-      // Check external DYSNOMIA_ABIS first (from abis/all.js)
+      // Check external DYSNOMIA_ABIS first (from abis/all.js) - these already include base functions
       if (window.DYSNOMIA_ABIS && window.DYSNOMIA_ABIS[normalizedType]) {
-        abi = [...abi, ...window.DYSNOMIA_ABIS[normalizedType]];
+        const abi = [...window.DYSNOMIA_ABIS[normalizedType]];
         log(`Built ABI for ${normalizedType}: ${abi.length} functions (external)`, 'success');
+        console.log(`buildDysnomiaABI: Final ABI has ${abi.length} functions`);
+        return abi;
       }
-      // Fall back to inline TYPE_ABI
-      else if (TYPE_ABI[normalizedType]) {
+      
+      // Fall back to inline TYPE_ABI + ERC20
+      let abi = [...ERC20_ABI];
+      if (TYPE_ABI[normalizedType]) {
         abi = [...abi, ...TYPE_ABI[normalizedType]];
         log(`Built ABI for ${normalizedType}: ${abi.length} functions`, 'success');
       } else {
-        log(`No specific ABI for "${normalizedType}" - using base`, 'warning');
+        log(`No specific ABI for "${normalizedType}" - using base ERC20`, 'warning');
       }
       
       console.log(`buildDysnomiaABI: Final ABI has ${abi.length} functions`);
@@ -2141,6 +2135,63 @@
     // ═══════════════════════════════════════════════════════════════════════════
     // IDENTITY LOADING
     // ═══════════════════════════════════════════════════════════════════════════
+    
+    // Bypass welcome screen - guest/explorer mode (no LAU required)
+    function bypassWelcome() {
+      log('Entering explorer mode (no LAU)', 'info');
+      
+      // Set guest identity
+      userIdentity.lau = {
+        address: null,
+        name: 'Guest Explorer',
+        contract: null
+      };
+      userIdentity.yue = { address: null, name: null, contract: null };
+      userIdentity.qing = { address: null, name: null, contract: null };
+      
+      // Update UI for guest mode
+      document.getElementById('lauName').textContent = 'Guest Explorer';
+      document.getElementById('lauPole').textContent = '--';
+      document.getElementById('lauSoul').textContent = '--';
+      document.getElementById('lauAura').textContent = '--';
+      
+      // Hide LAU address display
+      const lauAddrEl = document.getElementById('lauAddress');
+      if (lauAddrEl) lauAddrEl.style.display = 'none';
+      
+      // Switch to app view
+      document.getElementById('welcomeScreen').style.display = 'none';
+      document.getElementById('appContainer').classList.add('active');
+      
+      // Send guest welcome message
+      addAIMessage(`Welcome, Explorer! 👁️
+
+You're browsing in **guest mode** - no LAU loaded.
+
+**What you can do:**
+• Load and explore any contract by address
+• View contract functions and read data
+• Browse the QING map
+• Learn about Dysnomia
+
+**What requires a LAU:**
+• Sending transactions (write functions)
+• Joining territories
+• Chatting in QINGs
+
+Enter a contract address above to start exploring, or ask me anything about Dysnomia!`, 'assistant');
+      
+      log('Explorer mode active', 'success');
+    }
+    
+    // Load LAU later (from within guest mode)
+    function loadLauLater() {
+      const addr = prompt('Enter your LAU address:');
+      if (addr && ethers.isAddress(addr)) {
+        document.getElementById('lauInput').value = addr;
+        loadIdentity();
+      }
+    }
     
     async function loadIdentity() {
       const lauAddress = document.getElementById('lauInput').value.trim();
