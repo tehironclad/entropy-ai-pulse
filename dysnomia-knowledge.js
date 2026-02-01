@@ -213,15 +213,35 @@ flows: {
   5. YUE stores: Chan ref, Origin (wallet), Hypobar/Epibar mappings
   6. To retrieve: SEI.Chi() returns (YUE, LAU) for tx.origin`,
 
-  qingCreation: `QING TERRITORY CREATION:
-  1. Call MAP.New(integrativeAssetAddress) 
-  2. MAP calls CHO.Luo() to generate unique Waat coordinate
-     - Luo uses modExp with GUA constant to find unused coordinate
-  3. Creates new QING(Waat, assetAddr, CHO_address)
-  4. QING gets named after the asset (e.g., "AFFECTION QING")
-  5. Registered in MAP: _waats[Waat] = qing, _qings[asset] = qing
+  qingCreation: `QING TERRITORY CREATION (via MAP.New):
+  The function to create a QING is MAP.New(address Integrative).
+  MAP contract: 0xD3a7A95012Edd46Ea115c693B74c5e524b3DdA75
+
+  STEP BY STEP:
+  1. Choose any ERC-20 token to be the QING's "asset" (e.g., AFFECTION, any Dysnomia token)
+  2. Call MAP.New(tokenAddress) — this is the ONLY function that creates QINGs
+  3. NO PREREQUISITES — no YUE needed, no existing QING needed, just a LAU and wallet
+  3. MAP internally calls CHO.Luo() to generate a unique Waat coordinate via modExp with GUA constant
+  4. A new QING contract is deployed with that Waat and asset
+  5. QING auto-named: "[AssetName] QING" with symbol "q[AssetSymbol]"
   6. Mapped spatially via HECKE.Compliment(Waat) → (lat, lon)
-  7. GWAT determined by Waat % GwatDivisor == 0`,
+  7. GWAT flag set: if Waat % GwatDivisor == 0, GWAT=false (withdrawable), else true (locked)
+
+  RULES:
+  - One QING per asset token (can't create duplicates for same asset)
+  - Asset must NOT already be a QING itself (has Waat() function = rejected as "DerivativeQing")
+  - Asset must NOT be Forbidden on MAP
+  - If the asset has an owner() function, that owner gets added to the QING
+  - The caller becomes the initial staff member
+
+  DERIVATIVE QING (via GWAT.Gwat):
+  For creating QINGs derived from existing QINGs, use GWAT.Gwat(qingAddress, lin).
+  GWAT contract: 0xDaEBB2bc80009e776966e4B03bF9c33eF73E803C
+  - Requires having a YUE (calls SEI.Chi() internally)
+  - Creates new QING at a WAR.Faa-derived position
+  - Named "[Username]'s [Asset] GWAT"
+  - One GWAT per QING per YUE
+  - GWAT flag always true (locked)`,
 
   joining: `JOINING A QING:
   1. Call QING.Join(userTokenAddress) with your LAU address

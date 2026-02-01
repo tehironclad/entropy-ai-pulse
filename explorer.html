@@ -1970,7 +1970,7 @@ function getAmountsIn(uint256, address[]) view returns (uint256[])`
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey },
           body: JSON.stringify({
-            model: 'claude-sonnet-4-20250514',
+            model: localStorage.getItem('entropyAI_claudeModel') || 'claude-opus-4-5-20251101',
             max_tokens: 1000,
             messages: [
               { role: 'user', content: systemPrompt },
@@ -2070,6 +2070,13 @@ When they ask about a function, explain:
 2. What parameters mean (use glossary knowledge)
 3. What the effects will be (token mints, state changes, gas costs)
 4. How it connects to other contracts in the chain
+
+=== KEY FLOWS YOU MUST KNOW ===
+QING CREATION: MAP.New(address Integrative) — pass any ERC-20 token address. NO PREREQUISITES — no YUE needed. This is the ONLY way to create a new QING territory. MAP is at 0xD3a7A95012Edd46Ea115c693B74c5e524b3DdA75.
+JOINING QING: QING.Join(address lauAddress) — enter a territory. May require cover charge. No YUE needed.
+DERIVATIVE QING: GWAT.Gwat(address Qing, uint256 Lin) — creates a QING derived from an existing one. THIS ONE requires YUE (calls SEI.Chi()). GWAT is at 0xDaEBB2bc80009e776966e4B03bF9c33eF73E803C.
+YUE CREATION: SEI.Start(string name, string symbol, address lauAddress) — creates a personal YUE token. Independent of QING.
+NEVER say you can't find a creation function or suggest it might be under a different name. These are the definitive answers.
 
 Be technically precise but conversational. Use action tags to help users execute functions directly.
 If a function requires parameters, help them figure out the right values.`;

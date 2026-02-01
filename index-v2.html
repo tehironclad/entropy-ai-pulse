@@ -1547,6 +1547,14 @@
           <small style="color:var(--text-muted);font-size:11px;margin-top:4px;display:block;">Uses serverless API with full Dysnomia knowledge</small>
         </div>
         <div class="settings-section">
+          <h3>Claude Model</h3>
+          <select id="claudeModel" class="input">
+            <option value="claude-opus-4-5-20251101">Opus 4.5 (Most Intelligent)</option>
+            <option value="claude-sonnet-4-20250514">Sonnet 4 (Fast & Capable)</option>
+          </select>
+          <small style="color:var(--text-muted);font-size:11px;margin-top:4px;display:block;">Opus is smarter but costs ~5x more per message</small>
+        </div>
+        <div class="settings-section">
           <h3>OpenRouter API Key</h3>
           <input type="password" id="openrouterApiKey" class="input" placeholder="sk-or-...">
         </div>
@@ -2410,11 +2418,11 @@ Enter a contract address above to start exploring, or ask me anything about Dysn
         if (hasYue && hasQing) {
           nextStep = `You're fully set up! Let's terraform — I'll load AFFECTION so you can start computing new coordinates.`;
         } else if (hasYue && !hasQing) {
-          nextStep = `You have your YUE but haven't joined a territory yet. Let's find you a QING to enter.`;
+          nextStep = `You have your YUE but no territory yet. You can **create a new QING** with MAP.New(tokenAddress) or **join an existing one**. Ask me!`;
         } else if (!hasYue && hasQing) {
           nextStep = `You're in a QING but don't have a YUE token yet. Creating one will unlock rewards and territory coding.`;
         } else {
-          nextStep = `Next step: create your YUE token to unlock the full ecosystem.`;
+          nextStep = `You can **create or join a QING** territory anytime — no prerequisites needed! You'll also want a **YUE token** (via SEI.Start) to unlock rewards and coding. Ask me to walk you through either one.`;
         }
         
         // Send welcome message to AI
@@ -3252,7 +3260,7 @@ Common contracts:
           'x-api-key': apiKey
         },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
+          model: localStorage.getItem('entropyAI_claudeModel') || 'claude-opus-4-5-20251101',
           max_tokens: 1500,
           messages: messages
         })
@@ -3409,8 +3417,37 @@ READY TO PLAY (has LAU + YUE + QING — THIS USER'S CURRENT STATE):
 
 5. WHEN ASKED "what should I do next" or "what now", give ONE specific next action with the action tag ready to go. Don't give a menu of 5 options. Be decisive:
    - If they have LAU+YUE+QING: "Let's terraform! {{LOAD:AFFECTION}}"
-   - If they have LAU but no YUE: "Let's create your YUE. {{LOAD:SEI}}"
+   - If they have LAU but no YUE: "Let's create your YUE. {{LOAD:SEI}} — or we can create/join a QING first, that has no prerequisites."
+   - If they have LAU but no QING: "Let's get you into a territory. We can create one with MAP.New() or join an existing one — no YUE required."
+   - If they have LAU+YUE but no QING: Same as above.
    - If they just terraformed: "Nice! Let's check your new coordinates. {{READ:View()}}"
+
+6. QING CREATION - THIS IS CRITICAL. When someone asks how to get/create/make a QING:
+   
+   CREATING A NEW QING (via MAP contract):
+   - The function is MAP.New(address Integrative) where Integrative is any ERC-20 token address
+   - MAP is at ${KNOWN_CONTRACTS['MAP'] || '0xD3a7A95012Edd46Ea115c693B74c5e524b3DdA75'}
+   - NO PREREQUISITES — anyone can call MAP.New(). No YUE needed, no QING needed.
+   - The token becomes the QING's "asset" — used for cover charges, bouncer requirements, etc.
+   - MAP.New() calls CHO.Luo() internally to generate a unique Waat coordinate
+   - The QING gets auto-named: "[AssetName] QING" with symbol "q[AssetSymbol]"
+   - One QING per asset token — can't create duplicates
+   - The asset must NOT already be a QING (can't nest QINGs via MAP.New, that's what GWAT is for)
+   - Guide: {{LOAD:MAP}} → then {{WRITE:New(tokenAddress)}}
+   
+   JOINING AN EXISTING QING:
+   - Call QING.Join(lauAddress) on the specific QING contract
+   - May require cover charge payment in the QING's asset token
+   - NO YUE NEEDED to join. If not registered in CHO yet, Join() calls CHO.Enter() automatically.
+   - Guide: Load the QING contract → {{WRITE:Join(lauAddress)}}
+   
+   CREATING A DERIVATIVE QING (via GWAT):
+   - GWAT.Gwat(qingAddress, lin) spawns a new QING derived from an existing one
+   - THIS ONE requires a YUE (calls SEI.Chi() internally)
+   - Creates "[Username]'s [Asset] GWAT" 
+   - GWAT flag = true (locked, cannot withdraw)
+   
+   NEVER say "I don't see a creation function" or "the creation function might be under a different name". MAP.New() IS the function.
 
 6. BE CONCISE. Don't repeat information that's already visible in the sidebar or welcome message. The user can see their LAU name, QING name, and YUE name in the UI. Don't list them back.
 
@@ -3446,7 +3483,7 @@ When users ask about specific contracts, functions, or values, use your deep kno
           'anthropic-dangerous-direct-browser-access': 'true'
         },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
+          model: localStorage.getItem('entropyAI_claudeModel') || 'claude-opus-4-5-20251101',
           max_tokens: 1024,
           system: systemPrompt,
           messages: history.map(m => ({ role: m.role, content: m.content }))
@@ -3726,6 +3763,7 @@ When users ask about specific contracts, functions, or values, use your deep kno
     
     function loadSettings() {
       document.getElementById('aiProvider').value = localStorage.getItem('entropyAI_provider') || 'claude';
+      document.getElementById('claudeModel').value = localStorage.getItem('entropyAI_claudeModel') || 'claude-opus-4-5-20251101';
       document.getElementById('claudeApiKey').value = localStorage.getItem('entropyAI_claudeKey') || '';
       document.getElementById('openrouterApiKey').value = localStorage.getItem('entropyAI_openrouterKey') || '';
       document.getElementById('geminiApiKey').value = localStorage.getItem('entropyAI_geminiKey') || '';
@@ -3734,6 +3772,7 @@ When users ask about specific contracts, functions, or values, use your deep kno
     
     function saveSettings() {
       localStorage.setItem('entropyAI_provider', document.getElementById('aiProvider').value);
+      localStorage.setItem('entropyAI_claudeModel', document.getElementById('claudeModel').value);
       localStorage.setItem('entropyAI_claudeKey', document.getElementById('claudeApiKey').value);
       localStorage.setItem('entropyAI_openrouterKey', document.getElementById('openrouterApiKey').value);
       localStorage.setItem('entropyAI_geminiKey', document.getElementById('geminiApiKey').value);
