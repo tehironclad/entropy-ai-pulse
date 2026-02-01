@@ -553,6 +553,8 @@
       display: flex;
       flex-direction: column;
       height: calc(100vh - 64px);
+      min-width: 0;
+      overflow: hidden;
     }
 
     .ai-header {
@@ -605,6 +607,8 @@
 
     .message-content {
       word-wrap: break-word;
+      overflow-wrap: anywhere;
+      overflow: hidden;
     }
 
     .message-copy-btn {
@@ -839,6 +843,7 @@
       flex-direction: column;
       height: calc(100vh - 64px);
       overflow: hidden;
+      min-width: 0;
     }
 
     .contract-header {
@@ -1170,6 +1175,8 @@
       padding: 10px;
       color: var(--error);
       font-size: 12px;
+      overflow-wrap: anywhere;
+      overflow: hidden;
     }
 
     .result-label {
@@ -3057,6 +3064,37 @@ ${nextStep}`;
       conversationHistory.push({ role: 'assistant', content: loadMsg });
     }
     
+    // Clean up contract error messages - extract useful info, strip hex blobs
+    function cleanErrorMessage(msg) {
+      if (!msg) return 'Unknown error';
+      // Extract the action/reason part before the hex data
+      const actionMatch = msg.match(/execution reverted[^(]*/);
+      const reasonMatch = msg.match(/reason="([^"]+)"/);
+      const codeMatch = msg.match(/code=(\w+)/);
+      const customErr = msg.match(/error\s+(\w+)/i);
+      
+      if (reasonMatch) return `Reverted: ${reasonMatch[1]}`;
+      if (actionMatch) {
+        let clean = actionMatch[0].trim();
+        if (codeMatch) clean += ` (${codeMatch[1]})`;
+        return clean;
+      }
+      // For OwnableUnauthorizedAccount etc — decode the error selector
+      const selectorMatch = msg.match(/data="0x([a-f0-9]{8})/);
+      if (selectorMatch) {
+        const known = {
+          '0be6bab5': 'OwnableUnauthorizedAccount — you are not an owner of this contract',
+          '118cdaa7': 'OwnableInvalidOwner',
+          'e602df05': 'DysnomiaInsufficientAllowance',
+          'f4d678b8': 'DysnomiaInsufficientBalance',
+        };
+        const decoded = known[selectorMatch[1]];
+        if (decoded) return decoded;
+      }
+      // Fallback: truncate
+      return msg.length > 120 ? msg.slice(0, 120) + '...' : msg;
+    }
+    
     // AI action: Call a read function
     async function aiCallRead(functionCall) {
       if (!currentContract || !currentABI) {
@@ -3086,7 +3124,7 @@ ${nextStep}`;
         conversationHistory.push({ role: 'assistant', content: resultMsg });
         log(`${fnName} completed`, 'success');
       } catch (e) {
-        const errMsg = `⚠️ Error calling ${fnName}: ${e.message}`;
+        const errMsg = `⚠️ Error calling ${fnName}: ${cleanErrorMessage(e.message)}`;
         addAIMessage(errMsg, 'assistant');
         conversationHistory.push({ role: 'assistant', content: errMsg });
         log(`Error: ${e.message.slice(0, 50)}`, 'error');
@@ -3192,7 +3230,7 @@ ${nextStep}`;
         log(`${fnName} confirmed`, 'success');
       } catch (e) {
         console.error('Write error:', e);
-        const errMsg = `⚠️ Error executing ${fnName}: ${e.message}`;
+        const errMsg = `⚠️ Error executing ${fnName}: ${cleanErrorMessage(e.message)}`;
         addAIMessage(errMsg, 'assistant');
         conversationHistory.push({ role: 'assistant', content: errMsg });
         log(`Error: ${e.message.slice(0, 50)}`, 'error');
@@ -3528,9 +3566,18 @@ READY TO PLAY (has LAU + YUE + QING — THIS USER'S CURRENT STATE):
    
    NEVER say "I don't see a creation function" or "the creation function might be under a different name". MAP.New() IS the function.
 
-6. BE CONCISE. Don't repeat information that's already visible in the sidebar or welcome message. The user can see their LAU name, QING name, and YUE name in the UI. Don't list them back.
+7. SYSTEM CHAIN CONTRACTS ARE SINGLETONS. The core chain (VOID → SIU → YANG → YAU → ZHOU → ZHENG → YI) was deployed once at system initialization. Users CANNOT create new instances of these contracts.
+   - Nu() on VOID just READS the SIU address — it does NOT create a new SIU
+   - Psi() on SIU just READS the YANG address — it does NOT create a new YANG
+   - Mu() on YANG, Tau() on YAU, Upsilon() on ZHOU, Eta() on ZHENG — all READ functions returning existing addresses
+   - Miu() on SIU/VOID is an owner-only registration function — regular users will get OwnableUnauthorizedAccount
+   - NEVER suggest users call Miu(), Enter(), or other write functions on system chain contracts to "generate tokens" — they don't have permission
+   - If a user asks about interacting with system chain contracts, explain they are READ-ONLY for regular users
+   - The things users CAN create: LAU (via CHO.Enter), YUE (via SEI.Start), QING (via MAP.New), GWAT (via GWAT.Gwat)
 
-7. INTERPRET BLOCKCHAIN DATA intelligently:
+8. BE CONCISE. Don't repeat information that's already visible in the sidebar or welcome message. The user can see their LAU name, QING name, and YUE name in the UI. Don't list them back.
+
+9. INTERPRET BLOCKCHAIN DATA intelligently:
    - CurrentArea() = 0x0 → "Your LAU hasn't set a CurrentArea yet. This gets set when you interact with territories."
    - A Saat value like 345758206497486 → "Your Soul is 345758206497486 — this is your permanent identity in the Dysnomia coordinate space."
    - balanceOf returning 0 → explain what token they need and how to get it
