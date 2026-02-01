@@ -1826,7 +1826,7 @@ function getAmountsIn(uint256, address[]) view returns (uint256[])`
             result = `✅ Confirmed in block ${receipt.blockNumber}\nGas used: ${receipt.gasUsed.toString()}`;
           } catch (writeErr) {
             // If write fails, try as view call (public state variables missing view in ABI)
-            if (writeErr.code === 'UNSUPPORTED_OPERATION' || writeErr.message?.includes('cannot estimate gas')) {
+            if (writeErr.code === 'UNSUPPORTED_OPERATION' || writeErr.code === 'CALL_EXCEPTION' || writeErr.message?.includes('cannot estimate gas') || writeErr.message?.includes('missing revert data')) {
               try {
                 result = await currentContract[fn.name](...args);
                 outputBox.textContent = formatResult(result);

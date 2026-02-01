@@ -2911,8 +2911,8 @@ ${nextStep}`;
             `;
             setOutput(`${fn.name}() confirmed in block ${receipt.blockNumber}\nHash: ${tx.hash}`);
           } catch (writeErr) {
-            // If write fails with UNSUPPORTED_OPERATION or estimateGas, try as view call
-            if (writeErr.code === 'UNSUPPORTED_OPERATION' || writeErr.message?.includes('cannot estimate gas')) {
+            // If write fails, try as view call (handles mis-labeled view functions in ABI)
+            if (writeErr.code === 'UNSUPPORTED_OPERATION' || writeErr.code === 'CALL_EXCEPTION' || writeErr.message?.includes('cannot estimate gas') || writeErr.message?.includes('missing revert data')) {
               try {
                 result = await currentContract[fn.name](...args);
                 const formatted = formatResult(result);
