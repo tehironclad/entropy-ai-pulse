@@ -2862,35 +2862,76 @@ ${nextStep}`;
           setOutput(`${fn.name}() Result:\n\n${formatted}`);
         } else {
           if (!signer) {
-            resultDiv.innerHTML = '<div class="result-error">⚠️ Connect wallet first</div>';
-            log('Connect wallet for write functions', 'error');
-            return;
+            // No signer — try as a static/view call first (handles mis-labeled view functions)
+            try {
+              result = await currentContract[fn.name](...args);
+              const formatted = formatResult(result);
+              resultDiv.innerHTML = `
+                <div class="result-success">
+                  <div class="result-label">Result (read):</div>
+                  <div class="result-value">${formatted}</div>
+                  <button class="result-copy-btn" onclick="copyToClipboard('${formatted.replace(/'/g, "\\'")}')">📋 Copy</button>
+                </div>
+              `;
+              setOutput(`${fn.name}() Result:\n\n${formatted}`);
+              log(`${fn.name} completed (read fallback)`, 'success');
+              return;
+            } catch (readErr) {
+              // Genuinely needs a signer
+              resultDiv.innerHTML = '<div class="result-error">⚠️ Connect wallet first for write functions</div>';
+              log('Connect wallet for write functions', 'error');
+              return;
+            }
           }
           const contractWithSigner = currentContract.connect(signer);
           resultDiv.innerHTML = '<div class="result-loading">📤 Confirm in wallet...</div>';
-          const tx = await contractWithSigner[fn.name](...args);
-          resultDiv.innerHTML = `
-            <div class="result-pending">
-              <div class="result-label">Transaction Sent!</div>
-              <div class="result-hash" onclick="copyToClipboard('${tx.hash}')" title="Click to copy">
-                ${tx.hash.slice(0, 20)}...${tx.hash.slice(-8)} 📋
-              </div>
-              <div class="result-loading">Waiting for confirmation...</div>
-            </div>
-          `;
-          setOutput(`Transaction sent!\nHash: ${tx.hash}\n\nWaiting for confirmation...`);
           
-          const receipt = await tx.wait();
-          resultDiv.innerHTML = `
-            <div class="result-success">
-              <div class="result-label">✅ Confirmed in block ${receipt.blockNumber}</div>
-              <div class="result-hash" onclick="copyToClipboard('${tx.hash}')" title="Click to copy">
-                ${tx.hash.slice(0, 20)}...${tx.hash.slice(-8)} 📋
+          try {
+            const tx = await contractWithSigner[fn.name](...args);
+            resultDiv.innerHTML = `
+              <div class="result-pending">
+                <div class="result-label">Transaction Sent!</div>
+                <div class="result-hash" onclick="copyToClipboard('${tx.hash}')" title="Click to copy">
+                  ${tx.hash.slice(0, 20)}...${tx.hash.slice(-8)} 📋
+                </div>
+                <div class="result-loading">Waiting for confirmation...</div>
               </div>
-              <a href="https://scan.pulsechain.com/tx/${tx.hash}" target="_blank" class="result-link">View on PulseScan ↗</a>
-            </div>
-          `;
-          setOutput(`${fn.name}() confirmed in block ${receipt.blockNumber}\nHash: ${tx.hash}`);
+            `;
+            setOutput(`Transaction sent!\nHash: ${tx.hash}\n\nWaiting for confirmation...`);
+            
+            const receipt = await tx.wait();
+            resultDiv.innerHTML = `
+              <div class="result-success">
+                <div class="result-label">✅ Confirmed in block ${receipt.blockNumber}</div>
+                <div class="result-hash" onclick="copyToClipboard('${tx.hash}')" title="Click to copy">
+                  ${tx.hash.slice(0, 20)}...${tx.hash.slice(-8)} 📋
+                </div>
+                <a href="https://scan.pulsechain.com/tx/${tx.hash}" target="_blank" class="result-link">View on PulseScan ↗</a>
+              </div>
+            `;
+            setOutput(`${fn.name}() confirmed in block ${receipt.blockNumber}\nHash: ${tx.hash}`);
+          } catch (writeErr) {
+            // If write fails with UNSUPPORTED_OPERATION or estimateGas, try as view call
+            if (writeErr.code === 'UNSUPPORTED_OPERATION' || writeErr.message?.includes('cannot estimate gas')) {
+              try {
+                result = await currentContract[fn.name](...args);
+                const formatted = formatResult(result);
+                resultDiv.innerHTML = `
+                  <div class="result-success">
+                    <div class="result-label">Result (view):</div>
+                    <div class="result-value">${formatted}</div>
+                    <button class="result-copy-btn" onclick="copyToClipboard('${formatted.replace(/'/g, "\\'")}')">📋 Copy</button>
+                  </div>
+                `;
+                setOutput(`${fn.name}() Result:\n\n${formatted}`);
+                log(`${fn.name} completed (auto-detected as view)`, 'success');
+                return;
+              } catch (e2) {
+                throw writeErr; // Original error was more useful
+              }
+            }
+            throw writeErr;
+          }
         }
         log(`${fn.name} completed`, 'success');
       } catch (e) {

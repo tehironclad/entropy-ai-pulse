@@ -1808,14 +1808,35 @@ function getAmountsIn(uint256, address[]) view returns (uint256[])`
           result = await currentContract[fn.name](...args);
         } else {
           if (!signer) {
-            outputBox.textContent = '⚠️ Please connect wallet for write functions';
-            return;
+            // No signer — try as view call first (handles mis-labeled view functions)
+            try {
+              result = await currentContract[fn.name](...args);
+              outputBox.textContent = formatResult(result);
+              return;
+            } catch (readErr) {
+              outputBox.textContent = '⚠️ Please connect wallet for write functions';
+              return;
+            }
           }
           const contractWithSigner = currentContract.connect(signer);
-          const tx = await contractWithSigner[fn.name](...args);
-          outputBox.textContent = `Transaction sent!\nHash: ${tx.hash}\n\nWaiting for confirmation...`;
-          const receipt = await tx.wait();
-          result = `✅ Confirmed in block ${receipt.blockNumber}\nGas used: ${receipt.gasUsed.toString()}`;
+          try {
+            const tx = await contractWithSigner[fn.name](...args);
+            outputBox.textContent = `Transaction sent!\nHash: ${tx.hash}\n\nWaiting for confirmation...`;
+            const receipt = await tx.wait();
+            result = `✅ Confirmed in block ${receipt.blockNumber}\nGas used: ${receipt.gasUsed.toString()}`;
+          } catch (writeErr) {
+            // If write fails, try as view call (public state variables missing view in ABI)
+            if (writeErr.code === 'UNSUPPORTED_OPERATION' || writeErr.message?.includes('cannot estimate gas')) {
+              try {
+                result = await currentContract[fn.name](...args);
+                outputBox.textContent = formatResult(result);
+                return;
+              } catch (e2) {
+                throw writeErr;
+              }
+            }
+            throw writeErr;
+          }
         }
         
         outputBox.textContent = formatResult(result);
