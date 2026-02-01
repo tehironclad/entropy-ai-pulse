@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Entropy AI - Dysnomia Interface</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.9.0/ethers.umd.min.js"></script>
@@ -3476,9 +3477,9 @@ When users ask about specific contracts, functions, or values, use your deep kno
     function buildContext() {
       // Build function list for current contract
       let contractFunctions = null;
-      if (currentAddress && currentAbi) {
+      if (currentAddress && currentABI) {
         try {
-          const iface = new ethers.Interface(currentAbi);
+          const iface = new ethers.Interface(currentABI);
           contractFunctions = iface.fragments
             .filter(f => f.type === 'function')
             .map(f => ({
