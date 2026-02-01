@@ -2247,6 +2247,11 @@
         // Try to detect YUE now that wallet is connected
         if (userIdentity.lau.address) {
           await loadYueFromWallet();
+          // Save YUE to localStorage if found (shared with explorer)
+          if (userIdentity.yue && userIdentity.yue.address) {
+            localStorage.setItem('entropyAI_yue', userIdentity.yue.address);
+            localStorage.setItem('entropyAI_yueName', userIdentity.yue.name || '');
+          }
         }
         
       } catch (e) {

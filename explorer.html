@@ -1572,6 +1572,34 @@ function getAmountsIn(uint256, address[]) view returns (uint256[])`
         document.getElementById('connectBtn').textContent = 'Connected';
         document.getElementById('connectBtn').disabled = true;
         document.getElementById('disconnectBtn').style.display = 'inline-flex';
+        
+        // Try to detect YUE if not already in localStorage
+        if (!localStorage.getItem('entropyAI_yue')) {
+          try {
+            const chanAddress = KNOWN_CONTRACTS['CHAN'];
+            const chan = new ethers.Contract(chanAddress, [
+              'function Yan(address) view returns (address)',
+            ], provider);
+            const yueAddress = await chan.Yan(address);
+            if (yueAddress && yueAddress !== '0x0000000000000000000000000000000000000000') {
+              const yueContract = new ethers.Contract(yueAddress, [
+                'function name() view returns (string)',
+                'function symbol() view returns (string)',
+              ], provider);
+              let yueName = '';
+              try { yueName = await yueContract.name(); } catch {}
+              if (!yueName) try { yueName = await yueContract.symbol(); } catch {}
+              localStorage.setItem('entropyAI_yue', yueAddress);
+              localStorage.setItem('entropyAI_yueName', yueName || 'YUE');
+              document.getElementById('idYue').textContent = yueName || `${yueAddress.slice(0,6)}...`;
+              document.getElementById('idYue').dataset.address = yueAddress;
+              document.getElementById('idYue').title = yueAddress;
+              document.getElementById('identityBar').style.display = 'flex';
+            }
+          } catch (e) {
+            console.log('YUE detection:', e.message);
+          }
+        }
       } catch (e) {
         console.error('Wallet connection failed:', e);
       }
@@ -2033,17 +2061,45 @@ LAU: ${lauName ? lauName + ' (' + lauAddr + ')' : 'Not loaded (load in Entropy A
 YUE: ${yueName || 'Not created'}
 QING: ${qingName || 'Not joined'}
 
-=== ECOSYSTEM KNOWLEDGE ===
+=== ECOSYSTEM OVERVIEW ===
 ${K.overview || ''}
 
 === MATHEMATICAL FOUNDATION ===
 ${K.math || ''}
 
+=== DATA STRUCTURES ===
+${K.structures || ''}
+
 === CONTRACT HIERARCHY ===
 ${K.hierarchy || ''}
 
 === KEY FLOWS ===
-${K.flows ? Object.values(K.flows).join('\n\n') : ''}
+USER CREATION:
+${K.flows ? K.flows.userCreation : ''}
+
+YUE CREATION:
+${K.flows ? K.flows.yueCreation : ''}
+
+QING CREATION:
+${K.flows ? K.flows.qingCreation : ''}
+
+JOINING:
+${K.flows ? K.flows.joining : ''}
+
+TERRAFORMING:
+${K.flows ? K.flows.terraforming : ''}
+
+META BEAT:
+${K.flows ? K.flows.beat : ''}
+
+WORLD CODE:
+${K.flows ? K.flows.worldCode : ''}
+
+EXCHANGE:
+${K.flows ? K.flows.exchange : ''}
+
+=== NAMED CELESTIAL REACTORS ===
+${K.reactors || ''}
 
 === BOUNCER & ACCESS ===
 ${K.access || ''}
