@@ -4,7 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Entropy AI - Dysnomia Interface</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="favicon-48.png">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.9.0/ethers.umd.min.js"></script>
@@ -2398,21 +2401,36 @@ Enter a contract address above to start exploring, or ask me anything about Dysn
         // Load LAU into contract panel with FULL ABI
         loadContractIntoPanel(lauAddress, name, 'LAU', fullLauAbi);
         
+        // Build smart next step based on state
+        let nextStep = '';
+        const hasYue = userIdentity.yue && userIdentity.yue.name;
+        const hasQing = userIdentity.qing && userIdentity.qing.name;
+        
+        if (hasYue && hasQing) {
+          nextStep = `You're fully set up! Let's terraform — I'll load AFFECTION so you can start computing new coordinates.`;
+        } else if (hasYue && !hasQing) {
+          nextStep = `You have your YUE but haven't joined a territory yet. Let's find you a QING to enter.`;
+        } else if (!hasYue && hasQing) {
+          nextStep = `You're in a QING but don't have a YUE token yet. Creating one will unlock rewards and territory coding.`;
+        } else {
+          nextStep = `Next step: create your YUE token to unlock the full ecosystem.`;
+        }
+        
         // Send welcome message to AI
         let yueInfo = '';
-        if (userIdentity.yue && userIdentity.yue.name) {
+        if (hasYue) {
           yueInfo = `• **YUE Token**: ${userIdentity.yue.name}\n`;
         }
         
-        addAIMessage(`Welcome back, **${name}**! 🎉
+        const welcomeMsg = `Welcome back, **${name}**! 🎉
 
-I've loaded your identity. Here's what I found:
+I've loaded your identity:
+• **LAU**: ${name} — Soul ${soul}, Aura ${aura}
+${yueInfo}${hasQing ? `• **Territory**: ${userIdentity.qing.name}` : '• **Territory**: None yet'}
 
-• **LAU**: ${name}
-• **Coordinates**: Pole ${pole}, Soul ${soul}, Aura ${aura}
-${yueInfo}${userIdentity.qing.name ? `• **Current Territory**: ${userIdentity.qing.name}` : '• **Territory**: Not currently in a QING'}
-
-What would you like to do?`, 'assistant');
+${nextStep}`;
+        addAIMessage(welcomeMsg, 'assistant');
+        conversationHistory.push({ role: 'assistant', content: welcomeMsg });
         
         log(`Loaded: ${name}`, 'success');
         
@@ -2480,7 +2498,9 @@ What would you like to do?`, 'assistant');
         
         // Update AI welcome if already shown
         if (userIdentity.lau.name) {
-          addAIMessage(`🌐 Detected your YUE token: **${yueName || yueSymbol}** (${yueAddress.slice(0,8)}...)`, 'assistant');
+          const yueMsg = `🌐 Detected your YUE token: **${yueName || yueSymbol}** (${yueAddress.slice(0,8)}...)`;
+          addAIMessage(yueMsg, 'assistant');
+          conversationHistory.push({ role: 'assistant', content: yueMsg });
         }
         
       } catch (e) {
@@ -2943,6 +2963,10 @@ What would you like to do?`, 'assistant');
     async function aiLoadContract(nameOrAddress) {
       log(`AI loading ${nameOrAddress}...`, 'info');
       await loadContract(nameOrAddress);
+      // Tell the AI what contract is now loaded
+      const loadedName = document.getElementById('contractName')?.textContent || nameOrAddress;
+      const loadMsg = `📋 Loaded contract: **${loadedName}** (${currentAddress || nameOrAddress})`;
+      conversationHistory.push({ role: 'assistant', content: loadMsg });
     }
     
     // AI action: Call a read function
@@ -2969,10 +2993,14 @@ What would you like to do?`, 'assistant');
         const result = await currentContract[fnName](...args);
         const formatted = formatResult(result);
         setOutput(`${fnName}() Result:\n\n${formatted}`);
-        addAIMessage(`**${fnName}()** returned:\n\`\`\`\n${formatted}\n\`\`\``, 'assistant');
+        const resultMsg = `**${fnName}()** returned:\n\`\`\`\n${formatted}\n\`\`\``;
+        addAIMessage(resultMsg, 'assistant');
+        conversationHistory.push({ role: 'assistant', content: resultMsg });
         log(`${fnName} completed`, 'success');
       } catch (e) {
-        addAIMessage(`⚠️ Error calling ${fnName}: ${e.message}`, 'assistant');
+        const errMsg = `⚠️ Error calling ${fnName}: ${e.message}`;
+        addAIMessage(errMsg, 'assistant');
+        conversationHistory.push({ role: 'assistant', content: errMsg });
         log(`Error: ${e.message.slice(0, 50)}`, 'error');
       }
     }
@@ -3060,6 +3088,9 @@ What would you like to do?`, 'assistant');
         const receipt = await tx.wait();
         setOutput(`${fnName}() confirmed in block ${receipt.blockNumber}\nHash: ${tx.hash}`);
         
+        // Add to conversation history so AI knows the result
+        conversationHistory.push({ role: 'assistant', content: `✅ ${fnName}() confirmed in block ${receipt.blockNumber}. Transaction hash: ${tx.hash}` });
+        
         // Update the pending message to confirmed
         pendingMsg.innerHTML = `
           <div class="message-content">
@@ -3073,7 +3104,9 @@ What would you like to do?`, 'assistant');
         log(`${fnName} confirmed`, 'success');
       } catch (e) {
         console.error('Write error:', e);
-        addAIMessage(`⚠️ Error: ${e.message}`, 'assistant');
+        const errMsg = `⚠️ Error executing ${fnName}: ${e.message}`;
+        addAIMessage(errMsg, 'assistant');
+        conversationHistory.push({ role: 'assistant', content: errMsg });
         log(`Error: ${e.message.slice(0, 50)}`, 'error');
       }
     }
@@ -3305,6 +3338,12 @@ ${K.access || ''}
 
 === TOKEN ECONOMICS ===
 ${K.economics || ''}
+
+=== FOUR POWER TOKENS ===
+${K.powerTokens || ''}
+
+=== GAME STRATEGY & EXPANSION LOOPS ===
+${K.strategy || ''}
 ${qingContext}
 === ACTION TAGS - USE THESE TO EXECUTE BLOCKCHAIN ACTIONS ===
 
@@ -3339,10 +3378,46 @@ HAS LAU + YUE, NO QING:
   Show available territories, explain bouncer requirements
   Guide through QING.Join(lauAddress)
 
-READY TO PLAY:
-  Explain terraforming options (Alpha/Beta/Pi/Rho/Generate)
-  Explain WORLD.Code for territorial control
-  Explain META.Beat for the main game loop
+READY TO PLAY (has LAU + YUE + QING — THIS USER'S CURRENT STATE):
+  This user is FULLY SET UP. Do NOT suggest joining a QING — they are already in one.
+  Immediately guide them to ACTION:
+  1. Load AFFECTION and terraform: {{LOAD:AFFECTION}} then Alpha(seed), Beta(seed), Pi(), Rho(), Generate()
+  2. Check AFFECTION View() to see their current FAUNG coordinates
+  3. Use WORLD.Code() for territorial control
+  4. Use META.Beat() for the main game loop
+  5. Chat in their QING territory
+
+=== CRITICAL BEHAVIOR RULES ===
+
+1. READ THE CONVERSATION HISTORY. Function results appear in the chat as messages like "Username() returned: enteh" or "Saat() returned: 345758206497486". You CAN see these. Reference them directly. Analyze them.
+
+2. NEVER say "I don't see any results" if results ARE in the conversation history. Look carefully at the chat messages — results from {{READ}} calls are there.
+
+3. ANALYZE VALUES when you see them:
+   - CurrentArea() = 0x000...000 means the LAU has LEFT or never entered a territory. This is the zero address.
+   - Saat(0) = Pole, Saat(1) = Soul (unique ID), Saat(2) = Aura
+   - If Soul and Aura are non-zero, the user exists in the system
+   - Entropy values change every interaction
+   - Large uint256 values from View() are FAUNG coordinates
+
+4. USE THE CONTEXT at the top of this prompt. If it says:
+   - "LAU: enter teh" → the user HAS a LAU, don't ask them to create one
+   - "YUE: enteh" → the user HAS a YUE, don't suggest creating one  
+   - "QING: enter teh QING" → the user IS IN a QING, don't suggest joining one
+   - "Wallet: Connected" → the wallet is ready for write operations
+
+5. WHEN ASKED "what should I do next" or "what now", give ONE specific next action with the action tag ready to go. Don't give a menu of 5 options. Be decisive:
+   - If they have LAU+YUE+QING: "Let's terraform! {{LOAD:AFFECTION}}"
+   - If they have LAU but no YUE: "Let's create your YUE. {{LOAD:SEI}}"
+   - If they just terraformed: "Nice! Let's check your new coordinates. {{READ:View()}}"
+
+6. BE CONCISE. Don't repeat information that's already visible in the sidebar or welcome message. The user can see their LAU name, QING name, and YUE name in the UI. Don't list them back.
+
+7. INTERPRET BLOCKCHAIN DATA intelligently:
+   - CurrentArea() = 0x0 → "Your LAU hasn't set a CurrentArea yet. This gets set when you interact with territories."
+   - A Saat value like 345758206497486 → "Your Soul is 345758206497486 — this is your permanent identity in the Dysnomia coordinate space."
+   - balanceOf returning 0 → explain what token they need and how to get it
+   - An error about "Need Approved" → they need to approve the token first
 
 === YOUR PERSONALITY ===
 You are an expert Dysnomia guide who deeply understands the mathematical architecture. Be helpful, conversational, and technically precise. When showing coordinates or values, format them clearly. When explaining concepts, connect them to the mathematical foundations.
@@ -3355,7 +3430,7 @@ You understand that:
 - QING territories are both chat rooms and economic zones
 - Token minting through participation creates organic value distribution
 
-Be encouraging! Users are pioneers in an unprecedented mathematical space. Help them understand not just WHAT to do but WHY the math makes it interesting.
+Be DECISIVE and ACTION-ORIENTED. Don't overwhelm with options — pick the best next step and execute it. You're a guide leading someone through the system, not a reference manual.
 
 When users ask about specific contracts, functions, or values, use your deep knowledge of the Solidity source code to explain exactly what happens under the hood.`;
     }

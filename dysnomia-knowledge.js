@@ -18,6 +18,47 @@ math: `CORE OPERATION: Modular Exponentiation
   Implemented via Xiao.modExp() and Xiao.modExp64()
   This is the same math underlying RSA encryption and Diffie-Hellman key exchange.
 
+THE ATROPA MATH CHAIN (from firmware genesis):
+  The entire system derives from three primes and a chain of operations:
+
+  TRIAD (the three seeds):
+    m = 953,473                    (APOGEE - motion)
+    x = 954,114,361                (APEX - law)
+    b = 953,467,954,114,363        (MOTZKIN PRIME - the 27th Motzkin prime)
+
+  DERIVED CHAIN (each builds on the previous):
+    y = m ## x = 953,473,954,114,361                                    (SLOPE - concatenation of m and x)
+    s = m*x + b = 953,473,954,114,361                                   (DYSNOMIA)
+    l = m*s - 99 = 1,776,501,584,118,572,122,769                       (LOVE) [offset 99]
+    g = m*(m*y + b) - 49 = 866,814,341,819,618,935,572,122,819         (GAIN) [offset 49]
+    i = m*b + y - 211                                                    [offset 269] ~21 digits
+    o = s^2 - 257                                                        [offset 257] ~31 digits
+    q = i^2 - 116                                                        [offset 132] ~40 digits
+    t = o*g + q - 683                                                    [offset 693] ~55 digits
+    d = g*(g*s + o) - 110                                                [offset 110] ~67 digits
+    H = d + 110 - b - 187                                               [offset 187] ~67 digits
+    L = t^2 - 77^2 - 591                                                [offset 359] ~109 digits
+
+  Each value is verified prime. The [offset] is subtracted to maintain primality.
+  The chain grows from 6-digit primes to a 109-digit prime (L) through multiplication
+  and squaring operations — the same modular exponentiation the contracts use on-chain.
+
+  NOTE: DYSNOMIA (s) and SLOPE (y) produce the same number through different paths:
+  concatenating m||x gives the same value as m*x + b. This is NOT coincidence —
+  it's the fundamental identity the whole system is built on.
+
+HARDWARE LAYER:
+  The math chain runs on physical Heltec ESP32-S3 V4 LoRa devices.
+  - Radio frequency: 954,114,361 Hz (APEX prime)
+  - LoRa bandwidth: 2600
+  - Spreading factor: 15 (maximum range)
+  - The firmware implements modular exponentiation in C using a custom arbitrary-precision
+    math library (MathInt) with an entropic memory allocator (gemalloc) that fills
+    freed memory with random bytes instead of zeroing it.
+  - The device broadcasts at a prime number frequency, generating entropy from radio noise.
+  - Commands like :a generate random numbers from the radio, :n generates private keys,
+    and :s adjusts prime modifiers with automatic primality retuning.
+
 MOTZKIN PRIME: 953,467,954,114,363
   The fundamental modulus for all 64-bit operations. This is the 27th Motzkin prime.
   Used as the universal modulus in SHA.React() and most coordinate calculations.
@@ -435,6 +476,109 @@ REWARD TOKENS:
 AFFECTION is the primary gateway token - almost every contract accepts AFFECTION
 at a 1:1 market rate, making it the ecosystem's unit of account.`,
 
+// ─── FOUR POWER TOKENS ────────────────────────────────────────────────
+powerTokens: `THE FOUR POWER TOKENS control most major calculations in the system:
+
+ERIS (used in QI.React):
+  - QI.ReactSoul() and QI.ReactWaat() use Eris.balanceOf() / Entropy as base reaction values
+  - Controls the seed values that cascade through the entire reaction chain
+  - Named after the dwarf planet; Eris is the celestial discord that seeds all computation
+
+FOMALHAUTE (used in XIA.Charge):
+  - Acts as the MODULUS in XIA's modExp calculations: modExp(base, exp, Fomalhaute.balanceOf())
+  - A larger Fomalhaute balance = larger modulus = wider range of Charge outputs
+  - Named after the star Fomalhaut; it sets the boundary of the computational space
+
+FORNAX (used in XIE.Power):
+  - Omicron = Fornax.balanceOf(yourLAU) / yourEntropy
+  - Omega = Fornax.balanceOf(QING) / QING.Entropy
+  - Directly determines RANGE (Yeo) for WORLD.Code territorial expansion
+  - More Fornax on your LAU = Higher Omicron = Lower Chao = BIGGER range
+  - Named after the constellation; it's the furnace that powers expansion
+
+TETHYS (CHO token, used in ZI.Spin):
+  - Tethys.balanceOf() / Entropy feeds into ZI's Omega/Eta calculations
+  - Affects Spin outputs that cascade into PANG.Push and ultimately META.Beat
+  - Named after Saturn's moon; the sea that carries computational waves
+
+THE RANGE SYSTEM (Yeo - your expansion radius):
+  Yeo = Yeo / Chao
+  Chao = Yue.React(Phobos) / Omicron
+  Omicron = Fornax.balanceOf(your_LAU) / your_Entropy
+  → More Fornax on your LAU = Higher Omicron = Lower Chao = BIGGER Yeo range
+  → Range determines how far from a QING's position you can Code() and expand territory
+
+THE YUAN FORMULA (balance-weighted modulus):
+  Yuan(Currency) = Currency.balanceOf(your_wallet) × 1
+                 + Currency.balanceOf(your_LAU) × 10
+                 + Currency.balanceOf(your_YUE) × 40
+  Used as modulus in various calculations. Having tokens on your YUE is worth 40x
+  the same balance on your wallet. LAU balance is worth 10x. This incentivizes
+  keeping tokens in your ecosystem entities rather than raw wallets.`,
+
+// ─── GAME STRATEGY & LOOPS ────────────────────────────────────────────
+strategy: `THE GAME LOOP (expansion cycle):
+
+1. WORLD.Code(lat, lon, qing) — CLAIM TERRITORY
+   → Must be within Yeo distance of the QING's center position
+   → Earns VITUS tokens (capped at Meridians[13])
+   → Builds creator credits for the coder
+   → Range (Yeo) is determined by Fornax holdings
+
+2. WAR.Faa(qing, lin) — RESOURCE EXTRACTION
+   → Attacks a position on a QING's territory
+   → Compares Waat against _taan[Caude][Position]
+   → Mints H2O (water tokens) to your YUE on success
+   → CO2 added to global counter
+
+3. GWAT.Gwat(qing, lin) — SPAWN DERIVATIVE TERRITORY
+   → Calls WAR.Faa() internally to generate a new Luo position
+   → Creates new QING at the derived position
+   → Named "[YourUsername]'s [Asset] GWAT"
+   → GWAT tokens minted to you
+   → One GWAT per QING per YUE, but unlimited across different QINGs
+   → GWAT flag = true (funds locked, cannot withdraw)
+   → Each GWAT = new position = new range center for further expansion
+
+EXPANSION STRATEGY (exponential growth):
+  Your QING (position A)
+      ├── GWAT any QING in range → New position B
+      │       ├── GWAT from position B → New position C
+      │       │       └── Keep chaining...
+      │       └── GWAT another direction...
+      └── GWAT different QING → Expand other direction
+
+YUE TRADING THROUGH GWAT CHAINS:
+  Hong(SpendAsset, QingAsset, Amount) — BUY QING tokens with underlying asset
+  Hung(QingAsset, ReceiveAsset, Amount) — SELL QING tokens for underlying asset
+  
+  GetAssetRate() walks the GWAT chain:
+  → At each layer, multiplies rates together
+  → Applies dampening: if Mod < 777, divides by (777 - Mod) factor
+  → Rates can only increase (enforced by AddMarketRate)
+  → Capped at totalSupply / 777
+  → Deeper GWAT chains = compounding exchange rates
+  → It's nested derivative pricing — each GWAT layer adds a multiplier
+
+YUE AS ACCUMULATOR:
+  YUE.React(Qing) is called by game contracts during META.Beat
+  → Calls Chan.Xie().Power(waat) → returns (Charge, Omicron, Omega)
+  → Hypobar[Qing] += Omega (accumulates forever, never decreases)
+  → Epibar[Qing] += Omicron (accumulates forever, never decreases)
+  → Bar(Qing) reads out your accumulated power per territory
+  → Higher Fornax balance = faster Epibar growth (Omicron is Fornax-derived)
+
+THE REACTION CHAIN (how computation cascades):
+  CHO.React(Eta)
+    └── ReactShioRod(On.Shio, Entropy ^ Eta)
+          └── Shio.Rod().React(Theta, Channel)
+                └── SHA.React(Pi, Theta)
+                      ├── Eta = Pi^Channel mod Theta
+                      └── Kappa = Pi^Theta mod Channel
+  No direct balance dependency in the core reaction — it's pure math.
+  But the VALUES that feed into it come from balance-dependent computations
+  in QI, XIA, XIE, ZI, PANG which use the Four Power Tokens.`,
+
 // ─── GLOSSARY ───────────────────────────────────────────────────────────
 glossary: {
   'Waat': 'Unique coordinate identifier for a QING territory. Generated by CHO.Luo() using modExp with GUA constant.',
@@ -468,6 +612,17 @@ glossary: {
   'Miu': 'SIU.Miu() - creates new user (SHIO pair + Bao + Soul).',
   'Yuan': 'CHOA.Yuan() - denomination oracle value for a QING.',
   'Moment': 'RING.Moments[Soul] - the Iota value stored per user during Ring.Eta().',
+  'APOGEE': 'First prime in the Atropa triad: 953,473. Represents motion. Variable m in the math chain.',
+  'APEX': 'Second prime in the Atropa triad: 954,114,361. Represents law. Variable x. Also the LoRa radio frequency in Hz.',
+  'Triad': 'The three seed primes (APOGEE, APEX, MotzkinPrime) from which all Dysnomia constants derive.',
+  'Eris': 'Power token. Controls base reaction values in QI. Named after the dwarf planet.',
+  'Fomalhaute': 'Power token. Acts as modulus in XIA.Charge. Larger balance = wider computational space.',
+  'Fornax': 'Power token. Determines Omicron in XIE.Power and thus range (Yeo) for territorial expansion.',
+  'Tethys': 'CHO token. Feeds into ZI.Spin calculations. Named after Saturn\'s moon.',
+  'Yeo': 'Range value. Determines how far from a QING center you can Code(). Derived from Fornax holdings.',
+  'Yuan': 'Balance-weighted value: wallet×1 + LAU×10 + YUE×40. Used as modulus in calculations.',
+  'Gwat': 'Derivative QING territory spawned via GWAT.Gwat(). Creates new position for further expansion.',
+  'Iota': 'H2O reward amount from WAR.Faa(). Derived from power token calculations.',
 }
 };
 
